@@ -1,0 +1,21 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Konto ist bereits konfiguriert",
+            "already_in_progress": "Konfigurationsfluss ist bereits im Gange",
+            "authorize_url_timeout": "Zeitüberschreitung beim Generieren der Autorisierungs-URL.",
+            "missing_configuration": "Die Komponente ist nicht konfiguriert. Bitte folgen Sie der Dokumentation.",
+            "no_url_available": "Keine URL verfügbar. Informationen zu diesem Fehler finden Sie im [Hilfeabschnitt]({docs_url})",
+            "oauth_error": "Ungültige Tokendaten empfangen.",
+            "user_rejected_authorize": "Kontoverknüpfung abgelehnt: {error}"
+        },
+        "create_entry": {
+            "default": "Erfolgreich authentifiziert"
+        },
+        "step": {
+            "pick_implementation": {
+                "title": "Wählen Sie die Authentifizierungsmethode"
+            }
+        }
+    }
+}
