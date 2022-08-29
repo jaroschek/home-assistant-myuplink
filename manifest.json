@@ -2,7 +2,8 @@
   "domain": "myuplink",
   "name": "myUplink",
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/myuplink",
+  "documentation": "https://github.com/jaroschek/home-assistant-myuplink",
+  "issue_tracker": "https://github.com/jaroschek/home-assistant-myuplink/issues",
   "requirements": [],
   "ssdp": [],
   "zeroconf": [],
@@ -13,5 +14,6 @@
   "codeowners": [
     "@jaroschek"
   ],
-  "iot_class": "cloud_polling"
+  "iot_class": "cloud_polling",
+  "version": "22.08.29"
 }
