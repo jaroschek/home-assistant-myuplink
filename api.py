@@ -1,10 +1,17 @@
 """API for myUplink bound to Home Assistant OAuth."""
+from __future__ import annotations
+
+import asyncio
+import logging
 
 from aiohttp import ClientSession, ClientResponse
+from datetime import datetime, timedelta
 
 from homeassistant.helpers import config_entry_oauth2_flow
 
 from .const import API_HOST, API_VERSION
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class AsyncConfigEntryAuth:
@@ -200,10 +207,10 @@ class Zone:
 class Device:
     """Class that represents a device object in the myUplink API."""
 
-    def __init__(self, raw_data: dict, auth: AsyncConfigEntryAuth) -> None:
+    def __init__(self, raw_data: dict, api: MyUplink) -> None:
         """Initialize a device object."""
         self.raw_data = raw_data
-        self.auth = auth
+        self.api = api
         self.parameters = []
         self.zones = []
 
@@ -245,22 +252,17 @@ class Device:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        resp = await self.auth.request("get", f"devices/{self.id}/points")
-        resp.raise_for_status()
-        self.parameters = [Parameter(parameter) for parameter in await resp.json()]
-
-        resp = await self.auth.request("get", f"devices/{self.id}/smart-home-zones")
-        resp.raise_for_status()
-        self.zones = [Zone(zone) for zone in await resp.json()]
+        self.parameters = await self.api.get_parameters(self.id)
+        self.zones = await self.api.get_zones(self.id)
 
 
 class System:
     """Class that represents a system object in the myUplink API."""
 
-    def __init__(self, raw_data: dict, auth: AsyncConfigEntryAuth) -> None:
+    def __init__(self, raw_data: dict, api: MyUplink) -> None:
         """Initialize a system object."""
         self.raw_data = raw_data
-        self.auth = auth
+        self.api = api
         self.devices = []
 
     @property
@@ -286,9 +288,31 @@ class System:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         for device_data in self.raw_data["devices"]:
-            device = Device(device_data, self.auth)
+            device = Device(device_data, self.api)
             await device.async_fetch_data()
             self.devices.append(device)
+
+
+class Throttle:
+    """Throttling requests to API."""
+
+    def __init__(self, delay):
+        """Initialize throttle"""
+        self._delay = delay
+        self._timestamp = datetime.now()
+
+    async def __aenter__(self):
+        """Enter async throttle"""
+        timestamp = datetime.now()
+        delay = (self._timestamp - timestamp).total_seconds()
+        if delay > 0:
+            _LOGGER.debug("Delaying request by %s seconds due to throttle", delay)
+            await asyncio.sleep(delay)
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Exit async throttle"""
+        self._timestamp = datetime.now() + self._delay
 
 
 class MyUplink:
@@ -297,17 +321,42 @@ class MyUplink:
     def __init__(self, auth: AsyncConfigEntryAuth) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
+        self.lock = asyncio.Lock()
+        self.throttle = Throttle(timedelta(seconds=5))
 
     async def get_systems(self) -> list[System]:
-        """Return the systems."""
-        resp = await self.auth.request("get", "systems/me")
+        """Return all systems."""
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", "systems/me")
         resp.raise_for_status()
         data = await resp.json()
 
         systems = []
         for system_data in data["systems"]:
-            system = System(system_data, self.auth)
+            system = System(system_data, self)
             await system.async_fetch_data()
             systems.append(system)
-
         return systems
+
+    async def get_device(self, device_id) -> Device:
+        """Return a device by id."""
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", f"devices/{device_id}")
+        resp.raise_for_status()
+        return resp.json()
+
+    async def get_parameters(self, device_id) -> list[Parameter]:
+        """Return all parameters for a device."""
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", f"devices/{device_id}/points")
+        resp.raise_for_status()
+        return [Parameter(parameter) for parameter in await resp.json()]
+
+    async def get_zones(self, device_id) -> list[Zone]:
+        """Return all smart home zones for a device."""
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "get", f"devices/{device_id}/smart-home-zones"
+            )
+        resp.raise_for_status()
+        return [Zone(zone) for zone in await resp.json()]

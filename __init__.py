@@ -50,7 +50,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def async_update_data():
         try:
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(30):
                 return await api.get_systems()
         except aiohttp.client_exceptions.ClientResponseError as err:
             raise UpdateFailed(f"Wrong credentials: {err}") from err
@@ -62,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER,
         name="myUplink",
         update_method=async_update_data,
-        update_interval=timedelta(seconds=300),
+        update_interval=timedelta(seconds=60),
     )
     await coordinator.async_config_entry_first_refresh()
 
