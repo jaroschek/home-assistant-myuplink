@@ -343,7 +343,7 @@ class MyUplink:
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
-        return resp.json()
+        return Device(resp.json(), self)
 
     async def get_parameters(self, device_id) -> list[Parameter]:
         """Return all parameters for a device."""
