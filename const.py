@@ -18,3 +18,5 @@ API_VERSION = "v2"
 PLATFORMS = [
     Platform.SENSOR,
 ]
+
+DEGREE_MINUTES = "DM"

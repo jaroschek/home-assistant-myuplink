@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import Device, Parameter
-from .const import DOMAIN
+from .const import DOMAIN, DEGREE_MINUTES
 from .entity import MyUplinkEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,9 +51,11 @@ class MyUplinkParameterSensorEntity(MyUplinkEntity, SensorEntity):
         self._attr_name = f"{self._device.name} {self._parameter.name}"
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"
         self._attr_native_value = self._parameter.value
+        self._attr_native_unit_of_measurement = self._parameter.unit
         if self._parameter.unit == TEMP_CELSIUS:
             self._attr_device_class = SensorDeviceClass.TEMPERATURE
-            self._attr_native_unit_of_measurement = TEMP_CELSIUS
+        elif self._parameter.unit == DEGREE_MINUTES:
+            self._attr_device_class = "degree_minutes"
 
     @callback
     def _handle_coordinator_update(self) -> None:
