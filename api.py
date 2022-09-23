@@ -68,7 +68,7 @@ class Parameter:
     @property
     def id(self) -> int:
         """Return the ID of the parameter."""
-        return self.raw_data["parameterId"]
+        return int(self.raw_data["parameterId"])
 
     @property
     def name(self) -> str:

@@ -15,8 +15,8 @@ SCOPES = [
 API_HOST = "https://api.myuplink.com"
 API_VERSION = "v2"
 
-PLATFORMS = [
-    Platform.SENSOR,
-]
+PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
+
+BINARY_SENSORS = [10733]
 
 DEGREE_MINUTES = "DM"

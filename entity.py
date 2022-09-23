@@ -8,7 +8,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .api import Device
+from .api import Device, Parameter
 from .const import DOMAIN
 
 
@@ -54,5 +54,35 @@ class MyUplinkEntity(CoordinatorEntity):
             for device in system.devices:
                 if device.id == self._device.id:
                     self._update_from_device(device)
+
+        super().async_write_ha_state()
+
+
+class MyUplinkParameterEntity(MyUplinkEntity):
+    """Representation of a myUplink parameter entity."""
+
+    def __init__(
+        self, coordinator: DataUpdateCoordinator, device: Device, parameter: Parameter
+    ) -> None:
+        """Initialize a myUplink parameter entity."""
+        super().__init__(coordinator, device)
+        self._update_from_parameter(parameter)
+
+    def _update_from_parameter(self, parameter: Parameter) -> None:
+        """Update attrs from parameter."""
+        self._parameter = parameter
+        self._attr_name = f"{self._device.name} {self._parameter.name}"
+        self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        for system in self.coordinator.data:
+            for device in system.devices:
+                if device.id == self._device.id:
+                    super()._update_from_device(device)
+                    for parameter in device.parameters:
+                        if parameter.id == self._parameter.id:
+                            self._update_from_parameter(parameter)
 
         super().async_write_ha_state()
