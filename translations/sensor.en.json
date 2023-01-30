@@ -1,0 +1,40 @@
+{
+  "state": {
+    "myuplink__1965": {
+      "20": "Off",
+      "40": "Starting",
+      "60": "On",
+      "100": "Stopping",
+      "120": "Defrost­ing",
+      "140": "Defrost­ing",
+      "160": "Defrost­ing"
+    },
+    "myuplink__14950": {
+      "0": "Off",
+      "1": "Heating",
+      "2": "Cooling",
+      "3": "Hot water",
+      "4": "Pool",
+      "5": "Pool 2",
+      "6": "Pre­heating"
+    },
+    "myuplink__55000": {
+      "10": "Off",
+      "20": "Hot water",
+      "30": "Heating",
+      "40": "Pool",
+      "41": "Pool 2",
+      "50": "Transfer",
+      "60": "Cooling"
+    },
+    "myuplink__55027": {
+      "0": "Alarm",
+      "1": "Alarm",
+      "2": "Active",
+      "3": "Off",
+      "4": "Blocked",
+      "5": "Off",
+      "6": "Active"
+    }
+  }
+}

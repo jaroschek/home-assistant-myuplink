@@ -1,21 +1,69 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Konto ist bereits konfiguriert",
-            "already_in_progress": "Konfigurationsfluss ist bereits im Gange",
-            "authorize_url_timeout": "Zeitüberschreitung beim Generieren der Autorisierungs-URL.",
-            "missing_configuration": "Die Komponente ist nicht konfiguriert. Bitte folgen Sie der Dokumentation.",
-            "no_url_available": "Keine URL verfügbar. Informationen zu diesem Fehler finden Sie im [Hilfeabschnitt]({docs_url})",
-            "oauth_error": "Ungültige Tokendaten empfangen.",
-            "user_rejected_authorize": "Kontoverknüpfung abgelehnt: {error}"
-        },
-        "create_entry": {
-            "default": "Erfolgreich authentifiziert"
-        },
-        "step": {
-            "pick_implementation": {
-                "title": "Wählen Sie die Authentifizierungsmethode"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Konto ist bereits konfiguriert",
+      "already_in_progress": "Konfigurationsfluss ist bereits im Gange",
+      "authorize_url_timeout": "Zeitüberschreitung beim Generieren der Autorisierungs-URL.",
+      "missing_configuration": "Die Komponente ist nicht konfiguriert. Bitte folgen Sie der Dokumentation.",
+      "no_url_available": "Keine URL verfügbar. Informationen zu diesem Fehler finden Sie im [Hilfeabschnitt]({docs_url})",
+      "oauth_error": "Ungültige Tokendaten empfangen.",
+      "user_rejected_authorize": "Kontoverknüpfung abgelehnt: {error}"
+    },
+    "create_entry": {
+      "default": "Erfolgreich authentifiziert"
+    },
+    "step": {
+      "pick_implementation": {
+        "title": "Wählen Sie die Authentifizierungsmethode"
+      }
     }
+  },
+  "entity": {
+    "sensor": {
+      "1965": {
+        "state": {
+          "20": "Aus",
+          "40": "Startet",
+          "60": "Ein",
+          "100": "Stoppt",
+          "120": "Ent­eisung wird durch­geführt",
+          "140": "Ent­eisung wird durch­geführt",
+          "160": "Ent­eisung wird durch­geführt"
+        }
+      },
+      "14950": {
+        "state": {
+          "0": "Aus",
+          "1": "Heizung",
+          "2": "Kühlung",
+          "3": "Brauchwasser",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Vor­wärmung"
+        }
+      },
+      "55000": {
+        "state": {
+          "10": "Aus",
+          "20": "Brauchwasser",
+          "30": "Heizung",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Transfer",
+          "60": "Kühlung"
+        }
+      },
+      "55027": {
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Aktiv",
+          "3": "Aus",
+          "4": "Blockiert",
+          "5": "Aus",
+          "6": "Aktiv"
+        }
+      }
+    }
+  }
 }
