@@ -11,5 +11,5 @@
   "dependencies": ["application_credentials"],
   "codeowners": ["@jaroschek"],
   "iot_class": "cloud_polling",
-  "version": "22.09.23"
+  "version": "23.01.30"
 }
