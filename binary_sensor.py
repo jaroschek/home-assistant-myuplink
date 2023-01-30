@@ -45,5 +45,10 @@ class MyUplinkParameterBinarySensorEntity(MyUplinkParameterEntity, BinarySensorE
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        self._attr_is_on = not bool(int(self._parameter.value))
-        self._attr_device_class = BinarySensorDeviceClass.LOCK
+        self._attr_is_on = bool(int(self._parameter.value))
+
+        if self._parameter.id == 10733:
+            self._attr_is_on = not bool(int(self._parameter.value))
+            self._attr_device_class = BinarySensorDeviceClass.LOCK
+        elif self._parameter.id in (10905, 10906):
+            self._attr_device_class = BinarySensorDeviceClass.RUNNING

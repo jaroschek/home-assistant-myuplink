@@ -17,5 +17,53 @@
     "create_entry": {
       "default": "[%key:common::config_flow::create_entry::authenticated%]"
     }
+  },
+  "entity": {
+    "sensor": {
+      "1965": {
+        "state": {
+          "20": "Off",
+          "40": "Starting",
+          "60": "On",
+          "100": "Stopping",
+          "120": "Defrost­ing",
+          "140": "Defrost­ing",
+          "160": "Defrost­ing"
+        }
+      },
+      "14950": {
+        "state": {
+          "0": "Off",
+          "1": "Heating",
+          "2": "Cooling",
+          "3": "Hot water",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Pre­heating"
+        }
+      },
+      "55000": {
+        "state": {
+          "10": "Off",
+          "20": "Hot water",
+          "30": "Heating",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Transfer",
+          "60": "Cooling"
+        }
+      },
+      "55027": {
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Active",
+          "3": "Off",
+          "4": "Blocked",
+          "5": "Off",
+          "6": "Active"
+        }
+      }
+    }
   }
 }

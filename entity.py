@@ -71,7 +71,12 @@ class MyUplinkParameterEntity(MyUplinkEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         self._parameter = parameter
-        self._attr_name = f"{self._device.name} {self._parameter.name}"
+        if self._device.name == self._parameter.category:
+            self._attr_name = f"{self._device.name} {self._parameter.name}"
+        else:
+            self._attr_name = (
+                f"{self._device.name} {self._parameter.category} {self._parameter.name}"
+            )
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"
 
     @callback
