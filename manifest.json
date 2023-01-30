@@ -8,12 +8,8 @@
   "ssdp": [],
   "zeroconf": [],
   "homekit": {},
-  "dependencies": [
-    "application_credentials"
-  ],
-  "codeowners": [
-    "@jaroschek"
-  ],
+  "dependencies": ["application_credentials"],
+  "codeowners": ["@jaroschek"],
   "iot_class": "cloud_polling",
   "version": "22.09.23"
 }
