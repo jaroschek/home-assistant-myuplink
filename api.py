@@ -116,7 +116,7 @@ class Parameter:
         return self.raw_data["maxVal"]
 
     @property
-    def enum_values(self) -> list[str]:
+    def enum_values(self) -> list[dict]:
         """Return the enum values of the parameter."""
         return self.raw_data["enumValues"]
 
