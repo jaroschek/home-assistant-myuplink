@@ -15,8 +15,9 @@ You can also add the integration manually by copying `custom_components/myuplink
 ### Configuration
 
 To use this integration, you need to make an application at [dev.myuplink.com](https://dev.myuplink.com/).  
-_Remember to set a valid Callback Url. It might be easiest to use `https://my.home-assistant.io/redirect/oauth`. You have to make a new application in order to change it._
+Remember to set a valid Callback Url. It might be the easiest to use `https://my.home-assistant.io/redirect/oauth`.
+_Note: You cannot edit the Callback Url after the application has been created, even though the GUI makes you think so. Create a new one if you want to change it._
 
-Start the myUplink integration setup and copy the Client Identifier and Client Secret into the OAuth text fields.
+Start the myUplink integration setup and copy the Client Identifier and Client Secret from your myUplink-application into the OAuth text fields.
 
-Approve access via OAuth pop-up and you should be good to go!
+Next, approve access via the OAuth pop-up and you should be good to go!
