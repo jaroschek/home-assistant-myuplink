@@ -1,0 +1,69 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Konto er allerede konfigurert",
+      "already_in_progress": "Konfigurasjonsprosess er allerede i gang",
+      "authorize_url_timeout": "Tidsavbrudd mens autorisasjons-URL ble generert.",
+      "missing_configuration": "Komponenten er ikke konfigurert. Vennligst følg dokumentasjonen.",
+      "no_url_available": "Ingen URL tilgjengelig. For mer informasjon rundt denne feilen, [sjekk hjelp-delen]({docs_url})",
+      "oauth_error": "Mottok ugyldig nøkkeldata.",
+      "user_rejected_authorize": "Kontotilkobling avvist: {error}"
+    },
+    "create_entry": {
+      "default": "Autentisering vellykket"
+    },
+    "step": {
+      "pick_implementation": {
+        "title": "Velg metode for autentisering"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "1965": {
+        "state": {
+          "20": "Av",
+          "40": "Starter",
+          "60": "På",
+          "100": "Stopper",
+          "120": "Avrimer",
+          "140": "Avrimer",
+          "160": "Avrimer"
+        }
+      },
+      "14950": {
+        "state": {
+          "0": "Av",
+          "1": "Varmer",
+          "2": "Avkjøler",
+          "3": "Varmtvann",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Forvarmer"
+        }
+      },
+      "55000": {
+        "state": {
+          "10": "Av",
+          "20": "Varmtvann",
+          "30": "Varmer",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Overfør",
+          "60": "Avkjøler"
+        }
+      },
+      "55027": {
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Aktiv",
+          "3": "Av",
+          "4": "Blokkert",
+          "5": "Av",
+          "6": "Aktiv"
+        }
+      }
+    }
+  }
+}
