@@ -7,6 +7,8 @@ The easiest way to install this component is using HACS.
 
 Open HACS > Integrations. Click the three dots top right, and select custom repos. Paste the link to this repo and select "Integration" as category.
 
+![example view](example-device-view.png)
+
 ### Configuration
 
 To use this integration, you need to make an application at [dev.myuplink.com](https://dev.myuplink.com/).  
