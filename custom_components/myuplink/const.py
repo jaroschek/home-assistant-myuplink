@@ -29,3 +29,7 @@ class CustomUnits(StrEnum):
     DEGREE_MINUTES = "DM"
     POWER_WS = "Ws"
     VOLUME_LM = "l/m"
+    TIME_DAY = "day"
+    TIME_DAYS = "days"
+    TIME_HOUR = "hour"
+    TIME_HOURS = "hours"
