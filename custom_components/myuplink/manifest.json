@@ -1,15 +1,15 @@
 {
   "domain": "myuplink",
   "name": "myUplink",
+  "codeowners": ["@jaroschek"],
   "config_flow": true,
+  "dependencies": ["application_credentials"],
   "documentation": "https://github.com/jaroschek/home-assistant-myuplink",
+  "homekit": {},
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/jaroschek/home-assistant-myuplink/issues",
   "requirements": [],
   "ssdp": [],
-  "zeroconf": [],
-  "homekit": {},
-  "dependencies": ["application_credentials"],
-  "codeowners": ["@jaroschek"],
-  "iot_class": "cloud_polling",
-  "version": "23.01.30"
+  "version": "23.02.27",
+  "zeroconf": []
 }

@@ -9,7 +9,13 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower, UnitOfTemperature
+from homeassistant.const import (
+    PERCENTAGE,
+    UnitOfEnergy,
+    UnitOfPower,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -65,6 +71,15 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_state_class = SensorStateClass.TOTAL_INCREASING
             elif self._parameter.unit in (UnitOfPower.KILO_WATT, UnitOfPower.WATT):
                 self._attr_device_class = SensorDeviceClass.POWER
+            elif self._parameter.unit in (
+                UnitOfTime.DAYS,
+                UnitOfTime.HOURS,
+                CustomUnits.TIME_DAY,
+                CustomUnits.TIME_DAYS,
+                CustomUnits.TIME_HOUR,
+                CustomUnits.TIME_HOURS,
+            ):
+                self._attr_device_class = SensorDeviceClass.DURATION
             elif self._parameter.unit == CustomUnits.POWER_WS:
                 self._attr_device_class = SensorDeviceClass.POWER
                 self._attr_native_unit_of_measurement = UnitOfPower.WATT
