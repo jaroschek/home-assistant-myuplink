@@ -1,0 +1,40 @@
+{
+  "state": {
+    "myuplink__1965": {
+      "20": "Av",
+      "40": "Starter",
+      "60": "På",
+      "100": "Stopper",
+      "120": "Avriming",
+      "140": "Avriming",
+      "160": "Avriming"
+    },
+    "myuplink__14950": {
+      "0": "Av",
+      "1": "Varmer",
+      "2": "Avkjøler",
+      "3": "Varmtvann",
+      "4": "Pool",
+      "5": "Pool 2",
+      "6": "Forvarmer"
+    },
+    "myuplink__55000": {
+      "10": "Av",
+      "20": "Varmtvann",
+      "30": "Varmer",
+      "40": "Pool",
+      "41": "Pool 2",
+      "50": "Øverføring",
+      "60": "Avkjøling"
+    },
+    "myuplink__55027": {
+      "0": "Alarm",
+      "1": "Alarm",
+      "2": "Aktiv",
+      "3": "Av",
+      "4": "Blokkert",
+      "5": "Av",
+      "6": "Aktiv"
+    }
+  }
+}
