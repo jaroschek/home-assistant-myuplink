@@ -25,10 +25,13 @@ class MyUplinkEntity(CoordinatorEntity):
     def device_info(self):
         """Return the device_info of the device."""
         name_data = self._device.name.split()
-        name_data.reverse()
-        manufacturer = name_data.pop()
-        name_data.reverse()
-        model = " ".join(name_data)
+        manufacturer = None
+        model = name_data[0]
+        if len(name_data) > 1:
+            name_data.reverse()
+            manufacturer = name_data.pop()
+            name_data.reverse()
+            model = " ".join(name_data)
         return DeviceInfo(
             identifiers={(DOMAIN, self._device.id)},
             manufacturer=manufacturer,
