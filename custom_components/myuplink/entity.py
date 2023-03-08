@@ -28,9 +28,9 @@ class MyUplinkEntity(CoordinatorEntity):
         model = name_data[0]
         manufacturer = None
         if len(name_data) > 1:
-            # Assumes last word in raw name is manufacturer
-            model = " ".join(name_data[:-1])
-            manufacturer = name_data[-1]
+            # Assumes first word in raw name is manufacturer
+            model = " ".join(name_data[1:])
+            manufacturer = name_data[0]
         return DeviceInfo(
             identifiers={(DOMAIN, self._device.id)},
             manufacturer=manufacturer,
