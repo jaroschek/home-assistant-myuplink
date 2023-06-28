@@ -32,7 +32,7 @@ async def async_setup_entry(
 
     for system in coordinator.data:
         for device in system.devices:
-            if device.serial_number in WATER_HEATERS:
+            if device.name[:7] in WATER_HEATERS:
                 entities.append(MyUplinkWaterHeaterEntity(coordinator, device))
 
     async_add_entities(entities)

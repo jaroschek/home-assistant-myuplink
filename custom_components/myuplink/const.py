@@ -18,10 +18,39 @@ SCOPES = [
 API_HOST = "https://api.myuplink.com"
 API_VERSION = "v2"
 
-PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR, Platform.WATER_HEATER]
+PLATFORMS = [
+    Platform.SENSOR,
+    Platform.BINARY_SENSOR,
+    Platform.WATER_HEATER,
+    Platform.SWITCH,
+    Platform.SELECT,
+    Platform.NUMBER,
+]
 
-BINARY_SENSORS = [505, 506, 600, 7086, 10733, 10905, 10906]
-WATER_HEATERS = ["22044616"]
+BINARY_SENSORS = [505, 506, 7086, 10733, 10905, 10906]
+SWITCHES = [600]
+SELECTS = [500, 517, 544, 601]
+NUMBERS = [
+    100,
+    101,
+    200,
+    201,
+    300,
+    301,
+    304,
+    305,
+    307,
+    308,
+    511,
+    512,
+    516,
+    527,
+    545,
+    546,
+    547,
+    548,
+]
+WATER_HEATERS = ["18760NE"]
 
 
 class CustomUnits(StrEnum):

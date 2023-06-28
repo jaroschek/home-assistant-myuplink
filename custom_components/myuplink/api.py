@@ -123,11 +123,17 @@ class Parameter:
         return self.raw_data["enumValues"]
 
     @property
+    def scale_value(self) -> str:
+        """Return the enum values of the parameter."""
+        return self.raw_data["scaleValue"]
+
+    @property
     def zone_id(self) -> str:
         """Return the zone id of the parameter."""
         return self.raw_data["zoneId"]
 
     async def update_parameter(self, value) -> None:
+        """Patch parameter if writable"""
         if not self.is_writable:
             return
         await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
