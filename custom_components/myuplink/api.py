@@ -9,6 +9,7 @@ from aiohttp import ClientSession, ClientResponse
 from datetime import datetime, timedelta
 
 from homeassistant.helpers import config_entry_oauth2_flow
+from homeassistant.const import Platform
 
 from .const import API_HOST, API_VERSION
 
@@ -137,6 +138,23 @@ class Parameter:
         if not self.is_writable:
             return
         await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
+
+    def find_fitting_entity(self) -> Platform:
+        on_off = (
+            len(self.enum_values) == 2
+            and self.enum_values[0]["text"] == "Off"
+            and self.enum_values[1]["text"] == "On"
+        )
+        if on_off:
+            if self.is_writable:
+                return Platform.SWITCH
+            return Platform.BINARY_SENSOR
+        elif len(self.enum_values) > 0 and self.is_writable:
+            return Platform.SELECT
+        elif (self.max_value or self.min_value) and self.is_writable:
+            return Platform.NUMBER
+        else:
+            return Platform.SENSOR
 
 
 class Zone:

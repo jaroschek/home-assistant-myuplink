@@ -10,6 +10,7 @@ from homeassistant.components.binary_sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.const import Platform
 
 from .api import Parameter
 from .const import DOMAIN, BINARY_SENSORS
@@ -29,7 +30,7 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             for parameter in device.parameters:
-                if parameter.id in BINARY_SENSORS:
+                if parameter.find_fitting_entity() == Platform.BINARY_SENSOR:
                     entities.append(
                         MyUplinkParameterBinarySensorEntity(
                             coordinator, device, parameter

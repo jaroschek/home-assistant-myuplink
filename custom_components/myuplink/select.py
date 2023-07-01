@@ -7,6 +7,7 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.const import Platform
 
 from .api import Parameter
 from .const import DOMAIN, SELECTS
@@ -26,7 +27,7 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             for parameter in device.parameters:
-                if parameter.id in SELECTS:
+                if parameter.find_fitting_entity() == Platform.SELECT:
                     entities.append(
                         MyUplinkParameterSelectEntity(coordinator, device, parameter)
                     )

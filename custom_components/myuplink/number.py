@@ -10,7 +10,7 @@ from homeassistant.components.number import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import Platform
 
 from .api import Parameter
 from .const import DOMAIN, NUMBERS
@@ -30,7 +30,7 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             for parameter in device.parameters:
-                if parameter.id in NUMBERS:
+                if parameter.find_fitting_entity() == Platform.NUMBER:
                     entities.append(
                         MyUplinkParameterNumberEntity(coordinator, device, parameter)
                     )
