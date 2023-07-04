@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from homeassistant.helpers import config_entry_oauth2_flow
 from homeassistant.const import Platform
 
-from .const import API_HOST, API_VERSION
+from .const import API_HOST, API_VERSION, PLATFORM_OVERRIDE, WRITABLE_OVERRIDE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        return self.raw_data["writable"]
+        return WRITABLE_OVERRIDE.get(self.id, self.raw_data["writable"])
 
     @property
     def timestamp(self) -> str:
@@ -140,6 +140,8 @@ class Parameter:
         await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
 
     def find_fitting_entity(self) -> Platform:
+        if self.id in PLATFORM_OVERRIDE:
+            return PLATFORM_OVERRIDE[self.id]
         on_off = (
             len(self.enum_values) == 2
             and self.enum_values[0]["text"] == "Off"

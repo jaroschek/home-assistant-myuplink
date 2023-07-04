@@ -21,7 +21,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Parameter
-from .const import DOMAIN, BINARY_SENSORS, SWITCHES, SELECTS, NUMBERS, CustomUnits
+from .const import DOMAIN, CustomUnits
 from .entity import MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)

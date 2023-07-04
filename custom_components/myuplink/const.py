@@ -27,29 +27,8 @@ PLATFORMS = [
     Platform.NUMBER,
 ]
 
-BINARY_SENSORS = [505, 506, 7086, 10733, 10905, 10906]
-SWITCHES = [600]
-SELECTS = [500, 517, 544, 601]
-NUMBERS = [
-    100,
-    101,
-    200,
-    201,
-    300,
-    301,
-    304,
-    305,
-    307,
-    308,
-    511,
-    512,
-    516,
-    527,
-    545,
-    546,
-    547,
-    548,
-]
+PLATFORM_OVERRIDE = {10733: Platform.BINARY_SENSOR}
+WRITABLE_OVERRIDE = {781: False, 15753: False}
 WATER_HEATERS = ["18760NE"]
 
 

@@ -13,7 +13,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.const import Platform
 
 from .api import Parameter
-from .const import DOMAIN, NUMBERS
+from .const import DOMAIN
 from .entity import MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
