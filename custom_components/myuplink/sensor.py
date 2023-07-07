@@ -15,12 +15,13 @@ from homeassistant.const import (
     UnitOfPower,
     UnitOfTemperature,
     UnitOfTime,
+    Platform,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Parameter
-from .const import DOMAIN, BINARY_SENSORS, CustomUnits
+from .const import DOMAIN, CustomUnits
 from .entity import MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             for parameter in device.parameters:
-                if parameter.id not in BINARY_SENSORS:
+                if parameter.find_fitting_entity() == Platform.SENSOR:
                     entities.append(
                         MyUplinkParameterSensorEntity(coordinator, device, parameter)
                     )

@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import json
 
 from aiohttp import ClientSession, ClientResponse
 from datetime import datetime, timedelta
 
 from homeassistant.helpers import config_entry_oauth2_flow
+from homeassistant.const import Platform
 
-from .const import API_HOST, API_VERSION
+from .const import API_HOST, API_VERSION, PLATFORM_OVERRIDE, WRITABLE_OVERRIDE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +37,7 @@ class AsyncConfigEntryAuth:
 
     async def request(self, method, path, **kwargs) -> ClientResponse:
         """Make an authorized request."""
-        headers = kwargs.get("headers")
+        headers = kwargs.pop("headers", None)
 
         if headers is None:
             headers = {}
@@ -56,9 +58,10 @@ class AsyncConfigEntryAuth:
 class Parameter:
     """Class that represents a parameter object in the myUplink API."""
 
-    def __init__(self, raw_data: dict) -> None:
+    def __init__(self, raw_data: dict, device: Device) -> None:
         """Initialize a parameter object."""
         self.raw_data = raw_data
+        self.device = device
 
     @property
     def category(self) -> str:
@@ -83,7 +86,7 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        return self.raw_data["writable"]
+        return WRITABLE_OVERRIDE.get(self.id, self.raw_data["writable"])
 
     @property
     def timestamp(self) -> str:
@@ -108,12 +111,12 @@ class Parameter:
     @property
     def min_value(self) -> int:
         """Return the min value of the parameter."""
-        return self.raw_data["minVal"]
+        return self.raw_data["minValue"]
 
     @property
     def max_value(self) -> int:
         """Return the max value of the parameter."""
-        return self.raw_data["maxVal"]
+        return self.raw_data["maxValue"]
 
     @property
     def enum_values(self) -> list[dict]:
@@ -121,9 +124,39 @@ class Parameter:
         return self.raw_data["enumValues"]
 
     @property
+    def scale_value(self) -> str:
+        """Return the enum values of the parameter."""
+        return self.raw_data["scaleValue"]
+
+    @property
     def zone_id(self) -> str:
         """Return the zone id of the parameter."""
         return self.raw_data["zoneId"]
+
+    async def update_parameter(self, value) -> None:
+        """Patch parameter if writable"""
+        if not self.is_writable:
+            return
+        await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
+
+    def find_fitting_entity(self) -> Platform:
+        if self.id in PLATFORM_OVERRIDE:
+            return PLATFORM_OVERRIDE[self.id]
+        on_off = (
+            len(self.enum_values) == 2
+            and self.enum_values[0]["text"] == "Off"
+            and self.enum_values[1]["text"] == "On"
+        )
+        if on_off:
+            if self.is_writable:
+                return Platform.SWITCH
+            return Platform.BINARY_SENSOR
+        elif len(self.enum_values) > 0 and self.is_writable:
+            return Platform.SELECT
+        elif (self.max_value or self.min_value) and self.is_writable:
+            return Platform.NUMBER
+        else:
+            return Platform.SENSOR
 
 
 class Zone:
@@ -252,7 +285,7 @@ class Device:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        self.parameters = await self.api.get_parameters(self.id)
+        self.parameters = await self.api.get_parameters(self)
         self.zones = await self.api.get_zones(self.id)
 
 
@@ -296,7 +329,7 @@ class System:
 class Throttle:
     """Throttling requests to API."""
 
-    def __init__(self, delay):
+    def __init__(self, delay) -> None:
         """Initialize throttle"""
         self._delay = delay
         self._timestamp = datetime.now()
@@ -345,12 +378,12 @@ class MyUplink:
         resp.raise_for_status()
         return Device(resp.json(), self)
 
-    async def get_parameters(self, device_id) -> list[Parameter]:
+    async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return all parameters for a device."""
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device_id}/points")
+            resp = await self.auth.request("get", f"devices/{device.id}/points")
         resp.raise_for_status()
-        return [Parameter(parameter) for parameter in await resp.json()]
+        return [Parameter(parameter, device) for parameter in await resp.json()]
 
     async def get_zones(self, device_id) -> list[Zone]:
         """Return all smart home zones for a device."""
@@ -360,3 +393,15 @@ class MyUplink:
             )
         resp.raise_for_status()
         return [Zone(zone) for zone in await resp.json()]
+
+    async def patch_parameter(self, device_id, parameter_id: str, value: str) -> bool:
+        """Return all smart home zones for a device."""
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "patch",
+                f"devices/{device_id}/points",
+                data=json.dumps({parameter_id: value}),
+                headers={"Content-Type": "application/json-patch+json"},
+            )
+        resp.raise_for_status()
+        return resp.status == 200
