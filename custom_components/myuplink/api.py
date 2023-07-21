@@ -240,12 +240,16 @@ class Zone:
 class Device:
     """Class that represents a device object in the myUplink API."""
 
+    # List of collected parameters
+    parameters: list[Parameter] = []
+
+    # List of collected zones
+    zones: list[Zone] = []
+
     def __init__(self, raw_data: dict, api: MyUplink) -> None:
         """Initialize a device object."""
         self.raw_data = raw_data
         self.api = api
-        self.parameters = []
-        self.zones = []
 
     @property
     def id(self) -> int:
@@ -286,17 +290,19 @@ class Device:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         self.parameters = await self.api.get_parameters(self)
-        self.zones = await self.api.get_zones(self.id)
+        # self.zones = await self.api.get_zones(self.id)
 
 
 class System:
     """Class that represents a system object in the myUplink API."""
 
+    # List of collected devices
+    devices: list[Device] = []
+
     def __init__(self, raw_data: dict, api: MyUplink) -> None:
         """Initialize a system object."""
         self.raw_data = raw_data
         self.api = api
-        self.devices = []
 
     @property
     def id(self) -> int:
@@ -320,10 +326,14 @@ class System:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        for device_data in self.raw_data["devices"]:
-            device = Device(device_data, self.api)
-            await device.async_fetch_data()
-            self.devices.append(device)
+        if self.devices:
+            for device in self.devices:
+                await device.async_fetch_data()
+        else:
+            for device_data in self.raw_data["devices"]:
+                device = Device(device_data, self.api)
+                await device.async_fetch_data()
+                self.devices.append(device)
 
 
 class Throttle:
@@ -351,6 +361,9 @@ class Throttle:
 class MyUplink:
     """Class to communicate with the myUplink API."""
 
+    # List of collected systems
+    systems: list[System] = []
+
     def __init__(self, auth: AsyncConfigEntryAuth) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
@@ -359,20 +372,28 @@ class MyUplink:
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
-        async with self.lock, self.throttle:
-            resp = await self.auth.request("get", "systems/me")
-        resp.raise_for_status()
-        data = await resp.json()
+        if self.systems:
+            _LOGGER.debug("Update systems")
+            for system in self.systems:
+                await system.async_fetch_data()
 
-        systems = []
-        for system_data in data["systems"]:
-            system = System(system_data, self)
-            await system.async_fetch_data()
-            systems.append(system)
-        return systems
+        else:
+            _LOGGER.debug("Fetch systems")
+            async with self.lock, self.throttle:
+                resp = await self.auth.request("get", "systems/me")
+            resp.raise_for_status()
+            data = await resp.json()
+
+            for system_data in data["systems"]:
+                system = System(system_data, self)
+                await system.async_fetch_data()
+                self.systems.append(system)
+
+        return self.systems
 
     async def get_device(self, device_id) -> Device:
         """Return a device by id."""
+        _LOGGER.debug("Fetch device with id %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
@@ -380,6 +401,7 @@ class MyUplink:
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return all parameters for a device."""
+        _LOGGER.debug("Fetch parameters for device %s", device.id)
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device.id}/points")
         resp.raise_for_status()
@@ -387,6 +409,7 @@ class MyUplink:
 
     async def get_zones(self, device_id) -> list[Zone]:
         """Return all smart home zones for a device."""
+        _LOGGER.debug("Fetch zones for device %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
                 "get", f"devices/{device_id}/smart-home-zones"
@@ -396,6 +419,12 @@ class MyUplink:
 
     async def patch_parameter(self, device_id, parameter_id: str, value: str) -> bool:
         """Return all smart home zones for a device."""
+        _LOGGER.debug(
+            "Patch parameter %s for device %s with value %s",
+            parameter_id,
+            device_id,
+            value,
+        )
         async with self.lock, self.throttle:
             resp = await self.auth.request(
                 "patch",
