@@ -52,13 +52,10 @@ class MyUplinkParameterNumberEntity(MyUplinkParameterEntity, NumberEntity):
 
         self._attr_native_unit_of_measurement = parameter.unit
 
-        if self._attr_device_class == NumberDeviceClass.TEMPERATURE:
-            self._attr_native_max_value = parameter.max_value / 100
-            self._attr_native_min_value = parameter.min_value / 100
-        else:
-            self._attr_native_max_value = parameter.max_value
-            self._attr_native_min_value = parameter.min_value
-        self._attr_native_step = float(parameter.scale_value)
+        self._attr_native_max_value = parameter.max_value * parameter.scale_value
+        self._attr_native_min_value = parameter.min_value * parameter.scale_value
+        self._attr_native_step = parameter.step_value * parameter.scale_value
+
         self._attr_native_value = parameter.value
 
     async def async_set_native_value(self, value: float) -> None:
