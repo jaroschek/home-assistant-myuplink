@@ -52,10 +52,12 @@ class MyUplinkWaterHeaterEntity(MyUplinkEntity, WaterHeaterEntity):
         for parameter in self._device.parameters:
             parameter_map[parameter.id] = parameter
         # for some reason the min_value is formated like this: "2000" = 20.00 Celcius
-        min_value = str(parameter_map[527].min_value)
-        max_value = str(parameter_map[527].max_value)
-        self._attr_min_temp = int(float(min_value[:-2] + "." + min_value[-2:]))
-        self._attr_max_temp = int(float(max_value[:-2] + "." + max_value[-2:]))
+        self._attr_min_temp = (
+            parameter_map[527].min_value * parameter_map[527].scale_value
+        )
+        self._attr_max_temp = (
+            parameter_map[527].max_value * parameter_map[527].scale_value
+        )
         self._attr_current_temperature = parameter_map[528].value
         self._attr_target_temperature = parameter_map[527].value
         self._attr_target_temperature_high = self._attr_target_temperature

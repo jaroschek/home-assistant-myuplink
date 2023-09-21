@@ -119,14 +119,22 @@ class Parameter:
         return self.raw_data["maxValue"]
 
     @property
+    def step_value(self) -> int:
+        """Return the step value of the parameter."""
+        return self.raw_data["stepValue"]
+
+    @property
     def enum_values(self) -> list[dict]:
         """Return the enum values of the parameter."""
         return self.raw_data["enumValues"]
 
     @property
-    def scale_value(self) -> str:
-        """Return the enum values of the parameter."""
-        return self.raw_data["scaleValue"]
+    def scale_value(self) -> float | None:
+        """Return the scale value of the parameter."""
+        if self.raw_data["scaleValue"]:
+            return float(self.raw_data["scaleValue"])
+
+        return 1.0
 
     @property
     def zone_id(self) -> str:
