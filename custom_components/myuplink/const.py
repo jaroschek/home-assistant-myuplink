@@ -1,7 +1,7 @@
 """Constants for the myUplink integration."""
 from __future__ import annotations
 
-from enum import StrEnum
+from homeassistant.backports.enum import StrEnum
 from homeassistant.const import Platform
 
 DOMAIN = "myuplink"
