@@ -1,6 +1,8 @@
 # MyUplink integration for Home Assistant
 
-[![Release Builds](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml/badge.svg?branch=main&event=push)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml) [![Release Builds](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml/badge.svg?branch=main&event=push)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml)
+[![Version](https://img.shields.io/github/v/release/jaroschek/home-assistant-myuplink?label=version)](https://github.com/jaroschek/home-assistant-myuplink/releases/latest)
+[![Validate for HACS](https://github.com/jaroschek/home-assistant-myuplink/workflows/Validate%20for%20HACS/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml)
+[![Validate with hassfest](https://github.com/jaroschek/home-assistant-myuplink/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml)
 
 Custom Home Assistant integration for devices and sensors in [myUplink](https://myuplink.com/) account.
 
