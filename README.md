@@ -19,8 +19,10 @@ The easiest way to install this component is by clicking the badge below, which 
 You can also add the integration manually by copying `custom_components/myuplink` into `<HASS config directory>/custom_components`
 ### Configuration
 
-To use this integration, you need to make an application at [dev.myuplink.com](https://dev.myuplink.com/).  
-Remember to set a valid Callback Url. It might be the easiest to use `https://my.home-assistant.io/redirect/oauth`.
+To use this integration, you need to make an application at [dev.myuplink.com](https://dev.myuplink.com/). 
+
+Remember to set a valid Callback Url. Make sure you use `https://my.home-assistant.io/redirect/oauth`, as HA currently uses that callback URL by default for the Oauth2 config flow.
+
 _Note: You cannot edit the Callback Url after the application has been created, even though the GUI makes you think so. Create a new one if you want to change it._
 
 Start the myUplink integration setup and copy the Client Identifier and Client Secret from your myUplink-application into the OAuth text fields.
