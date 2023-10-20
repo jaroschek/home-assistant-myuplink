@@ -56,7 +56,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
 
         if len(parameter.enum_values):
             self._attr_device_class = SensorDeviceClass.ENUM
-            self._attr_translation_key = self._parameter.id
+            self._attr_translation_key = str(self._parameter.id)
             self._attr_native_value = str(int(self._parameter.value))
             self._attr_options = []
             for option in parameter.enum_values:

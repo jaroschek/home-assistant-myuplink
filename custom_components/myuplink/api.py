@@ -76,7 +76,7 @@ class Parameter:
     @property
     def name(self) -> str:
         """Return the name of the parameter."""
-        return self.raw_data["parameterName"]
+        return self.raw_data["parameterName"].replace("\xad", "")
 
     @property
     def unit(self) -> str:
