@@ -1,4 +1,4 @@
-"""Definition of base myUplink Entity"""
+"""Definition of base myUplink Entity."""
 from __future__ import annotations
 
 from homeassistant.core import callback
