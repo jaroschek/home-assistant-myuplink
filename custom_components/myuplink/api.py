@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 import asyncio
-import logging
-import json
-
-from aiohttp import ClientSession, ClientResponse
 from datetime import datetime, timedelta
+import json
+import logging
 
-from homeassistant.helpers import config_entry_oauth2_flow
+from aiohttp import ClientResponse, ClientSession
+
 from homeassistant.const import Platform
+from homeassistant.helpers import config_entry_oauth2_flow
 
 from .const import API_HOST, API_VERSION, PLATFORM_OVERRIDE, WRITABLE_OVERRIDE
 
@@ -142,12 +142,13 @@ class Parameter:
         return self.raw_data["zoneId"]
 
     async def update_parameter(self, value) -> None:
-        """Patch parameter if writable"""
+        """Patch parameter if writable."""
         if not self.is_writable:
             return
         await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
 
     def find_fitting_entity(self) -> Platform:
+        """Try to identify entity platform."""
         if self.id in PLATFORM_OVERRIDE:
             return PLATFORM_OVERRIDE[self.id]
         on_off = (
@@ -348,12 +349,12 @@ class Throttle:
     """Throttling requests to API."""
 
     def __init__(self, delay) -> None:
-        """Initialize throttle"""
+        """Initialize throttle."""
         self._delay = delay
         self._timestamp = datetime.now()
 
     async def __aenter__(self):
-        """Enter async throttle"""
+        """Enter async throttle."""
         timestamp = datetime.now()
         delay = (self._timestamp - timestamp).total_seconds()
         if delay > 0:
@@ -362,7 +363,7 @@ class Throttle:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Exit async throttle"""
+        """Exit async throttle."""
         self._timestamp = datetime.now() + self._delay
 
 

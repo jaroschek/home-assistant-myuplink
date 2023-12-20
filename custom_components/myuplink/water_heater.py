@@ -9,13 +9,11 @@ from homeassistant.components.water_heater import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
-
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import Parameter, Device
+from .api import Device, Parameter
 from .const import DOMAIN, WATER_HEATERS
 from .entity import MyUplinkEntity
 

@@ -1,11 +1,11 @@
 """The myUplink integration."""
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
+import logging
 
 import aiohttp
-import async_timeout
-import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -50,7 +50,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def async_update_data():
         try:
-            async with async_timeout.timeout(30):
+            async with asyncio.timeout(30):
                 return await api.get_systems()
         except aiohttp.client_exceptions.ClientResponseError as err:
             raise UpdateFailed(f"Wrong credentials: {err}") from err
