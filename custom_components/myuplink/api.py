@@ -335,14 +335,14 @@ class System:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        if self.devices:
-            for device in self.devices:
-                await device.async_fetch_data()
-        else:
-            for device_data in self.raw_data["devices"]:
-                device = Device(device_data, self.api)
-                await device.async_fetch_data()
-                self.devices.append(device)
+        if not self.devices:
+            self.devices = [
+                Device(device_data, self.api)
+                for device_data in self.raw_data["devices"]
+            ]
+
+        for device in self.devices:
+            await device.async_fetch_data()
 
 
 class Throttle:
@@ -381,22 +381,20 @@ class MyUplink:
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
-        if self.systems:
-            _LOGGER.debug("Update systems")
-            for system in self.systems:
-                await system.async_fetch_data()
-
-        else:
+        if not self.systems:
             _LOGGER.debug("Fetch systems")
             async with self.lock, self.throttle:
                 resp = await self.auth.request("get", "systems/me")
             resp.raise_for_status()
             data = await resp.json()
 
-            for system_data in data["systems"]:
-                system = System(system_data, self)
-                await system.async_fetch_data()
-                self.systems.append(system)
+            self.systems = [
+                System(system_data, self) for system_data in data["systems"]
+            ]
+
+        _LOGGER.debug("Update systems")
+        for system in self.systems:
+            await system.async_fetch_data()
 
         return self.systems
 
