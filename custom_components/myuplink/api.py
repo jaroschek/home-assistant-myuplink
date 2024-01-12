@@ -145,7 +145,9 @@ class Parameter:
         """Patch parameter if writable."""
         if not self.is_writable:
             return
-        await self.device.api.patch_parameter(self.device.id, str(self.id), str(value))
+        await self.device.system.api.patch_parameter(
+            self.device.id, str(self.id), str(value)
+        )
 
     def find_fitting_entity(self) -> Platform:
         """Try to identify entity platform."""
@@ -255,10 +257,10 @@ class Device:
     # List of collected zones
     zones: list[Zone] = []
 
-    def __init__(self, raw_data: dict, api: MyUplink) -> None:
+    def __init__(self, raw_data: dict, system: System) -> None:
         """Initialize a device object."""
         self.raw_data = raw_data
-        self.api = api
+        self.system = system
 
     @property
     def id(self) -> int:
@@ -268,7 +270,9 @@ class Device:
     @property
     def name(self) -> str:
         """Return the name of the device."""
-        return self.raw_data["product"]["name"]
+        return " ".join(
+            list(dict.fromkeys([self.raw_data["product"]["name"], self.system.name]))
+        )
 
     @property
     def connection_state(self) -> str:
@@ -298,8 +302,8 @@ class Device:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        self.parameters = await self.api.get_parameters(self)
-        # self.zones = await self.api.get_zones(self.id)
+        self.parameters = await self.system.api.get_parameters(self)
+        # self.zones = await self.system.api.get_zones(self.id)
 
 
 class System:
@@ -335,14 +339,13 @@ class System:
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
-        if self.devices:
-            for device in self.devices:
-                await device.async_fetch_data()
-        else:
-            for device_data in self.raw_data["devices"]:
-                device = Device(device_data, self.api)
-                await device.async_fetch_data()
-                self.devices.append(device)
+        if not self.devices:
+            self.devices = [
+                Device(device_data, self) for device_data in self.raw_data["devices"]
+            ]
+
+        for device in self.devices:
+            await device.async_fetch_data()
 
 
 class Throttle:
@@ -381,22 +384,20 @@ class MyUplink:
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
-        if self.systems:
-            _LOGGER.debug("Update systems")
-            for system in self.systems:
-                await system.async_fetch_data()
-
-        else:
+        if not self.systems:
             _LOGGER.debug("Fetch systems")
             async with self.lock, self.throttle:
                 resp = await self.auth.request("get", "systems/me")
             resp.raise_for_status()
             data = await resp.json()
 
-            for system_data in data["systems"]:
-                system = System(system_data, self)
-                await system.async_fetch_data()
-                self.systems.append(system)
+            self.systems = [
+                System(system_data, self) for system_data in data["systems"]
+            ]
+
+        _LOGGER.debug("Update systems")
+        for system in self.systems:
+            await system.async_fetch_data()
 
         return self.systems
 
