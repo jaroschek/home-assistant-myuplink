@@ -43,11 +43,11 @@ Double-check that the Callback URL saved in the myUpLink application is correct.
 
 This means that the credentials used by the integration is invalid. This often occurs when the myuplink-application is deleted and recreated, without deleting the old credentials from Home Assistant.
 
-You can delete the old credentials by going to the Devices & Services page, clicking the three dots top right and selecting "Application Credentials". Delete the one originating from myuplink, and you'll be prompted for new credentials next time you set up the integration.
+You can delete the old credentials stored in Home Assistant by going to the Devices & Services page, clicking the three dots top right and selecting "Application Credentials". Delete the one originating from myuplink, and you'll be prompted for new credentials next time you set up the integration.
 
 #### Some entities don't look right
 
-This can happen when the device is integrated poorly with the myUpLink-API. Maybe you'll see a wrong unit, or a mutable entity that should be immutable or the other way around.
+This can happen when the device is integrated poorly with the myUpLink-API, or it's implemented in a way this integration cannot handle yet.
 
 See the debugging section below to find some useful info about the offending data point.
 
