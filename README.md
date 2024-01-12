@@ -29,7 +29,7 @@ Start the myUplink integration setup and copy the Client Identifier and Client S
 
 Next, approve access via the OAuth pop-up and you should be good to go!
 
-### Troubleshooting
+### Troubleshooting
 
 Reading this might help if you run into issues
 
