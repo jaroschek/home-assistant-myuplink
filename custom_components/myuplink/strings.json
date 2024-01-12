@@ -33,7 +33,19 @@
           "8": "External",
           "9": "Legionella",
           "10": "Vacation",
-          "11": "Boost"
+          "11": "Boost",
+          "Boost": "Boost",
+          "Eco": "Eco",
+          "Express": "Express",
+          "External": "External",
+          "Legionella": "Legionella",
+          "Normal": "Normal",
+          "Off": "Off",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "Sleep": "Sleep",
+          "Test": "Test",
+          "Vacation": "Vacation"
         }
       },
       "500": {
@@ -44,7 +56,14 @@
           "7": "Schedule",
           "8": "External",
           "10": "Vacation",
-          "11": "Boost"
+          "11": "Boost",
+          "Boost": "Boost",
+          "Eco": "Eco",
+          "External": "External",
+          "Normal": "Normal",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "Vacation": "Vacation"
         }
       },
       "517": {
@@ -52,7 +71,10 @@
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W"
+          "3": "2000W",
+          "1300W": "1300W",
+          "2000W": "2000W",
+          "700W": "700W"
         }
       },
       "544": {
@@ -61,7 +83,12 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5"
+          "5": "NO5",
+          "NO1": "NO1",
+          "NO2": "NO2",
+          "NO3": "NO3",
+          "NO4": "NO4",
+          "NO5": "NO5"
         }
       },
       "549": {
@@ -69,12 +96,17 @@
           "0": "Unknown",
           "1": "Cheap",
           "2": "Normal",
-          "3": "Expensive"
+          "3": "Expensive",
+          "Cheap": "Cheap",
+          "Expensive": "Expensive",
+          "Normal": "Normal",
+          "Unknown": "Unknown"
         }
       },
       "601": {
         "state": {
-          "1": "heat"
+          "1": "heat",
+          "heat": "heat"
         }
       },
       "1965": {
@@ -83,9 +115,14 @@
           "40": "Starting",
           "60": "On",
           "100": "Stopping",
-          "120": "Defrost­ing",
-          "140": "Defrost­ing",
-          "160": "Defrost­ing"
+          "120": "Defrosting",
+          "140": "Defrosting",
+          "160": "Defrosting",
+          "Defrosting": "Defrosting",
+          "Off": "Off",
+          "On": "On",
+          "Starting": "Starting",
+          "Stopping": "Stopping"
         }
       },
       "14950": {
@@ -96,7 +133,14 @@
           "3": "Hot water",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Pre­heating"
+          "6": "Preheating",
+          "Cooling": "Cooling",
+          "Heating": "Heating",
+          "Hot water": "Hot water",
+          "Off": "Off",
+          "Pool 2": "Pool 2",
+          "Pool": "Pool",
+          "Preheating": "Preheating"
         }
       },
       "55000": {
@@ -107,7 +151,14 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Transfer",
-          "60": "Cooling"
+          "60": "Cooling",
+          "Cooling": "Cooling",
+          "Heating": "Heating",
+          "Hot water": "Hot water",
+          "Off": "Off",
+          "Pool 2": "Pool 2",
+          "Pool": "Pool",
+          "Transfer": "Transfer"
         }
       },
       "55027": {
@@ -118,7 +169,11 @@
           "3": "Off",
           "4": "Blocked",
           "5": "Off",
-          "6": "Active"
+          "6": "Active",
+          "Active": "Active",
+          "Alarm": "Alarm",
+          "Blocked": "Blocked",
+          "Off": "Off"
         }
       }
     }

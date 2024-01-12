@@ -50,9 +50,9 @@
       "40": "Starting",
       "60": "On",
       "100": "Stopping",
-      "120": "Defrost­ing",
-      "140": "Defrost­ing",
-      "160": "Defrost­ing"
+      "120": "Defrosting",
+      "140": "Defrosting",
+      "160": "Defrosting"
     },
     "myuplink__14950": {
       "0": "Off",
@@ -61,7 +61,7 @@
       "3": "Hot water",
       "4": "Pool",
       "5": "Pool 2",
-      "6": "Pre­heating"
+      "6": "Preheating"
     },
     "myuplink__55000": {
       "10": "Off",

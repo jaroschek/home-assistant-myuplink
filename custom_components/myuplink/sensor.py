@@ -53,15 +53,14 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        self._attr_native_value = self._parameter.value
 
         if len(parameter.enum_values):
             self._attr_device_class = SensorDeviceClass.ENUM
             self._attr_translation_key = str(self._parameter.id)
-            self._attr_native_value = str(int(self._parameter.value))
             self._attr_options = []
             for option in parameter.enum_values:
-                self._attr_options.append(str(int(option["value"])))
+                self._attr_options.append(option["text"])
+            self._attr_native_value = self._parameter.string_value
 
         else:
             self._attr_native_unit_of_measurement = self._parameter.unit
@@ -91,3 +90,5 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_device_class = "degree_minutes"
             elif self._parameter.unit in (PERCENTAGE, CustomUnits.VOLUME_LM):
                 self._attr_icon = "mdi:speedometer"
+
+            self._attr_native_value = self._parameter.value

@@ -12,7 +12,19 @@
       "8": "Ekstern",
       "9": "Legionella",
       "10": "Ferie",
-      "11": "Boost"
+      "11": "Boost",
+      "Boost": "Boost",
+      "Eco": "Øko",
+      "Express": "Ekspress",
+      "External": "Ekstern",
+      "Legionella": "Legionella",
+      "Normal": "Normal",
+      "Off": "Av",
+      "Price": "Pris",
+      "Schedule": "Timeplan",
+      "Sleep": "Hvilemodus",
+      "Test": "Test",
+      "Vacation": "Ferie"
     },
     "myuplink__500": {
       "3": "Øko",
@@ -21,7 +33,14 @@
       "7": "Timeplan",
       "8": "Ekstern",
       "10": "Ferie",
-      "11": "Boost"
+      "11": "Boost",
+      "Boost": "Boost",
+      "Eco": "Øko",
+      "External": "Ekstern",
+      "Normal": "Normal",
+      "Price": "Pris",
+      "Schedule": "Timeplan",
+      "Vacation": "Ferie"
     },
     "myuplink__517": {
       "0": "0",
@@ -40,10 +59,15 @@
       "0": "Ukjent",
       "1": "Billig",
       "2": "Normal",
-      "3": "Dyr"
+      "3": "Dyr",
+      "Cheap": "Billig",
+      "Expensive": "Dyr",
+      "Normal": "Normal",
+      "Unknown": "Ukjent"
     },
     "myuplink__601": {
-      "1": "varme"
+      "1": "varme",
+      "heat": "varme"
     },
     "myuplink__1965": {
       "20": "Av",
@@ -52,7 +76,12 @@
       "100": "Stopper",
       "120": "Avriming",
       "140": "Avriming",
-      "160": "Avriming"
+      "160": "Avriming",
+      "Defrosting": "Avrimer",
+      "Off": "Av",
+      "On": "På",
+      "Starting": "Starter",
+      "Stopping": "Stopper"
     },
     "myuplink__14950": {
       "0": "Av",
@@ -61,7 +90,14 @@
       "3": "Varmtvann",
       "4": "Pool",
       "5": "Pool 2",
-      "6": "Forvarmer"
+      "6": "Forvarmer",
+      "Cooling": "Avkjøler",
+      "Heating": "Varmer",
+      "Hot water": "Varmtvann",
+      "Off": "Av",
+      "Pool 2": "Pool 2",
+      "Pool": "Pool",
+      "Preheating": "Forvarmer"
     },
     "myuplink__55000": {
       "10": "Av",
@@ -70,7 +106,14 @@
       "40": "Pool",
       "41": "Pool 2",
       "50": "Øverføring",
-      "60": "Avkjøling"
+      "60": "Avkjøling",
+      "Cooling": "Avkjøling",
+      "Heating": "Varmer",
+      "Hot water": "Varmtvann",
+      "Off": "Av",
+      "Pool 2": "Pool 2",
+      "Pool": "Pool",
+      "Transfer": "Øverføring"
     },
     "myuplink__55027": {
       "0": "Alarm",
@@ -79,7 +122,11 @@
       "3": "Av",
       "4": "Blokkert",
       "5": "Av",
-      "6": "Aktiv"
+      "6": "Aktiv",
+      "Active": "Aktiv",
+      "Alarm": "Alarm",
+      "Blocked": "Blokkert",
+      "Off": "Av"
     }
   }
 }

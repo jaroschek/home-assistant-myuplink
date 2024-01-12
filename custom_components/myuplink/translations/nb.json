@@ -33,7 +33,19 @@
           "8": "Ekstern",
           "9": "Legionella",
           "10": "Ferie",
-          "11": "Boost"
+          "11": "Boost",
+          "Boost": "Boost",
+          "Eco": "Øko",
+          "Express": "Ekspress",
+          "External": "Ekstern",
+          "Legionella": "Legionella",
+          "Normal": "Normal",
+          "Off": "Av",
+          "Price": "Pris",
+          "Schedule": "Timeplan",
+          "Sleep": "Hvilemodus",
+          "Test": "Test",
+          "Vacation": "Ferie"
         }
       },
       "500": {
@@ -44,7 +56,14 @@
           "7": "Timeplan",
           "8": "Ekstern",
           "10": "Ferie",
-          "11": "Boost"
+          "11": "Boost",
+          "Boost": "Boost",
+          "Eco": "Øko",
+          "External": "Ekstern",
+          "Normal": "Normal",
+          "Price": "Pris",
+          "Schedule": "Timeplan",
+          "Vacation": "Ferie"
         }
       },
       "517": {
@@ -69,12 +88,17 @@
           "0": "Ukjent",
           "1": "Billig",
           "2": "Normal",
-          "3": "Dyr"
+          "3": "Dyr",
+          "Cheap": "Billig",
+          "Expensive": "Dyr",
+          "Normal": "Normal",
+          "Unknown": "Ukjent"
         }
       },
       "601": {
         "state": {
-          "1": "varme"
+          "1": "varme",
+          "heat": "varme"
         }
       },
       "1965": {
@@ -85,7 +109,12 @@
           "100": "Stopper",
           "120": "Avrimer",
           "140": "Avrimer",
-          "160": "Avrimer"
+          "160": "Avrimer",
+          "Defrosting": "Avrimer",
+          "Off": "Av",
+          "On": "På",
+          "Starting": "Starter",
+          "Stopping": "Stopper"
         }
       },
       "14950": {
@@ -96,7 +125,14 @@
           "3": "Varmtvann",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Forvarmer"
+          "6": "Forvarmer",
+          "Cooling": "Avkjøler",
+          "Heating": "Varmer",
+          "Hot water": "Varmtvann",
+          "Off": "Av",
+          "Pool 2": "Pool 2",
+          "Pool": "Pool",
+          "Preheating": "Forvarmer"
         }
       },
       "55000": {
@@ -107,7 +143,14 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Overføring",
-          "60": "Avkjøler"
+          "60": "Avkjøler",
+          "Cooling": "Avkjøling",
+          "Heating": "Varmer",
+          "Hot water": "Varmtvann",
+          "Off": "Av",
+          "Pool 2": "Pool 2",
+          "Pool": "Pool",
+          "Transfer": "Øverføring"
         }
       },
       "55027": {
@@ -118,7 +161,11 @@
           "3": "Av",
           "4": "Blokkert",
           "5": "Av",
-          "6": "Aktiv"
+          "6": "Aktiv",
+          "Active": "Aktiv",
+          "Alarm": "Alarm",
+          "Blocked": "Blokkert",
+          "Off": "Av"
         }
       }
     }
