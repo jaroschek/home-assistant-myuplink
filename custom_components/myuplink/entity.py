@@ -75,7 +75,7 @@ class MyUplinkParameterEntity(MyUplinkEntity):
         self._parameter = parameter
         if self._device.name == self._parameter.category:
             self._attr_name = f"{self._device.name} {self._parameter.name}"
-        else:
+        elif self._parameter.category:
             self._attr_name = (
                 f"{self._device.name} {self._parameter.category} {self._parameter.name}"
             )
