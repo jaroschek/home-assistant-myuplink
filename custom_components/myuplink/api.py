@@ -66,6 +66,8 @@ class Parameter:
     @property
     def category(self) -> str:
         """Return the category of the parameter."""
+        if "Text not found" in self.raw_data["category"]:
+            return ""
         return self.raw_data["category"]
 
     @property
