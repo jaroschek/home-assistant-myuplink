@@ -5,9 +5,14 @@
       "40": "Startet",
       "60": "Ein",
       "100": "Stoppt",
-      "120": "Ent­eisung wird durch­geführt",
-      "140": "Ent­eisung wird durch­geführt",
-      "160": "Ent­eisung wird durch­geführt"
+      "120": "Enteisung wird durchgeführt",
+      "140": "Enteisung wird durchgeführt",
+      "160": "Enteisung wird durchgeführt",
+      "Defrosting": "Enteisung wird durchgeführt",
+      "Off": "Aus",
+      "On": "Ein",
+      "Starting": "Startet",
+      "Stopping": "Stoppt"
     },
     "myuplink__14950": {
       "0": "Aus",
@@ -16,7 +21,14 @@
       "3": "Brauchwasser",
       "4": "Pool",
       "5": "Pool 2",
-      "6": "Vor­wärmung"
+      "6": "Vorwärmung",
+      "Cooling": "Kühlung",
+      "Heating": "Heizung",
+      "Hot water": "Brauchwasser",
+      "Off": "Aus",
+      "Pool 2": "Pool 2",
+      "Pool": "Pool",
+      "Preheating": "Vorwärmung"
     },
     "myuplink__55000": {
       "10": "Aus",
@@ -25,7 +37,14 @@
       "40": "Pool",
       "41": "Pool 2",
       "50": "Transfer",
-      "60": "Kühlung"
+      "60": "Kühlung",
+      "Cooling": "Kühlung",
+      "Heating": "Heizung",
+      "Hot water": "Brauchwasser",
+      "Off": "Aus",
+      "Pool 2": "Pool 2",
+      "Pool": "Pool",
+      "Transfer": "Transfer"
     },
     "myuplink__55027": {
       "0": "Alarm",
@@ -34,7 +53,11 @@
       "3": "Aus",
       "4": "Blockiert",
       "5": "Aus",
-      "6": "Aktiv"
+      "6": "Aktiv",
+      "Active": "Aktiv",
+      "Alarm": "Alarm",
+      "Blocked": "Blockiert",
+      "Off": "Aus"
     }
   }
 }

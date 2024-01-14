@@ -41,10 +41,10 @@ class MyUplinkParameterSelectEntity(MyUplinkParameterEntity, SelectEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        options = []
+        self._attr_translation_key = str(self._parameter.id)
+        self._attr_options = []
         for enum in parameter.enum_values:
-            options.append(enum["text"])
-        self._attr_options = options
+            self._attr_options.append(enum["text"])
         self._attr_current_option = parameter.string_value
 
     async def async_select_option(self, option: str) -> None:
