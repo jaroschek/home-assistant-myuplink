@@ -25,6 +25,7 @@ PLATFORMS = [
     Platform.SWITCH,
     Platform.SELECT,
     Platform.NUMBER,
+    Platform.UPDATE,
 ]
 
 PLATFORM_OVERRIDE = {10733: Platform.BINARY_SENSOR, 44703: Platform.BINARY_SENSOR}
