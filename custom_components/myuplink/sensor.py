@@ -54,7 +54,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
 
-        if len(parameter.enum_values):
+        if not self._parameter.unit and len(parameter.enum_values):
             self._attr_device_class = SensorDeviceClass.ENUM
             self._attr_translation_key = str(self._parameter.id)
             self._attr_options = []
@@ -77,6 +77,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
             elif self._parameter.unit in (
                 UnitOfTime.DAYS,
                 UnitOfTime.HOURS,
+                UnitOfTime.MINUTES,
                 CustomUnits.TIME_DAY,
                 CustomUnits.TIME_DAYS,
                 CustomUnits.TIME_HOUR,
