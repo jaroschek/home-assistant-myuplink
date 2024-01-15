@@ -55,6 +55,39 @@ class AsyncConfigEntryAuth:
         )
 
 
+class FirmwareInfo:
+    """Class that represents the firmware info object in the myUplink API."""
+
+    def __init__(self, raw_data: dict) -> None:
+        """Initialize a parameter object."""
+        self.raw_data = raw_data
+
+    @property
+    def device_id(self) -> str:
+        """Return the ID of the device."""
+        return self.raw_data["deviceId"]
+
+    @property
+    def firmware_id(self) -> int:
+        """Return the ID of the firmware."""
+        return self.raw_data["firmwareId"]
+
+    @property
+    def current_version(self) -> str:
+        """Return the current firmware version of the device."""
+        return self.raw_data["currentFwVersion"]
+
+    @property
+    def pending_version(self) -> str:
+        """Return the pending firmware version of the device."""
+        return self.raw_data["pendingFwVersion"]
+
+    @property
+    def desired_version(self) -> str:
+        """Return the desired firmware version of the device."""
+        return self.raw_data["desiredFwVersion"]
+
+
 class Parameter:
     """Class that represents a parameter object in the myUplink API."""
 
@@ -253,6 +286,9 @@ class Zone:
 class Device:
     """Class that represents a device object in the myUplink API."""
 
+    # Firmware info
+    firmware_info: FirmwareInfo
+
     # List of collected parameters
     parameters: list[Parameter] = []
 
@@ -265,7 +301,7 @@ class Device:
         self.system = system
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Return the ID of the device."""
         return self.raw_data["id"]
 
@@ -305,6 +341,7 @@ class Device:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         self.parameters = await self.system.api.get_parameters(self)
+        self.firmware_info = await self.system.api.get_firmware_info(self)
         # self.zones = await self.system.api.get_zones(self.id)
 
 
@@ -320,7 +357,7 @@ class System:
         self.api = api
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Return the ID of the system."""
         return self.raw_data["systemId"]
 
@@ -410,6 +447,14 @@ class MyUplink:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
         return Device(resp.json(), self)
+
+    async def get_firmware_info(self, device: Device) -> FirmwareInfo:
+        """Return firmware info for a device."""
+        _LOGGER.debug("Fetch firmware info for device %s", device.id)
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", f"devices/{device.id}/firmware-info")
+        resp.raise_for_status()
+        return FirmwareInfo(await resp.json())
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return all parameters for a device."""
