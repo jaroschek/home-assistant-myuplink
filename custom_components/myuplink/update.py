@@ -1,6 +1,10 @@
 """Support for myUplink update platform."""
 
-from homeassistant.components.update import UpdateEntity, UpdateEntityFeature
+from homeassistant.components.update import (
+    UpdateDeviceClass,
+    UpdateEntity,
+    UpdateEntityFeature,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -29,6 +33,7 @@ class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
     """Representation of a myUplink update entity."""
 
     _attr_supported_features = UpdateEntityFeature.PROGRESS
+    _attr_device_class = UpdateDeviceClass.FIRMWARE
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
