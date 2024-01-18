@@ -129,8 +129,11 @@ class Parameter:
         return self.raw_data["timestamp"]
 
     @property
-    def value(self) -> float:
+    def value(self) -> float | None:
         """Return the value of the paramter."""
+        if self.raw_data["value"] == -32768:
+            return None
+
         return self.raw_data["value"]
 
     @property
