@@ -392,7 +392,9 @@ class MyUplink:
         if not self.systems:
             _LOGGER.debug("Fetch systems")
             async with self.lock, self.throttle:
-                resp = await self.auth.request("get", "systems/me")
+                resp = await self.auth.request(
+                    "get", "systems/me?page=1&itemsPerPage=99"
+                )
             resp.raise_for_status()
             data = await resp.json()
 
