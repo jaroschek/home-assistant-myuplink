@@ -426,16 +426,13 @@ class MyUplink:
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
-        if not self.systems:
-            _LOGGER.debug("Fetch systems")
-            async with self.lock, self.throttle:
-                resp = await self.auth.request("get", "systems/me")
-            resp.raise_for_status()
-            data = await resp.json()
+        _LOGGER.debug("Fetch systems")
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", "systems/me")
+        resp.raise_for_status()
+        data = await resp.json()
 
-            self.systems = [
-                System(system_data, self) for system_data in data["systems"]
-            ]
+        self.systems = [System(system_data, self) for system_data in data["systems"]]
 
         _LOGGER.debug("Update systems")
         for system in self.systems:
