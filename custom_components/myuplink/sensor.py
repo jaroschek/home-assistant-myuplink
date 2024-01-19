@@ -21,9 +21,9 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Parameter
+from .api import Device, Parameter
 from .const import DOMAIN, CustomUnits
-from .entity import MyUplinkParameterEntity
+from .entity import MyUplinkEntity, MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,6 +38,7 @@ async def async_setup_entry(
 
     for system in coordinator.data:
         for device in system.devices:
+            entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
             for parameter in device.parameters:
                 if parameter.find_fitting_entity() == Platform.SENSOR:
                     entities.append(
@@ -94,3 +95,31 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_icon = "mdi:speedometer"
 
             self._attr_native_value = self._parameter.value
+
+
+class MyUplinkNotificationsSensorEntity(MyUplinkEntity, SensorEntity):
+    """Representation of a myUplink alarm sensor entity."""
+
+    def _update_from_device(self, device: Device) -> None:
+        """Update attrs from device."""
+        super()._update_from_device(device)
+
+        self._attr_name = f"{device.name} Notifications"
+        self._attr_unique_id = f"{DOMAIN}_{device.id}_notifications"
+
+        self._attr_native_value = len(device.notifications)
+
+        self._attr_extra_state_attributes = {
+            "notifications": [
+                {
+                    "header": notification.header,
+                    "description": notification.description,
+                    "status": notification.status,
+                    "severity": notification.severity,
+                    "equipment": notification.equipment,
+                    "alarm_number": notification.alarm_number,
+                    "created": notification.created_datetime,
+                }
+                for notification in device.notifications
+            ]
+        }
