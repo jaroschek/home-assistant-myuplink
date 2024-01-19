@@ -11,6 +11,7 @@ from homeassistant.components.sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
+    EntityCategory,
     Platform,
     UnitOfEnergy,
     UnitOfFrequency,
@@ -99,6 +100,8 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
 
 class MyUplinkNotificationsSensorEntity(MyUplinkEntity, SensorEntity):
     """Representation of a myUplink alarm sensor entity."""
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
