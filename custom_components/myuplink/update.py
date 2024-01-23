@@ -1,10 +1,6 @@
 """Support for myUplink update platform."""
 
-from homeassistant.components.update import (
-    UpdateDeviceClass,
-    UpdateEntity,
-    UpdateEntityFeature,
-)
+from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -32,7 +28,6 @@ async def async_setup_entry(
 class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
     """Representation of a myUplink update entity."""
 
-    _attr_supported_features = UpdateEntityFeature.PROGRESS
     _attr_device_class = UpdateDeviceClass.FIRMWARE
 
     def _update_from_device(self, device: Device) -> None:
@@ -51,8 +46,3 @@ class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
     def latest_version(self) -> str | None:
         """Latest version available for install."""
         return self._device.firmware_info.desired_version
-
-    @property
-    def in_progress(self) -> bool:
-        """Update installation in progress."""
-        return self._device.firmware_info.pending_version != ""

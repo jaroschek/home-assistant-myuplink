@@ -128,17 +128,23 @@ class FirmwareInfo:
     @property
     def current_version(self) -> str:
         """Return the current firmware version of the device."""
-        return self.raw_data["currentFwVersion"]
+        if self.raw_data["currentFwVersion"].strip() == "":
+            return None
+        return self.raw_data["currentFwVersion"].strip()
 
     @property
     def pending_version(self) -> str:
         """Return the pending firmware version of the device."""
-        return self.raw_data["pendingFwVersion"]
+        if self.raw_data["pendingFwVersion"].strip() == "":
+            return None
+        return self.raw_data["pendingFwVersion"].strip()
 
     @property
     def desired_version(self) -> str:
         """Return the desired firmware version of the device."""
-        return self.raw_data["desiredFwVersion"]
+        if self.raw_data["desiredFwVersion"].strip() == "":
+            return None
+        return self.raw_data["desiredFwVersion"].strip()
 
 
 class Parameter:
