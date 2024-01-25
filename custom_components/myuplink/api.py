@@ -160,8 +160,8 @@ class Parameter:
             return PLATFORM_OVERRIDE[self.id]
         on_off = (
             len(self.enum_values) == 2
-            and self.enum_values[0]["text"] == "Off"
-            and self.enum_values[1]["text"] == "On"
+            and lower(self.enum_values[0]["text"]) == "off"
+            and lower(self.enum_values[1]["text"]) == "on"
         )
         if on_off:
             if self.is_writable:
