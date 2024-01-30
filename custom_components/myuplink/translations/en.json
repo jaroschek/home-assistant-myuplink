@@ -15,6 +15,11 @@
     "step": {
       "pick_implementation": {
         "title": "Pick Authentication Method"
+      },
+      "options": {
+        "data": {
+          "scan_interval": "Scan Interval (seconds)"
+        }
       }
     }
   },
@@ -119,6 +124,15 @@
           "4": "Blocked",
           "5": "Off",
           "6": "Active"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Scan Interval (seconds)"
         }
       }
     }
