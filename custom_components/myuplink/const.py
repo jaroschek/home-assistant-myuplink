@@ -19,13 +19,17 @@ API_HOST = "https://api.myuplink.com"
 API_VERSION = "v2"
 
 PLATFORMS = [
-    Platform.SENSOR,
     Platform.BINARY_SENSOR,
-    Platform.WATER_HEATER,
-    Platform.SWITCH,
-    Platform.SELECT,
     Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.UPDATE,
+    Platform.WATER_HEATER,
 ]
+
+DEFAULT_SCAN_INTERVAL = 300
+MIN_SCAN_INTERVAL = 60
 
 PLATFORM_OVERRIDE = {10733: Platform.BINARY_SENSOR, 44703: Platform.BINARY_SENSOR}
 WRITABLE_OVERRIDE = {781: False, 15753: False}

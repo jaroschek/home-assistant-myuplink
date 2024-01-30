@@ -8,6 +8,7 @@ import logging
 import aiohttp
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import aiohttp_client, config_entry_oauth2_flow
@@ -15,7 +16,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import AsyncConfigEntryAuth, MyUplink
-from .const import DOMAIN, PLATFORMS
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, PLATFORMS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,12 +58,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except aiohttp.client_exceptions.ClientConnectorError as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
 
+    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    _LOGGER.debug(
+        "Initialize coordinator with %d sesonds update interval", scan_interval
+    )
+
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
         name="myUplink",
         update_method=async_update_data,
-        update_interval=timedelta(seconds=60),
+        update_interval=timedelta(seconds=scan_interval),
     )
     await coordinator.async_config_entry_first_refresh()
 

@@ -15,6 +15,11 @@
     "step": {
       "pick_implementation": {
         "title": "Wählen Sie die Authentifizierungsmethode"
+      },
+      "options": {
+        "data": {
+          "scan_interval": "Scanintervall (Sekunden)"
+        }
       }
     }
   },
@@ -85,6 +90,15 @@
           "Alarm": "Alarm",
           "Blocked": "Blockiert",
           "Off": "Aus"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Scanintervall (Sekunden)"
         }
       }
     }

@@ -55,6 +55,98 @@ class AsyncConfigEntryAuth:
         )
 
 
+class Notification:
+    """Class that represents the notificationobject in the myUplink API."""
+
+    def __init__(self, raw_data: dict) -> None:
+        """Initialize a notification object."""
+        self.raw_data = raw_data
+
+    @property
+    def id(self) -> str:
+        """Return the ID of the notification."""
+        return self.raw_data["id"]
+
+    @property
+    def alarm_number(self) -> int:
+        """Return the alarm number of the notification."""
+        return int(self.raw_data["alarmNumber"])
+
+    @property
+    def device_id(self) -> str:
+        """Return the device ID of the notification."""
+        return self.raw_data["deviceId"]
+
+    @property
+    def severity(self) -> int:
+        """Return the severity of the notification."""
+        return int(self.raw_data["severity"])
+
+    @property
+    def status(self) -> str:
+        """Return the status of the notification."""
+        return self.raw_data["status"]
+
+    @property
+    def created_datetime(self) -> str:
+        """Return the created date time of the notification."""
+        return self.raw_data["createdDatetime"]
+
+    @property
+    def header(self) -> str:
+        """Return the header of the notification."""
+        return self.raw_data["header"]
+
+    @property
+    def description(self) -> str:
+        """Return the description of the notification."""
+        return self.raw_data["description"]
+
+    @property
+    def equipment(self) -> str:
+        """Return the equipment of the notification."""
+        return self.raw_data["equipName"]
+
+
+class FirmwareInfo:
+    """Class that represents the firmware info object in the myUplink API."""
+
+    def __init__(self, raw_data: dict) -> None:
+        """Initialize a firmware object."""
+        self.raw_data = raw_data
+
+    @property
+    def device_id(self) -> str:
+        """Return the ID of the device."""
+        return self.raw_data["deviceId"]
+
+    @property
+    def firmware_id(self) -> int:
+        """Return the ID of the firmware."""
+        return int(self.raw_data["firmwareId"])
+
+    @property
+    def current_version(self) -> str:
+        """Return the current firmware version of the device."""
+        if self.raw_data["currentFwVersion"].strip() == "":
+            return None
+        return self.raw_data["currentFwVersion"].strip()
+
+    @property
+    def pending_version(self) -> str:
+        """Return the pending firmware version of the device."""
+        if self.raw_data["pendingFwVersion"].strip() == "":
+            return None
+        return self.raw_data["pendingFwVersion"].strip()
+
+    @property
+    def desired_version(self) -> str:
+        """Return the desired firmware version of the device."""
+        if self.raw_data["desiredFwVersion"].strip() == "":
+            return None
+        return self.raw_data["desiredFwVersion"].strip()
+
+
 class Parameter:
     """Class that represents a parameter object in the myUplink API."""
 
@@ -256,6 +348,12 @@ class Zone:
 class Device:
     """Class that represents a device object in the myUplink API."""
 
+    # Firmware info
+    firmware_info: FirmwareInfo
+
+    # List of collected notifications
+    notifications: list[Notification] = []
+
     # List of collected parameters
     parameters: list[Parameter] = []
 
@@ -268,7 +366,7 @@ class Device:
         self.system = system
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Return the ID of the device."""
         return self.raw_data["id"]
 
@@ -308,6 +406,7 @@ class Device:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         self.parameters = await self.system.api.get_parameters(self)
+        self.firmware_info = await self.system.api.get_firmware_info(self)
         # self.zones = await self.system.api.get_zones(self.id)
 
 
@@ -323,7 +422,7 @@ class System:
         self.api = api
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """Return the ID of the system."""
         return self.raw_data["systemId"]
 
@@ -349,7 +448,14 @@ class System:
                 Device(device_data, self) for device_data in self.raw_data["devices"]
             ]
 
+        notifications = await self.api.get_notifications(self)
+
         for device in self.devices:
+            device.notifications = []
+            for notification in notifications:
+                if notification.device_id == device.id:
+                    device.notifications.append(notification)
+
             await device.async_fetch_data()
 
 
@@ -389,18 +495,13 @@ class MyUplink:
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
-        if not self.systems:
-            _LOGGER.debug("Fetch systems")
-            async with self.lock, self.throttle:
-                resp = await self.auth.request(
-                    "get", "systems/me?page=1&itemsPerPage=99"
-                )
-            resp.raise_for_status()
-            data = await resp.json()
+        _LOGGER.debug("Fetch systems")
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", "systems/me?page=1&itemsPerPage=99")
+        resp.raise_for_status()
+        data = await resp.json()
 
-            self.systems = [
-                System(system_data, self) for system_data in data["systems"]
-            ]
+        self.systems = [System(system_data, self) for system_data in data["systems"]]
 
         _LOGGER.debug("Update systems")
         for system in self.systems:
@@ -408,13 +509,34 @@ class MyUplink:
 
         return self.systems
 
-    async def get_device(self, device_id) -> Device:
+    async def get_notifications(self, system: System) -> list[Notification]:
+        """Return all active notifications by system id."""
+        _LOGGER.debug("Fetch notifications for system %s", system.id)
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "get",
+                f"systems/{system.id}/notifications/active?page=1&itemsPerPage=99",
+            )
+        resp.raise_for_status()
+        data = await resp.json()
+
+        return [Notification(notification) for notification in data["notifications"]]
+
+    async def get_device(self, device_id: str) -> Device:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
-        return Device(resp.json(), self)
+        return Device(await resp.json(), self)
+
+    async def get_firmware_info(self, device: Device) -> FirmwareInfo:
+        """Return firmware info for a device."""
+        _LOGGER.debug("Fetch firmware info for device %s", device.id)
+        async with self.lock, self.throttle:
+            resp = await self.auth.request("get", f"devices/{device.id}/firmware-info")
+        resp.raise_for_status()
+        return FirmwareInfo(await resp.json())
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return all parameters for a device."""

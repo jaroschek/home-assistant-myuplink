@@ -15,6 +15,11 @@
     "step": {
       "pick_implementation": {
         "title": "Velg metode for autentisering"
+      },
+      "options": {
+        "data": {
+          "scan_interval": "Skanneintervall (sekunder)"
+        }
       }
     }
   },
@@ -166,6 +171,15 @@
           "Alarm": "Alarm",
           "Blocked": "Blokkert",
           "Off": "Av"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Skanneintervall (sekunder)"
         }
       }
     }
