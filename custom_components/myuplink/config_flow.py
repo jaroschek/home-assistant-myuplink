@@ -71,6 +71,9 @@ class OAuth2FlowHandler(
     async def async_oauth_create_entry(self, data: dict) -> FlowResult:
         """Create an entry for the flow."""
         _LOGGER.debug("Finishing post-oauth configuration")
+        if self.source == SOURCE_REAUTH:
+            _LOGGER.debug("Skipping post-oauth configuration")
+            return self.async_create_entry(title=self.flow_impl.name, data=data)
         self._data = data
         return await self.async_step_options()
 
