@@ -56,9 +56,24 @@ class OAuth2FlowHandler(
         """Extra data that needs to be appended to the authorize url."""
         return {"scope": " ".join(SCOPES)}
 
+    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> FlowResult:
+        """Perform reauth upon an API authentication error."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict | None = None
+    ) -> FlowResult:
+        """Dialog that informs the user that reauth is required."""
+        if user_input is None:
+            return self.async_show_form(step_id="reauth_confirm")
+        return await self.async_step_user()
+
     async def async_oauth_create_entry(self, data: dict) -> FlowResult:
         """Create an entry for the flow."""
         _LOGGER.debug("Finishing post-oauth configuration")
+        if self.source == SOURCE_REAUTH:
+            _LOGGER.debug("Skipping post-oauth configuration")
+            return self.async_create_entry(title=self.flow_impl.name, data=data)
         self._data = data
         return await self.async_step_options()
 
