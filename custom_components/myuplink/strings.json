@@ -3,6 +3,11 @@
     "step": {
       "pick_implementation": {
         "title": "[%key:common::config_flow::title::oauth2_pick_implementation%]"
+      },
+      "options": {
+        "data": {
+          "scan_interval": "Scan Interval (seconds)"
+        }
       }
     },
     "abort": {
@@ -119,6 +124,15 @@
           "4": "Blocked",
           "5": "Off",
           "6": "Active"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Scan Interval (seconds)"
         }
       }
     }

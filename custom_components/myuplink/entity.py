@@ -36,7 +36,7 @@ class MyUplinkEntity(CoordinatorEntity):
             manufacturer=manufacturer,
             model=model,
             name=self._device.name,
-            sw_version=self._device.current_firmware_version,
+            sw_version=self._device.firmware_info.current_version,
         )
 
     @property
