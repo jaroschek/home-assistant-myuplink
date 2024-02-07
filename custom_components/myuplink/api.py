@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import suppress
 from datetime import datetime, timedelta
 import json
 import logging
@@ -473,7 +474,9 @@ class Throttle:
         delay = (self._timestamp - timestamp).total_seconds()
         if delay > 0:
             _LOGGER.debug("Delaying request by %s seconds due to throttle", delay)
-            await asyncio.sleep(delay)
+            with suppress(asyncio.CancelledError):
+                await asyncio.sleep(delay)
+
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
