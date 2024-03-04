@@ -49,9 +49,12 @@ class MyUplinkParameterNumberEntity(MyUplinkParameterEntity, NumberEntity):
 
         self._attr_native_unit_of_measurement = parameter.unit
 
-        self._attr_native_max_value = parameter.max_value * parameter.scale_value
-        self._attr_native_min_value = parameter.min_value * parameter.scale_value
-        self._attr_native_step = parameter.step_value * parameter.scale_value
+        if parameter.max_value is not None:
+            self._attr_native_max_value = parameter.max_value * parameter.scale_value
+        if parameter.min_value is not None:
+            self._attr_native_min_value = parameter.min_value * parameter.scale_value
+        if parameter.step_value is not None:
+            self._attr_native_step = parameter.step_value * parameter.scale_value
 
         self._attr_native_value = parameter.value
 
