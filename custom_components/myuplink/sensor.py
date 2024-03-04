@@ -67,7 +67,10 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
         else:
             self._attr_native_unit_of_measurement = self._parameter.unit
 
-            if self._parameter.unit == UnitOfTemperature.CELSIUS:
+            if self._parameter.unit in (
+                UnitOfTemperature.CELSIUS,
+                UnitOfTemperature.FAHRENHEIT,
+            ):
                 self._attr_device_class = SensorDeviceClass.TEMPERATURE
                 self._attr_state_class = SensorStateClass.MEASUREMENT
             elif self._parameter.unit == UnitOfEnergy.KILO_WATT_HOUR:
