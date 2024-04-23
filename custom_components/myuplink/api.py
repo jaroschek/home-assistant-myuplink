@@ -1,4 +1,5 @@
 """API for myUplink bound to Home Assistant OAuth."""
+
 from __future__ import annotations
 
 import asyncio
@@ -155,6 +156,7 @@ class Parameter:
         """Initialize a parameter object."""
         self.raw_data = raw_data
         self.device = device
+        self.fitting_entity = self.find_fitting_entity()
 
     @property
     def category(self) -> str:
@@ -247,7 +249,7 @@ class Parameter:
             self.device.id, str(self.id), str(value)
         )
 
-    def find_fitting_entity(self) -> Platform:
+    def find_fitting_entity(self) -> Platform | None:
         """Try to identify entity platform."""
         if self.id in PLATFORM_OVERRIDE:
             return PLATFORM_OVERRIDE[self.id]
@@ -260,12 +262,27 @@ class Parameter:
             if self.is_writable:
                 return Platform.SWITCH
             return Platform.BINARY_SENSOR
-        elif len(self.enum_values) > 0 and self.is_writable:
+        if len(self.enum_values) > 0 and self.is_writable:
             return Platform.SELECT
-        elif (self.max_value or self.min_value) and self.is_writable:
+        if (self.max_value or self.min_value) and self.is_writable:
             return Platform.NUMBER
-        else:
-            return Platform.SENSOR
+        # If we've come this far, it most likely is a sensor
+        # Some paramaters might however contain a string (like 513),
+        # which isn't supported by sensor with device_class None.
+        if self.unit == "":
+            try:
+                int(self.value)
+            except ValueError:
+                try:
+                    float(self.value)
+                except ValueError:
+                    _LOGGER.debug(
+                        "Param %s (%s) did not fit any platforms, skipping",
+                        self.name,
+                        self.id,
+                    )
+                    return None
+        return Platform.SENSOR
 
 
 class Zone:

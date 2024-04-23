@@ -1,4 +1,5 @@
 """Support for myUplink sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -31,7 +32,7 @@ async def async_setup_entry(
         for device in system.devices:
             entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
             for parameter in device.parameters:
-                if parameter.find_fitting_entity() == Platform.BINARY_SENSOR:
+                if parameter.fitting_entity == Platform.BINARY_SENSOR:
                     entities.append(
                         MyUplinkParameterBinarySensorEntity(
                             coordinator, device, parameter
