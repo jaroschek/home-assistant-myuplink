@@ -542,12 +542,27 @@ class MyUplink:
         return FirmwareInfo(await resp.json())
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
-        """Return all parameters for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device.id}/points")
         resp.raise_for_status()
-        return [Parameter(parameter, device) for parameter in await resp.json()]
+        parameters_data = await resp.json()
+    
+        unique_parameters = {}
+        seen = set()
+    
+        for parameter_data in parameters_data:
+            unique_key = (parameter_data["parameterId"], parameter_data["parameterName"])
+            
+            if unique_key not in seen:
+                seen.add(unique_key)
+                unique_parameters[unique_key] = Parameter(parameter_data, device)
+    
+        duplicates_count = len(parameters_data) - len(unique_parameters)
+        if duplicates_count > 0:
+            _LOGGER.debug(f"Found {duplicates_count} duplicates.")
+    
+        return list(unique_parameters.values())
 
     async def get_zones(self, device_id) -> list[Zone]:
         """Return all smart home zones for a device."""
