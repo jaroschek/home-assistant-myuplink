@@ -75,10 +75,10 @@ class MyUplinkParameterEntity(MyUplinkEntity):
         self._parameter = parameter
         if self._parameter.category and self._device.name != self._parameter.category:
             self._attr_name = (
-                f"{self._device.name} {self._parameter.category} {self._parameter.name}"
+                f"{self._parameter.category} {self._parameter.name} ({self._parameter.id})"
             )
         else:
-            self._attr_name = f"{self._device.name} {self._parameter.name}"
+            self._attr_name = f"{self._parameter.name} ({self._parameter.id})"
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"
 
     @callback
