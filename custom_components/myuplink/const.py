@@ -32,8 +32,28 @@ PLATFORMS = [
 DEFAULT_SCAN_INTERVAL = 300
 MIN_SCAN_INTERVAL = 5
 
-PLATFORM_OVERRIDE = {10733: Platform.BINARY_SENSOR, 44703: Platform.BINARY_SENSOR}
-WRITABLE_OVERRIDE = {781: False, 15753: False}
+PLATFORM_OVERRIDE = {
+    10733: Platform.BINARY_SENSOR,
+    44703: Platform.BINARY_SENSOR,
+
+    47839: Platform.SWITCH,
+    47805: Platform.SWITCH,
+    47771: Platform.SWITCH,
+    47669: Platform.SWITCH,
+    47635: Platform.SWITCH,
+    47050: Platform.SWITCH,
+    47394: Platform.SWITCH,
+    48442: Platform.SWITCH,
+    48043: Platform.SWITCH,
+    48009: Platform.SWITCH,
+    47975: Platform.SWITCH,
+}
+
+WRITABLE_OVERRIDE = {
+    781: False,
+    15753: False,
+}
+
 WATER_HEATERS = ["18760NE"]
 
 
