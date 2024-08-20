@@ -1,0 +1,140 @@
+{
+    "config": {
+      "abort": {
+        "already_configured": "Kontoen er allerede konfigureret",
+        "already_in_progress": "Konfigurationsprocessen er allerede i gang",
+        "authorize_url_timeout": "Timeout ved generering af autorisations-URL.",
+        "missing_configuration": "Komponenten er ikke konfigureret. Følg venligst dokumentationen.",
+        "no_url_available": "Ingen URL tilgængelig. For information om denne fejl, [se hjælpesektionen]({docs_url})",
+        "oauth_error": "Modtog ugyldige token-data.",
+        "user_rejected_authorize": "Konto-linking afvist: {error}"
+      },
+      "create_entry": {
+        "default": "Godkendt med succes"
+      },
+      "step": {
+        "pick_implementation": {
+          "title": "Vælg godkendelsesmetode"
+        },
+        "options": {
+          "data": {
+            "scan_interval": "Scan-interval (sekunder)"
+          }
+        }
+      }
+    },
+    "entity": {
+      "sensor": {
+        "406": {
+          "state": {
+            "0": "Test",
+            "1": "Slukket",
+            "2": "Søvn",
+            "3": "Øko",
+            "4": "Normal",
+            "5": "Ekspres",
+            "6": "Pris",
+            "7": "Tidsplan",
+            "8": "Ekstern",
+            "9": "Legionella",
+            "10": "Ferie",
+            "11": "Boost"
+          }
+        },
+        "500": {
+          "state": {
+            "3": "Øko",
+            "4": "Normal",
+            "6": "Pris",
+            "7": "Tidsplan",
+            "8": "Ekstern",
+            "10": "Ferie",
+            "11": "Boost"
+          }
+        },
+        "517": {
+          "state": {
+            "0": "0",
+            "1": "700W",
+            "2": "1300W",
+            "3": "2000W"
+          }
+        },
+        "544": {
+          "state": {
+            "1": "NO1",
+            "2": "NO2",
+            "3": "NO3",
+            "4": "NO4",
+            "5": "NO5"
+          }
+        },
+        "549": {
+          "state": {
+            "0": "Ukendt",
+            "1": "Billig",
+            "2": "Normal",
+            "3": "Dyr"
+          }
+        },
+        "601": {
+          "state": {
+            "1": "Varm"
+          }
+        },
+        "1965": {
+          "state": {
+            "20": "Slukket",
+            "40": "Starter",
+            "60": "Tændt",
+            "100": "Stopper",
+            "120": "Afrimer",
+            "140": "Afrimer",
+            "160": "Afrimer"
+          }
+        },
+        "14950": {
+          "state": {
+            "0": "Slukket",
+            "1": "Opvarmning",
+            "2": "Køling",
+            "3": "Varmt vand",
+            "4": "Pool",
+            "5": "Pool 2",
+            "6": "Forvarmning"
+          }
+        },
+        "55000": {
+          "state": {
+            "10": "Slukket",
+            "20": "Varmt vand",
+            "30": "Opvarmning",
+            "40": "Pool",
+            "41": "Pool 2",
+            "50": "Overførsel",
+            "60": "Køling"
+          }
+        },
+        "55027": {
+          "state": {
+            "0": "Alarm",
+            "1": "Alarm",
+            "2": "Aktiv",
+            "3": "Slukket",
+            "4": "Blokeret",
+            "5": "Slukket",
+            "6": "Aktiv"
+          }
+        }
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "data": {
+            "scan_interval": "Scan-interval (sekunder)"
+          }
+        }
+      }
+    }
+  }
