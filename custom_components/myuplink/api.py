@@ -1,4 +1,5 @@
 """API for myUplink bound to Home Assistant OAuth."""
+
 from __future__ import annotations
 
 import asyncio
@@ -253,19 +254,22 @@ class Parameter:
             return PLATFORM_OVERRIDE[self.id]
         on_off = (
             len(self.enum_values) == 2
-            and self.enum_values[0]["text"].lower() == "off"
-            and self.enum_values[1]["text"].lower() == "on"
+            and self.enum_values[0]["value"] == "0"
+            and self.enum_values[1]["value"] == "1"
         )
+
         if on_off:
             if self.is_writable:
                 return Platform.SWITCH
             return Platform.BINARY_SENSOR
-        elif len(self.enum_values) > 0 and self.is_writable:
+
+        if len(self.enum_values) > 0 and self.is_writable:
             return Platform.SELECT
-        elif (self.max_value or self.min_value) and self.is_writable:
+
+        if (self.max_value or self.min_value) and self.is_writable:
             return Platform.NUMBER
-        else:
-            return Platform.SENSOR
+
+        return Platform.SENSOR
 
 
 class Zone:
@@ -490,17 +494,21 @@ class MyUplink:
     # List of collected systems
     systems: list[System] = []
 
-    def __init__(self, auth: AsyncConfigEntryAuth) -> None:
+    def __init__(self, auth: AsyncConfigEntryAuth, language_code: str) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
         self.lock = asyncio.Lock()
         self.throttle = Throttle(timedelta(seconds=5))
 
+        self.header = {"Accept-Language": language_code}
+
     async def get_systems(self) -> list[System]:
         """Return all systems."""
         _LOGGER.debug("Fetch systems")
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", "systems/me?page=1&itemsPerPage=99")
+            resp = await self.auth.request(
+                "get", "systems/me?page=1&itemsPerPage=99", headers=self.header
+            )
         resp.raise_for_status()
         data = await resp.json()
 
@@ -519,6 +527,7 @@ class MyUplink:
             resp = await self.auth.request(
                 "get",
                 f"systems/{system.id}/notifications/active?page=1&itemsPerPage=99",
+                headers=self.header,
             )
         resp.raise_for_status()
         data = await resp.json()
@@ -529,7 +538,9 @@ class MyUplink:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device_id}")
+            resp = await self.auth.request(
+                "get", f"devices/{device_id}", headers=self.header
+            )
         resp.raise_for_status()
         return Device(await resp.json(), self)
 
@@ -537,31 +548,41 @@ class MyUplink:
         """Return firmware info for a device."""
         _LOGGER.debug("Fetch firmware info for device %s", device.id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device.id}/firmware-info")
+            resp = await self.auth.request(
+                "get", f"devices/{device.id}/firmware-info", headers=self.header
+            )
         resp.raise_for_status()
         return FirmwareInfo(await resp.json())
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
+        """Return parameters info for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device.id}/points")
+            resp = await self.auth.request(
+                "get",
+                f"devices/{device.id}/points",
+                headers=self.header,
+            )
         resp.raise_for_status()
         parameters_data = await resp.json()
-    
+
         unique_parameters = {}
         seen = set()
-    
+
         for parameter_data in parameters_data:
-            unique_key = (parameter_data["parameterId"], parameter_data["parameterName"])
-            
+            unique_key = (
+                parameter_data["parameterId"],
+                parameter_data["parameterName"],
+            )
+
             if unique_key not in seen:
                 seen.add(unique_key)
                 unique_parameters[unique_key] = Parameter(parameter_data, device)
-    
+
         duplicates_count = len(parameters_data) - len(unique_parameters)
         if duplicates_count > 0:
-            _LOGGER.debug(f"Found {duplicates_count} duplicates.")
-    
+            _LOGGER.debug("Found %d duplicates", duplicates_count)
+
         return list(unique_parameters.values())
 
     async def get_zones(self, device_id) -> list[Zone]:
@@ -569,7 +590,7 @@ class MyUplink:
         _LOGGER.debug("Fetch zones for device %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
-                "get", f"devices/{device_id}/smart-home-zones"
+                "get", f"devices/{device_id}/smart-home-zones", headers=self.header
             )
         resp.raise_for_status()
         return [Zone(zone) for zone in await resp.json()]

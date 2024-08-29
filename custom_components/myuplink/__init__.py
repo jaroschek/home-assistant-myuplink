@@ -1,4 +1,5 @@
 """The myUplink integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -46,7 +47,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady from ex
 
     api = MyUplink(
-        AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session)
+        AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session),
+        f"{hass.config.language}-{hass.config.country}",
     )
 
     async def async_update_data():
