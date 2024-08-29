@@ -7,7 +7,8 @@
       "options": {
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
-          "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)"
+          "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "scan_interval": "Scan Interval (seconds)"
         }
       }
     },
@@ -134,7 +135,8 @@
       "init": {
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
-          "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)"
+          "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "scan_interval": "Scan Interval (seconds)"
         }
       }
     }

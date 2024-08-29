@@ -14,11 +14,10 @@ from homeassistant.config_entries import (
     ConfigEntry,
     OptionsFlowWithConfigEntry,
 )
-from homeassistant.const import CONF_SCAN_INTERVAL
+from homeassistant.const import CONF_SCAN_INTERVAL, UnitOfTime
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_entry_oauth2_flow, selector
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
@@ -26,7 +25,9 @@ from .const import (
     CONF_FETCH_NOTIFICATIONS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
+    SCAN_INTERVAL_STEP,
     SCOPES,
 )
 
@@ -47,7 +48,15 @@ def get_options_schema(data: ConfigType) -> Schema:
             vol.Required(
                 CONF_SCAN_INTERVAL,
                 default=data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-            ): vol.All(cv.positive_int, vol.Clamp(min=MIN_SCAN_INTERVAL)),
+            ): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=MIN_SCAN_INTERVAL,
+                    max=MAX_SCAN_INTERVAL,
+                    mode=selector.NumberSelectorMode.BOX,
+                    step=SCAN_INTERVAL_STEP,
+                    unit_of_measurement=UnitOfTime.SECONDS,
+                )
+            ),
         }
     )
 
