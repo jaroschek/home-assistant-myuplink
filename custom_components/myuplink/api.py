@@ -17,6 +17,7 @@ from homeassistant.helpers import config_entry_oauth2_flow
 from .const import (
     API_HOST,
     API_VERSION,
+    CONF_ADDITIONAL_PARAMETER,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -532,6 +533,13 @@ class MyUplink:
             self.parameter_whitelist = []
 
         try:
+            self.additional_parameter = json.loads(
+                entry.options.get(CONF_ADDITIONAL_PARAMETER, "[]")
+            )
+        except json.decoder.JSONDecodeError:
+            self.additional_parameter = []
+
+        try:
             self.platform_override = json.loads(
                 entry.options.get(
                     CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE)
@@ -606,38 +614,46 @@ class MyUplink:
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return parameters info for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
-        query_parameters = {}
-        if len(self.parameter_whitelist):
-            query_parameters["parameters"] = ",".join(
-                str(parameter_id) for parameter_id in self.parameter_whitelist
-            )
+        parameter_filters = []
 
-        async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "get",
-                f"devices/{device.id}/points",
-                headers=self.header,
-                params=query_parameters,
+        if len(self.parameter_whitelist) == 0:
+            parameter_filters.append([])
+            if len(self.additional_parameter) > 0:
+                parameter_filters.append(self.additional_parameter)
+        else:
+            parameter_filters.append(
+                [*self.parameter_whitelist, *self.additional_parameter]
             )
-        resp.raise_for_status()
-        parameters_data = await resp.json()
 
         unique_parameters = {}
         seen = set()
 
-        for parameter_data in parameters_data:
-            unique_key = (
-                parameter_data["parameterId"],
-                parameter_data["parameterName"],
-            )
+        for parameter_filter in parameter_filters:
+            query_parameters = {}
+            if len(parameter_filter) > 0:
+                query_parameters["parameters"] = ",".join(
+                    str(parameter_id) for parameter_id in parameter_filter
+                )
 
-            if unique_key not in seen:
-                seen.add(unique_key)
-                unique_parameters[unique_key] = Parameter(parameter_data, device)
+            async with self.lock, self.throttle:
+                resp = await self.auth.request(
+                    "get",
+                    f"devices/{device.id}/points",
+                    headers=self.header,
+                    params=query_parameters,
+                )
+            resp.raise_for_status()
+            parameters_data = await resp.json()
 
-        duplicates_count = len(parameters_data) - len(unique_parameters)
-        if duplicates_count > 0:
-            _LOGGER.debug("Found %d duplicates", duplicates_count)
+            for parameter_data in parameters_data:
+                unique_key = (
+                    parameter_data["parameterId"],
+                    parameter_data["parameterName"],
+                )
+
+                if unique_key not in seen:
+                    seen.add(unique_key)
+                    unique_parameters[unique_key] = Parameter(parameter_data, device)
 
         return list(unique_parameters.values())
 

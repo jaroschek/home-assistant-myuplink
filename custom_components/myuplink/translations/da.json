@@ -18,6 +18,7 @@
       },
       "options": {
         "data": {
+          "additional_parameter": "Yderligere parameter\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
           "parameter_whitelist": "Parameterhvidliste\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
@@ -137,6 +138,7 @@
     "step": {
       "init": {
         "data": {
+          "additional_parameter": "Yderligere parameter\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
           "parameter_whitelist": "Parameterhvidliste\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",

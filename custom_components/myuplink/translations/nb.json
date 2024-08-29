@@ -18,6 +18,7 @@
       },
       "options": {
         "data": {
+          "additional_parameter": "Tilleggsparameter\n\n(Kommaseparert liste over parameter-ID-er. Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
           "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
           "parameter_whitelist": "Parameterhviteliste\n\n(Kommaseparert liste over parameter-ID-er. Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
@@ -184,6 +185,7 @@
     "step": {
       "init": {
         "data": {
+          "additional_parameter": "Tilleggsparameter\n\n(Kommaseparert liste over parameter-ID-er. Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
           "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
           "parameter_whitelist": "Parameterhviteliste\n\n(Kommaseparert liste over parameter-ID-er. Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
