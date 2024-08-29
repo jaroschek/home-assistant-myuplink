@@ -22,6 +22,7 @@ from homeassistant.helpers import config_entry_oauth2_flow, selector
 from homeassistant.helpers.typing import ConfigType
 
 from .const import (
+    CONF_ADDITIONAL_PARAMETER,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -48,6 +49,13 @@ def get_options_schema(data: ConfigType) -> Schema:
         )
     except json.decoder.JSONDecodeError:
         parameter_whitlist = "[]"
+
+    try:
+        additional_parameter = json.dumps(
+            json.loads(data.get(CONF_ADDITIONAL_PARAMETER, "[]"))
+        )
+    except json.decoder.JSONDecodeError:
+        additional_parameter = "[]"
 
     try:
         platform_override = json.dumps(
@@ -91,6 +99,10 @@ def get_options_schema(data: ConfigType) -> Schema:
             vol.Optional(
                 CONF_PARAMETER_WHITELIST,
                 default=parameter_whitlist,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            vol.Optional(
+                CONF_ADDITIONAL_PARAMETER,
+                default=additional_parameter,
             ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_PLATFORM_OVERRIDE,
