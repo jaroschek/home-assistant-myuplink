@@ -10,10 +10,17 @@ import logging
 
 from aiohttp import ClientResponse, ClientSession
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.helpers import config_entry_oauth2_flow
 
-from .const import API_HOST, API_VERSION, PLATFORM_OVERRIDE, WRITABLE_OVERRIDE
+from .const import (
+    API_HOST,
+    API_VERSION,
+    CONF_FETCH_FIRMWARE,
+    PLATFORM_OVERRIDE,
+    WRITABLE_OVERRIDE,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -411,7 +418,8 @@ class Device:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         self.parameters = await self.system.api.get_parameters(self)
-        self.firmware_info = await self.system.api.get_firmware_info(self)
+        if self.system.api.entry.options.get(CONF_FETCH_FIRMWARE, True):
+            self.firmware_info = await self.system.api.get_firmware_info(self)
         # self.zones = await self.system.api.get_zones(self.id)
 
 
@@ -494,9 +502,12 @@ class MyUplink:
     # List of collected systems
     systems: list[System] = []
 
-    def __init__(self, auth: AsyncConfigEntryAuth, language_code: str) -> None:
+    def __init__(
+        self, auth: AsyncConfigEntryAuth, language_code: str, entry: ConfigEntry
+    ) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
+        self.entry = entry
         self.lock = asyncio.Lock()
         self.throttle = Throttle(timedelta(seconds=5))
 

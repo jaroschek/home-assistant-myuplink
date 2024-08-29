@@ -6,7 +6,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device
-from .const import DOMAIN
+from .const import CONF_FETCH_FIRMWARE, DOMAIN
 from .entity import MyUplinkEntity
 
 
@@ -18,9 +18,10 @@ async def async_setup_entry(
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[UpdateEntity] = []
 
-    for system in coordinator.data:
-        for device in system.devices:
-            entities.append(MyUplinkUpdateEntity(coordinator, device))
+    if entry.options.get(CONF_FETCH_FIRMWARE, True):
+        for system in coordinator.data:
+            for device in system.devices:
+                entities.append(MyUplinkUpdateEntity(coordinator, device))
 
     async_add_entities(entities)
 

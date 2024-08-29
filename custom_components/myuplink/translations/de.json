@@ -18,7 +18,7 @@
       },
       "options": {
         "data": {
-          "scan_interval": "Scanintervall (Sekunden)"
+          "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)"
         }
       }
     }
@@ -98,7 +98,7 @@
     "step": {
       "init": {
         "data": {
-          "scan_interval": "Scanintervall (Sekunden)"
+          "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)"
         }
       }
     }

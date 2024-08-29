@@ -1,4 +1,5 @@
 """Definition of base myUplink Entity."""
+
 from __future__ import annotations
 
 from homeassistant.core import callback
@@ -36,7 +37,7 @@ class MyUplinkEntity(CoordinatorEntity):
             manufacturer=manufacturer,
             model=model,
             name=self._device.name,
-            sw_version=self._device.firmware_info.current_version,
+            sw_version=self._device.current_firmware_version,
         )
 
     @property
@@ -74,9 +75,7 @@ class MyUplinkParameterEntity(MyUplinkEntity):
         """Update attrs from parameter."""
         self._parameter = parameter
         if self._parameter.category and self._device.name != self._parameter.category:
-            self._attr_name = (
-                f"{self._parameter.category} {self._parameter.name} ({self._parameter.id})"
-            )
+            self._attr_name = f"{self._parameter.category} {self._parameter.name} ({self._parameter.id})"
         else:
             self._attr_name = f"{self._parameter.name} ({self._parameter.id})"
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"

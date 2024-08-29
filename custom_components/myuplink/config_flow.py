@@ -1,7 +1,9 @@
 """Config flow for myUplink."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
+import json
 import logging
 from typing import Any
 
@@ -16,11 +18,17 @@ from homeassistant.config_entries import (
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers import config_entry_oauth2_flow
+from homeassistant.helpers import config_entry_oauth2_flow, selector
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, MIN_SCAN_INTERVAL, SCOPES
+from .const import (
+    CONF_FETCH_FIRMWARE,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    MIN_SCAN_INTERVAL,
+    SCOPES,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,9 +38,12 @@ def get_options_schema(data: ConfigType) -> Schema:
     return vol.Schema(
         {
             vol.Required(
+                CONF_FETCH_FIRMWARE, default=data.get(CONF_FETCH_FIRMWARE, True)
+            ): selector.BooleanSelector(),
+            vol.Required(
                 CONF_SCAN_INTERVAL,
                 default=data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-            ): vol.All(cv.positive_int, vol.Clamp(min=MIN_SCAN_INTERVAL))
+            ): vol.All(cv.positive_int, vol.Clamp(min=MIN_SCAN_INTERVAL)),
         }
     )
 
