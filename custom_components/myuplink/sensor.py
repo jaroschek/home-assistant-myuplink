@@ -1,4 +1,5 @@
 """Support for myUplink sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -23,7 +24,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter
-from .const import DOMAIN, CustomUnits
+from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
 from .entity import MyUplinkEntity, MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,7 +40,8 @@ async def async_setup_entry(
 
     for system in coordinator.data:
         for device in system.devices:
-            entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
+            if entry.options.get(CONF_FETCH_NOTIFICATIONS, True):
+                entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
             for parameter in device.parameters:
                 if parameter.find_fitting_entity() == Platform.SENSOR:
                     if (

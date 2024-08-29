@@ -18,7 +18,8 @@
       },
       "options": {
         "data": {
-          "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)"
+          "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
+          "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)"
         }
       }
     }
@@ -132,7 +133,8 @@
     "step": {
       "init": {
         "data": {
-          "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)"
+          "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
+          "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)"
         }
       }
     }

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-import json
 import logging
 from typing import Any
 
@@ -24,6 +23,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_FETCH_FIRMWARE,
+    CONF_FETCH_NOTIFICATIONS,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     MIN_SCAN_INTERVAL,
@@ -39,6 +39,10 @@ def get_options_schema(data: ConfigType) -> Schema:
         {
             vol.Required(
                 CONF_FETCH_FIRMWARE, default=data.get(CONF_FETCH_FIRMWARE, True)
+            ): selector.BooleanSelector(),
+            vol.Required(
+                CONF_FETCH_NOTIFICATIONS,
+                default=data.get(CONF_FETCH_NOTIFICATIONS, True),
             ): selector.BooleanSelector(),
             vol.Required(
                 CONF_SCAN_INTERVAL,

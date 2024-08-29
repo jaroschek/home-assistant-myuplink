@@ -18,6 +18,7 @@ from .const import (
     API_HOST,
     API_VERSION,
     CONF_FETCH_FIRMWARE,
+    CONF_FETCH_NOTIFICATIONS,
     PLATFORM_OVERRIDE,
     WRITABLE_OVERRIDE,
 )
@@ -461,13 +462,16 @@ class System:
                 Device(device_data, self) for device_data in self.raw_data["devices"]
             ]
 
-        notifications = await self.api.get_notifications(self)
+        fetch_notifications = self.api.entry.options.get(CONF_FETCH_NOTIFICATIONS, True)
+        if fetch_notifications:
+            notifications = await self.api.get_notifications(self)
 
         for device in self.devices:
-            device.notifications = []
-            for notification in notifications:
-                if notification.device_id == device.id:
-                    device.notifications.append(notification)
+            if fetch_notifications:
+                device.notifications = []
+                for notification in notifications:
+                    if notification.device_id == device.id:
+                        device.notifications.append(notification)
 
             await device.async_fetch_data()
 
