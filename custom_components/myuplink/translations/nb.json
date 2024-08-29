@@ -18,7 +18,7 @@
       },
       "options": {
         "data": {
-          "scan_interval": "Skanneintervall (sekunder)"
+          "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)"
         }
       }
     }
@@ -179,7 +179,7 @@
     "step": {
       "init": {
         "data": {
-          "scan_interval": "Skanneintervall (sekunder)"
+          "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)"
         }
       }
     }

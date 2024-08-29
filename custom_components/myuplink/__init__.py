@@ -49,6 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api = MyUplink(
         AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session),
         f"{hass.config.language}-{hass.config.country}",
+        entry,
     )
 
     async def async_update_data():
