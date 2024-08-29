@@ -21,7 +21,8 @@
           "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
           "platform_override": "Platform-Überschreibung\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "scan_interval": "Scanintervall (Sekunden)"
+          "scan_interval": "Scanintervall (Sekunden)",
+          "writable_override": "Schreibkarkeit\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)"
         }
       }
     }
@@ -104,7 +105,8 @@
           "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
           "platform_override": "Platform-Überschreibung\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "scan_interval": "Scanintervall (Sekunden)"
+          "scan_interval": "Scanintervall (Sekunden)",
+          "writable_override": "Schreibkarkeit\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)"
         }
       }
     }

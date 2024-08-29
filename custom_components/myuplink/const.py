@@ -33,6 +33,7 @@ PLATFORMS = [
 CONF_FETCH_FIRMWARE = "fetch_firmware"
 CONF_FETCH_NOTIFICATIONS = "fetch_notifications"
 CONF_PLATFORM_OVERRIDE = "platform_override"
+CONF_WRITABLE_OVERRIDE = "writable_override"
 
 DEFAULT_SCAN_INTERVAL = 300
 MAX_SCAN_INTERVAL = 600
@@ -55,7 +56,7 @@ DEFAULT_PLATFORM_OVERRIDE = {
     48442: Platform.SWITCH,
 }
 
-WRITABLE_OVERRIDE = {
+DEFAULT_WRITABLE_OVERRIDE = {
     781: False,
     1755: False,
     1959: False,

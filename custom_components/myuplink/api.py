@@ -20,8 +20,9 @@ from .const import (
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PLATFORM_OVERRIDE,
+    CONF_WRITABLE_OVERRIDE,
     DEFAULT_PLATFORM_OVERRIDE,
-    WRITABLE_OVERRIDE,
+    DEFAULT_WRITABLE_OVERRIDE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -191,7 +192,10 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        return WRITABLE_OVERRIDE.get(self.id, self.raw_data["writable"])
+        if self.id in self.device.system.api.writable_override:
+            return self.device.system.api.writable_override[self.id]
+
+        return self.raw_data["writable"]
 
     @property
     def timestamp(self) -> str:
@@ -528,6 +532,16 @@ class MyUplink:
             )
         except json.decoder.JSONDecodeError:
             self.platform_override = DEFAULT_PLATFORM_OVERRIDE
+
+        try:
+            self.writable_override = json.loads(
+                entry.options.get(
+                    CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE)
+                ),
+                object_hook=self.parse_int_keys,
+            )
+        except json.decoder.JSONDecodeError:
+            self.writable_override = DEFAULT_WRITABLE_OVERRIDE
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
