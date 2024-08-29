@@ -20,6 +20,7 @@
         "data": {
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
+          "parameter_whitelist": "Parameterhvidliste\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "platform_override": "Platformtilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "scan_interval": "Scan-interval (sekunder)",
           "writable_override": "Skrivbare tilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)"
@@ -138,6 +139,7 @@
         "data": {
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
+          "parameter_whitelist": "Parameterhvidliste\n\n(Kommasepareret liste over parameter-id'er. Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "platform_override": "Platformtilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "scan_interval": "Scan-interval (sekunder)",
           "writable_override": "Skrivbare tilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)"

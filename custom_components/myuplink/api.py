@@ -19,6 +19,7 @@ from .const import (
     API_VERSION,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
+    CONF_PARAMETER_WHITELIST,
     CONF_PLATFORM_OVERRIDE,
     CONF_WRITABLE_OVERRIDE,
     DEFAULT_PLATFORM_OVERRIDE,
@@ -524,6 +525,13 @@ class MyUplink:
         self.header = {"Accept-Language": language_code}
 
         try:
+            self.parameter_whitelist = json.loads(
+                entry.options.get(CONF_PARAMETER_WHITELIST, "[]")
+            )
+        except json.decoder.JSONDecodeError:
+            self.parameter_whitelist = []
+
+        try:
             self.platform_override = json.loads(
                 entry.options.get(
                     CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE)
@@ -598,11 +606,18 @@ class MyUplink:
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return parameters info for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
+        query_parameters = {}
+        if len(self.parameter_whitelist):
+            query_parameters["parameters"] = ",".join(
+                str(parameter_id) for parameter_id in self.parameter_whitelist
+            )
+
         async with self.lock, self.throttle:
             resp = await self.auth.request(
                 "get",
                 f"devices/{device.id}/points",
                 headers=self.header,
+                params=query_parameters,
             )
         resp.raise_for_status()
         parameters_data = await resp.json()

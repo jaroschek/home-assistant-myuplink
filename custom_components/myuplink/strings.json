@@ -8,6 +8,7 @@
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
           "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "parameter_whitelist": "Parameter Whitelist\n\n(Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset.)",
           "platform_override": "Platform Overrides\n\n(Must be valid JSON. Empty field and save to reset.)",
           "scan_interval": "Scan Interval (seconds)",
           "writable_override": "Writable Overrides\n\n(Must be valid JSON. Empty field and save to reset.)"
@@ -138,6 +139,7 @@
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
           "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "parameter_whitelist": "Parameter Whitelist\n\n(Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset.)",
           "platform_override": "Platform Overrides\n\n(Must be valid JSON. Empty field and save to reset.)",
           "scan_interval": "Scan Interval (seconds)",
           "writable_override": "Writable Overrides\n\n(Must be valid JSON. Empty field and save to reset.)"
