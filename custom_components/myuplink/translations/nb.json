@@ -19,7 +19,8 @@
       "options": {
         "data": {
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
-          "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)"
+          "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
+          "scan_interval": "Skanneintervall (sekunder)"
         }
       }
     }
@@ -181,7 +182,8 @@
       "init": {
         "data": {
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
-          "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)"
+          "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
+          "scan_interval": "Skanneintervall (sekunder)"
         }
       }
     }

@@ -19,7 +19,8 @@
       "options": {
         "data": {
           "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)"
+          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
+          "scan_interval": "Scanintervall (Sekunden)"
         }
       }
     }
@@ -100,7 +101,8 @@
       "init": {
         "data": {
           "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)"
+          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
+          "scan_interval": "Scanintervall (Sekunden)"
         }
       }
     }
