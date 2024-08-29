@@ -24,6 +24,7 @@ from homeassistant.helpers.typing import ConfigType
 from .const import (
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
+    CONF_PARAMETER_WHITELIST,
     CONF_PLATFORM_OVERRIDE,
     CONF_WRITABLE_OVERRIDE,
     DEFAULT_PLATFORM_OVERRIDE,
@@ -41,6 +42,13 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_options_schema(data: ConfigType) -> Schema:
     """Return the options schema."""
+    try:
+        parameter_whitlist = json.dumps(
+            json.loads(data.get(CONF_PARAMETER_WHITELIST, "[]"))
+        )
+    except json.decoder.JSONDecodeError:
+        parameter_whitlist = "[]"
+
     try:
         platform_override = json.dumps(
             json.loads(
@@ -80,6 +88,10 @@ def get_options_schema(data: ConfigType) -> Schema:
                     unit_of_measurement=UnitOfTime.SECONDS,
                 )
             ),
+            vol.Optional(
+                CONF_PARAMETER_WHITELIST,
+                default=parameter_whitlist,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_PLATFORM_OVERRIDE,
                 default=platform_override,

@@ -32,6 +32,7 @@ PLATFORMS = [
 
 CONF_FETCH_FIRMWARE = "fetch_firmware"
 CONF_FETCH_NOTIFICATIONS = "fetch_notifications"
+CONF_PARAMETER_WHITELIST = "parameter_whitelist"
 CONF_PLATFORM_OVERRIDE = "platform_override"
 CONF_WRITABLE_OVERRIDE = "writable_override"
 
