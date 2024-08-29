@@ -20,6 +20,7 @@
         "data": {
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
+          "platform_override": "Platformtilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "scan_interval": "Scan-interval (sekunder)"
         }
       }
@@ -136,6 +137,7 @@
         "data": {
           "fetch_firmware": "Hent firmwareoplysninger fra API?\n\n(Kræver et ekstra API-kald.)",
           "fetch_notifications": "Vil du hente meddelelser fra API?\n\n(Kræver et ekstra API-kald.)",
+          "platform_override": "Platformtilsidesættelser\n\n(Skal være gyldig JSON. Tøm felt og gem for at nulstille.)",
           "scan_interval": "Scan-interval (sekunder)"
         }
       }

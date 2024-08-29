@@ -20,6 +20,7 @@
         "data": {
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
           "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
+          "platform_override": "Plattformoverstyringer\n\n(Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
           "scan_interval": "Skanneintervall (sekunder)"
         }
       }
@@ -183,6 +184,7 @@
         "data": {
           "fetch_firmware": "Hent fastvareinformasjon fra API?\n\n(Krever et ekstra API-kall.)",
           "fetch_notifications": "Hente varsler fra API?\n\n(Krever et ekstra API-kall.)",
+          "platform_override": "Plattformoverstyringer\n\n(Må være gyldig JSON. Tøm feltet og lagre for å tilbakestille.)",
           "scan_interval": "Skanneintervall (sekunder)"
         }
       }

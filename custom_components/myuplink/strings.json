@@ -8,6 +8,7 @@
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
           "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "platform_override": "Platform Overrides\n\n(Must be valid JSON. Empty field and save to reset.)",
           "scan_interval": "Scan Interval (seconds)"
         }
       }
@@ -136,6 +137,7 @@
         "data": {
           "fetch_firmware": "Fetch Firmware Info from API?\n\n(Requires an additional API call.)",
           "fetch_notifications": "Fetch Notifications from API?\n\n(Requires an additional API call.)",
+          "platform_override": "Platform Overrides\n\n(Must be valid JSON. Empty field and save to reset.)",
           "scan_interval": "Scan Interval (seconds)"
         }
       }
