@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import json
 import logging
 from typing import Any
 
@@ -23,6 +24,8 @@ from homeassistant.helpers.typing import ConfigType
 from .const import (
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
+    CONF_PLATFORM_OVERRIDE,
+    DEFAULT_PLATFORM_OVERRIDE,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     MAX_SCAN_INTERVAL,
@@ -36,6 +39,15 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_options_schema(data: ConfigType) -> Schema:
     """Return the options schema."""
+    try:
+        platform_override = json.dumps(
+            json.loads(
+                data.get(CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE))
+            )
+        )
+    except json.decoder.JSONDecodeError:
+        platform_override = json.dumps(DEFAULT_PLATFORM_OVERRIDE)
+
     return vol.Schema(
         {
             vol.Required(
@@ -57,6 +69,10 @@ def get_options_schema(data: ConfigType) -> Schema:
                     unit_of_measurement=UnitOfTime.SECONDS,
                 )
             ),
+            vol.Optional(
+                CONF_PLATFORM_OVERRIDE,
+                default=platform_override,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
         }
     )
 

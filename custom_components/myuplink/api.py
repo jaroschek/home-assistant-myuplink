@@ -19,7 +19,8 @@ from .const import (
     API_VERSION,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
-    PLATFORM_OVERRIDE,
+    CONF_PLATFORM_OVERRIDE,
+    DEFAULT_PLATFORM_OVERRIDE,
     WRITABLE_OVERRIDE,
 )
 
@@ -258,8 +259,9 @@ class Parameter:
 
     def find_fitting_entity(self) -> Platform:
         """Try to identify entity platform."""
-        if self.id in PLATFORM_OVERRIDE:
-            return PLATFORM_OVERRIDE[self.id]
+        if self.id in self.device.system.api.platform_override:
+            return self.device.system.api.platform_override[self.id]
+
         on_off = (
             len(self.enum_values) == 2
             and self.enum_values[0]["value"] == "0"
@@ -517,6 +519,16 @@ class MyUplink:
 
         self.header = {"Accept-Language": language_code}
 
+        try:
+            self.platform_override = json.loads(
+                entry.options.get(
+                    CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE)
+                ),
+                object_hook=self.parse_int_keys,
+            )
+        except json.decoder.JSONDecodeError:
+            self.platform_override = DEFAULT_PLATFORM_OVERRIDE
+
     async def get_systems(self) -> list[System]:
         """Return all systems."""
         _LOGGER.debug("Fetch systems")
@@ -627,3 +639,17 @@ class MyUplink:
             )
         resp.raise_for_status()
         return resp.status == 200
+
+    def parse_int_keys(self, dct):
+        """Parse object keys into integers."""
+        rval = {}
+        for key, val in dct.items():
+            try:
+                # Convert the key to an integer
+                int_key = int(key)
+                # Assign value to the integer key in the new dict
+                rval[int_key] = val
+            except ValueError:
+                # Couldn't convert key to an integer; Use original key
+                rval[key] = val
+        return rval
