@@ -25,8 +25,10 @@ from .const import (
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PLATFORM_OVERRIDE,
+    CONF_WRITABLE_OVERRIDE,
     DEFAULT_PLATFORM_OVERRIDE,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_WRITABLE_OVERRIDE,
     DOMAIN,
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
@@ -47,6 +49,15 @@ def get_options_schema(data: ConfigType) -> Schema:
         )
     except json.decoder.JSONDecodeError:
         platform_override = json.dumps(DEFAULT_PLATFORM_OVERRIDE)
+
+    try:
+        writable_override = json.dumps(
+            json.loads(
+                data.get(CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE))
+            )
+        )
+    except json.decoder.JSONDecodeError:
+        writable_override = json.dumps(DEFAULT_WRITABLE_OVERRIDE)
 
     return vol.Schema(
         {
@@ -72,6 +83,10 @@ def get_options_schema(data: ConfigType) -> Schema:
             vol.Optional(
                 CONF_PLATFORM_OVERRIDE,
                 default=platform_override,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            vol.Optional(
+                CONF_WRITABLE_OVERRIDE,
+                default=writable_override,
             ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
         }
     )
