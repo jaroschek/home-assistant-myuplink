@@ -18,13 +18,30 @@
       },
       "options": {
         "data": {
-          "additional_parameter": "Zusätzliche Parameter\n\n(Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "parameter_whitelist": "Parameter-Whitelist\n\n(Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "platform_override": "Platform-Überschreibung\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
+          "fetch_firmware": "Firmware-Informationen von API abrufen?",
+          "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
-          "writable_override": "Schreibkarkeit\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)"
+          "expert_mode": "Expertenmodus"
+        },
+        "data_description": {
+          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
+          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "expert_mode": "Erweiterte Optionen konfigurieren."
+        }
+      },
+      "expert": {
+        "title": "Experteneinstellungen",
+        "data": {
+          "platform_override": "Platform-Überschreibung",
+          "writable_override": "Schreibkarkeit",
+          "parameter_whitelist": "Parameter-Whitelist",
+          "additional_parameter": "Zusätzliche Parameter"
+        },
+        "data_description": {
+          "platform_override": "Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "writable_override": "Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "parameter_whitelist": "Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "additional_parameter": "Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern."
         }
       }
     }
@@ -102,15 +119,32 @@
   },
   "options": {
     "step": {
-      "init": {
+      "options": {
         "data": {
-          "additional_parameter": "Zusätzliche Parameter\n\n(Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "fetch_firmware": "Firmware-Informationen von API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "fetch_notifications": "Benachrichtigungen von der API abrufen?\n\n(Erfordert einen zusätzlichen API-Aufruf.)",
-          "parameter_whitelist": "Parameter-Whitelist\n\n(Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
-          "platform_override": "Platform-Überschreibung\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)",
+          "fetch_firmware": "Firmware-Informationen von API abrufen?",
+          "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
-          "writable_override": "Schreibkarkeit\n\n(Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.)"
+          "expert_mode": "Expertenmodus"
+        },
+        "data_description": {
+          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
+          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "expert_mode": "Erweiterte Optionen konfigurieren."
+        }
+      },
+      "expert": {
+        "title": "Experteneinstellungen",
+        "data": {
+          "platform_override": "Platform-Überschreibung",
+          "writable_override": "Schreibkarkeit",
+          "parameter_whitelist": "Parameter-Whitelist",
+          "additional_parameter": "Zusätzliche Parameter"
+        },
+        "data_description": {
+          "platform_override": "Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "writable_override": "Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "parameter_whitelist": "Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern.",
+          "additional_parameter": "Durch Komma getrennte Liste von Parameter-IDs. Muss gültiges JSON sein. Feld leeren und zum Zurücksetzen speichern."
         }
       }
     }
