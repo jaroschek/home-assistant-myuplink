@@ -112,19 +112,19 @@ def get_expert_schema(data: ConfigType) -> Schema:
             vol.Optional(
                 CONF_PLATFORM_OVERRIDE,
                 default=platform_override,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_WRITABLE_OVERRIDE,
                 default=writable_override,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_PARAMETER_WHITELIST,
                 default=parameter_whitlist,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_ADDITIONAL_PARAMETER,
                 default=additional_parameter,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
         }
     )
 
