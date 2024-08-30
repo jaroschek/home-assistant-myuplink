@@ -23,6 +23,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import (
     CONF_ADDITIONAL_PARAMETER,
+    CONF_EXPERT_MODE,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -43,38 +44,6 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_options_schema(data: ConfigType) -> Schema:
     """Return the options schema."""
-    try:
-        parameter_whitlist = json.dumps(
-            json.loads(data.get(CONF_PARAMETER_WHITELIST, "[]"))
-        )
-    except json.decoder.JSONDecodeError:
-        parameter_whitlist = "[]"
-
-    try:
-        additional_parameter = json.dumps(
-            json.loads(data.get(CONF_ADDITIONAL_PARAMETER, "[]"))
-        )
-    except json.decoder.JSONDecodeError:
-        additional_parameter = "[]"
-
-    try:
-        platform_override = json.dumps(
-            json.loads(
-                data.get(CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE))
-            )
-        )
-    except json.decoder.JSONDecodeError:
-        platform_override = json.dumps(DEFAULT_PLATFORM_OVERRIDE)
-
-    try:
-        writable_override = json.dumps(
-            json.loads(
-                data.get(CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE))
-            )
-        )
-    except json.decoder.JSONDecodeError:
-        writable_override = json.dumps(DEFAULT_WRITABLE_OVERRIDE)
-
     return vol.Schema(
         {
             vol.Required(
@@ -96,14 +65,50 @@ def get_options_schema(data: ConfigType) -> Schema:
                     unit_of_measurement=UnitOfTime.SECONDS,
                 )
             ),
-            vol.Optional(
-                CONF_PARAMETER_WHITELIST,
-                default=parameter_whitlist,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
-            vol.Optional(
-                CONF_ADDITIONAL_PARAMETER,
-                default=additional_parameter,
-            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            vol.Required(
+                CONF_EXPERT_MODE,
+                default=data.get(CONF_EXPERT_MODE, False),
+            ): selector.BooleanSelector(),
+        }
+    )
+
+
+def get_expert_schema(data: ConfigType) -> Schema:
+    """Return the expert schema."""
+    try:
+        platform_override = json.dumps(
+            json.loads(
+                data.get(CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE))
+            )
+        )
+    except json.decoder.JSONDecodeError:
+        platform_override = json.dumps(DEFAULT_PLATFORM_OVERRIDE)
+
+    try:
+        writable_override = json.dumps(
+            json.loads(
+                data.get(CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE))
+            )
+        )
+    except json.decoder.JSONDecodeError:
+        writable_override = json.dumps(DEFAULT_WRITABLE_OVERRIDE)
+
+    try:
+        parameter_whitlist = json.dumps(
+            json.loads(data.get(CONF_PARAMETER_WHITELIST, "[]"))
+        )
+    except json.decoder.JSONDecodeError:
+        parameter_whitlist = "[]"
+
+    try:
+        additional_parameter = json.dumps(
+            json.loads(data.get(CONF_ADDITIONAL_PARAMETER, "[]"))
+        )
+    except json.decoder.JSONDecodeError:
+        additional_parameter = "[]"
+
+    return vol.Schema(
+        {
             vol.Optional(
                 CONF_PLATFORM_OVERRIDE,
                 default=platform_override,
@@ -111,6 +116,14 @@ def get_options_schema(data: ConfigType) -> Schema:
             vol.Optional(
                 CONF_WRITABLE_OVERRIDE,
                 default=writable_override,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            vol.Optional(
+                CONF_PARAMETER_WHITELIST,
+                default=parameter_whitlist,
+            ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
+            vol.Optional(
+                CONF_ADDITIONAL_PARAMETER,
+                default=additional_parameter,
             ): selector.TextSelector(selector.TargetSelectorConfig(multiline=True)),
         }
     )
@@ -124,6 +137,8 @@ class OAuth2FlowHandler(
     DOMAIN = DOMAIN
 
     _data: dict[str, Any] = {}
+
+    _options: dict[str, Any] = {}
 
     @property
     def logger(self) -> logging.Logger:
@@ -157,15 +172,31 @@ class OAuth2FlowHandler(
         return await self.async_step_options()
 
     async def async_step_options(
-        self, user_input: dict[str, Any] | None = None
+        self, options_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the options step."""
-        if user_input is None:
+        if options_input is None:
             return self.async_show_form(
-                step_id="options", data_schema=get_options_schema(self._data)
+                step_id="options", data_schema=get_options_schema(self._options)
             )
+        self._options = options_input
+        if options_input.get(CONF_EXPERT_MODE, False):
+            return await self.async_step_expert()
         return self.async_create_entry(
-            title=self.flow_impl.name, data=self._data, options=user_input
+            title=self.flow_impl.name, data=self._data, options=self._options
+        )
+
+    async def async_step_expert(
+        self, expert_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the expert step."""
+        if expert_input is None:
+            return self.async_show_form(
+                step_id="expert", data_schema=get_expert_schema(self._options)
+            )
+        self._options.update(expert_input)
+        return self.async_create_entry(
+            title=self.flow_impl.name, data=self._data, options=self._options
         )
 
     @staticmethod
@@ -184,10 +215,28 @@ class OptionsFlow(OptionsFlowWithConfigEntry):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Initialize form."""
-        if user_input is not None:
-            return self.async_create_entry(
-                title=self.config_entry.title, data=user_input
+        return await self.async_step_options(options_input=user_input)
+
+    async def async_step_options(
+        self, options_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the options step."""
+        if options_input is None:
+            return self.async_show_form(
+                step_id="options", data_schema=get_options_schema(self.options)
             )
-        return self.async_show_form(
-            step_id="init", data_schema=get_options_schema(self.options)
-        )
+        self.options.update(options_input)
+        if options_input.get(CONF_EXPERT_MODE, False):
+            return await self.async_step_expert()
+        return self.async_create_entry(title="", data=self.options)
+
+    async def async_step_expert(
+        self, expert_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the expert step."""
+        if expert_input is None:
+            return self.async_show_form(
+                step_id="expert", data_schema=get_expert_schema(self.options)
+            )
+        self.options.update(expert_input)
+        return self.async_create_entry(title="", data=self.options)
