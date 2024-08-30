@@ -38,10 +38,10 @@
           "additional_parameter": "Additional Parameter"
         },
         "data_description": {
-          "platform_override": "Must be valid JSON. Empty field and save to reset.",
-          "writable_override": "Must be valid JSON. Empty field and save to reset.",
-          "parameter_whitelist": "Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset.",
-          "additional_parameter": "Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset."
+          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
+          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
         }
       }
     }
@@ -175,10 +175,10 @@
           "additional_parameter": "Additional Parameter"
         },
         "data_description": {
-          "platform_override": "Must be valid JSON. Empty field and save to reset.",
-          "writable_override": "Must be valid JSON. Empty field and save to reset.",
-          "parameter_whitelist": "Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset.",
-          "additional_parameter": "Comma separated list of parameter ids. Must be valid JSON. Empty field and save to reset."
+          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
+          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
         }
       }
     }
