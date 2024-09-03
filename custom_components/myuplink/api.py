@@ -563,9 +563,7 @@ class MyUplink:
         """Return all systems."""
         _LOGGER.debug("Fetch systems")
         async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "get", "systems/me?page=1&itemsPerPage=99", headers=self.header
-            )
+            resp = await self.auth.request("get", "systems/me?page=1&itemsPerPage=99")
         resp.raise_for_status()
         data = await resp.json()
 
@@ -595,9 +593,7 @@ class MyUplink:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "get", f"devices/{device_id}", headers=self.header
-            )
+            resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
         return Device(await resp.json(), self)
 
