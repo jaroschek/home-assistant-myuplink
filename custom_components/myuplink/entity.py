@@ -40,11 +40,6 @@ class MyUplinkEntity(CoordinatorEntity):
             sw_version=self._device.current_firmware_version,
         )
 
-    @property
-    def available(self):
-        """Return if the device is online."""
-        return super().available and self._device.connection_state == "Connected"
-
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         self._device = device
@@ -92,3 +87,8 @@ class MyUplinkParameterEntity(MyUplinkEntity):
                             self._update_from_parameter(parameter)
 
         super().async_write_ha_state()
+
+    @property
+    def available(self):
+        """Return if the device is online."""
+        return super().available and self._device.connection_state == "Connected"
