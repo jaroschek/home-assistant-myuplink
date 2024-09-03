@@ -1,4 +1,5 @@
 """Support for myUplink sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -61,12 +62,13 @@ class MyUplinkConnectedBinarySensor(MyUplinkEntity, BinarySensorEntity):
 
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_name = f"{self._device.name} Connection State"
+        self._attr_translation_key = "myuplink_connection_state"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_connection_state"
 
     @property

@@ -114,6 +114,19 @@
           "Blocked": "Blockiert",
           "Off": "Aus"
         }
+      },
+      "myuplink_notifications": {
+        "name": "Benachrichtigungen"
+      }
+    },
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Verbindungsstatus"
+      }
+    },
+    "update": {
+      "myuplink_firmware": {
+        "name": "Firmware"
       }
     }
   },
