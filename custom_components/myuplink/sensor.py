@@ -113,12 +113,13 @@ class MyUplinkNotificationsSensorEntity(MyUplinkEntity, SensorEntity):
     """Representation of a myUplink alarm sensor entity."""
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_name = f"{device.name} Notifications"
+        self._attr_translation_key = "myuplink_notifications"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_notifications"
 
         self._attr_native_value = len(device.notifications)

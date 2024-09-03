@@ -148,6 +148,19 @@
           "5": "Slukket",
           "6": "Aktiv"
         }
+      },
+      "myuplink_notifications": {
+        "name": "Meddelelser"
+      }
+    },
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Forbindelsestilstand"
+      }
+    },
+    "update": {
+      "myuplink_firmware": {
+        "name": "Firmware"
       }
     }
   },

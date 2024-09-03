@@ -30,12 +30,13 @@ class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
     """Representation of a myUplink update entity."""
 
     _attr_device_class = UpdateDeviceClass.FIRMWARE
+    _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_name = f"{self._device.name} Firmware"
+        self._attr_translation_key = "myuplink_firmware"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_firmware"
 
     @property

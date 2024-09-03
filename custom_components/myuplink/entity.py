@@ -43,7 +43,6 @@ class MyUplinkEntity(CoordinatorEntity):
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         self._device = device
-        self._attr_name = self._device.name
 
     @callback
     def _handle_coordinator_update(self) -> None:
