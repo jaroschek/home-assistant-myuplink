@@ -43,10 +43,10 @@ async def async_setup_entry(
             if entry.options.get(CONF_FETCH_NOTIFICATIONS, True):
                 entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
             for parameter in device.parameters:
-                if parameter.find_fitting_entity() == Platform.SENSOR:
+                if parameter.get_platform() == Platform.SENSOR:
                     if (
                         not parameter.unit
-                        and not len(parameter.enum_values)
+                        and len(parameter.enum_values) == 0
                         and not isinstance(parameter.value, (int, float))
                     ):
                         continue

@@ -263,18 +263,21 @@ class Parameter:
             self.device.id, str(self.id), str(value)
         )
 
-    def find_fitting_entity(self) -> Platform:
+    def get_platform(self) -> Platform:
         """Try to identify entity platform."""
         if self.id in self.device.system.api.platform_override:
             return self.device.system.api.platform_override[self.id]
 
-        on_off = (
+        if (
             len(self.enum_values) == 2
             and self.enum_values[0]["value"] == "0"
             and self.enum_values[1]["value"] == "1"
-        )
-
-        if on_off:
+        ) or (
+            len(self.enum_values) == 0
+            and self.min_value == 0
+            and self.max_value == 1
+            and self.step_value == 1
+        ):
             if self.is_writable:
                 return Platform.SWITCH
             return Platform.BINARY_SENSOR
