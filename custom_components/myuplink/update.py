@@ -20,8 +20,10 @@ async def async_setup_entry(
 
     if entry.options.get(CONF_FETCH_FIRMWARE, True):
         for system in coordinator.data:
-            for device in system.devices:
+            [
                 entities.append(MyUplinkUpdateEntity(coordinator, device))
+                for device in system.devices
+            ]
 
     async_add_entities(entities)
 
