@@ -31,13 +31,13 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
-            for parameter in device.parameters:
-                if parameter.find_fitting_entity() == Platform.BINARY_SENSOR:
-                    entities.append(
-                        MyUplinkParameterBinarySensorEntity(
-                            coordinator, device, parameter
-                        )
-                    )
+            [
+                entities.append(
+                    MyUplinkParameterBinarySensorEntity(coordinator, device, parameter)
+                )
+                for parameter in device.parameters
+                if parameter.get_platform() == Platform.BINARY_SENSOR
+            ]
 
     async_add_entities(entities)
 
