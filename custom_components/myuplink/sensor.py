@@ -83,7 +83,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_state_class = SensorStateClass.MEASUREMENT
             elif self._parameter.unit == UnitOfEnergy.KILO_WATT_HOUR:
                 self._attr_device_class = SensorDeviceClass.ENERGY
-                self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+                self._attr_state_class = SensorStateClass.TOTAL
             elif self._parameter.unit == UnitOfFrequency.HERTZ:
                 self._attr_device_class = SensorDeviceClass.FREQUENCY
             elif self._parameter.unit in (UnitOfPower.KILO_WATT, UnitOfPower.WATT):
