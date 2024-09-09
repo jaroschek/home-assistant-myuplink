@@ -1,4 +1,5 @@
 """Definition of base myUplink Entity."""
+
 from __future__ import annotations
 
 from homeassistant.core import callback
@@ -36,18 +37,12 @@ class MyUplinkEntity(CoordinatorEntity):
             manufacturer=manufacturer,
             model=model,
             name=self._device.name,
-            sw_version=self._device.firmware_info.current_version,
+            sw_version=self._device.current_firmware_version,
         )
-
-    @property
-    def available(self):
-        """Return if the device is online."""
-        return super().available and self._device.connection_state == "Connected"
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         self._device = device
-        self._attr_name = self._device.name
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -74,9 +69,7 @@ class MyUplinkParameterEntity(MyUplinkEntity):
         """Update attrs from parameter."""
         self._parameter = parameter
         if self._parameter.category and self._device.name != self._parameter.category:
-            self._attr_name = (
-                f"{self._parameter.category} {self._parameter.name} ({self._parameter.id})"
-            )
+            self._attr_name = f"{self._parameter.category} {self._parameter.name} ({self._parameter.id})"
         else:
             self._attr_name = f"{self._parameter.name} ({self._parameter.id})"
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{self._parameter.id}"
@@ -93,3 +86,8 @@ class MyUplinkParameterEntity(MyUplinkEntity):
                             self._update_from_parameter(parameter)
 
         super().async_write_ha_state()
+
+    @property
+    def available(self):
+        """Return if the device is online."""
+        return super().available and self._device.connection_state == "Connected"

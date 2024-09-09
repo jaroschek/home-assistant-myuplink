@@ -10,6 +10,6 @@
   "issue_tracker": "https://github.com/jaroschek/home-assistant-myuplink/issues",
   "requirements": [],
   "ssdp": [],
-  "version": "1.2.5",
+  "version": "1.3.0-beta8",
   "zeroconf": []
 }

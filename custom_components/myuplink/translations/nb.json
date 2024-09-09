@@ -18,7 +18,30 @@
       },
       "options": {
         "data": {
-          "scan_interval": "Skanneintervall (sekunder)"
+          "fetch_firmware": "Hent fastvareinformasjon fra API?",
+          "fetch_notifications": "Hente varsler fra API?",
+          "scan_interval": "Skanneintervall (sekunder)",
+          "expert_mode": "Ekspertmodus"
+        },
+        "data_description": {
+          "fetch_firmware": "Krever et ekstra API-kall.",
+          "fetch_notifications": "Krever et ekstra API-kall.",
+          "expert_mode": "Konfigurer avanserte alternativer."
+        }
+      },
+      "expert": {
+        "title": "Ekspertinnstillinger",
+        "data": {
+          "platform_override": "Plattformoverstyringer",
+          "writable_override": "Skrivbare overstyringer",
+          "parameter_whitelist": "Parameterhviteliste",
+          "additional_parameter": "Tilleggsparameter"
+        },
+        "data_description": {
+          "platform_override": "Tving frem en spesifikk plattform for en gitt parameter-ID.\n\nDette er noen ganger nødvendig hvis myUplink API gir feil parameterdata og integrasjonen oppdager feil plattform.\n\nMå være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt vil ikke forårsake noen endring.",
+          "writable_override": "Sett spesifikk parameter til skrivbar eller ikke skrivbar.\n\nDette er noen ganger nødvendig hvis myUplink API gir feil tilstand for parameteralternativet `writable`.\n\nMå være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt vil ikke forårsake noen endring.",
+          "parameter_whitelist": "Begrensning av de forespurte parameterne til en spesifikk liste med parameter-ID-er.\n\nDette kan være nyttig hvis myUplink API gir et ekstremt stort antall parametere, hvorav noen er uviktige, og du ønsker å begrense den tilgjengelige listen over parametere.\n\nListe over parameter-ID-er atskilt med komma. En tom liste resulterer ikke i noen begrensning. Må være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt resulterer ikke i noen endring.",
+          "additional_parameter": "Legg til flere parameter-IDer i spørringen.\n\nI ekstremt sjeldne tilfeller gir ikke myUplink API alle tilgjengelige parametere. Med denne listen er det mulig å legge til kjente parameter-IDer, som deretter spørres direkte.\n\nKommaseparert liste over parameter-ID-er. En tom liste medfører ingen restriksjoner. Må være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt resulterer ikke i noen endringer."
         }
       }
     }
@@ -172,14 +195,50 @@
           "Blocked": "Blokkert",
           "Off": "Av"
         }
+      },
+      "myuplink_notifications": {
+        "name": "Varsler"
+      }
+    },
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Tilkoblingstilstand"
+      }
+    },
+    "update": {
+      "myuplink_firmware": {
+        "name": "Fastvare"
       }
     }
   },
   "options": {
     "step": {
-      "init": {
+      "options": {
         "data": {
-          "scan_interval": "Skanneintervall (sekunder)"
+          "fetch_firmware": "Hent fastvareinformasjon fra API?",
+          "fetch_notifications": "Hente varsler fra API?",
+          "scan_interval": "Skanneintervall (sekunder)",
+          "expert_mode": "Ekspertmodus"
+        },
+        "data_description": {
+          "fetch_firmware": "Krever et ekstra API-kall.",
+          "fetch_notifications": "Krever et ekstra API-kall.",
+          "expert_mode": "Konfigurer avanserte alternativer."
+        }
+      },
+      "expert": {
+        "title": "Ekspertinnstillinger",
+        "data": {
+          "platform_override": "Plattformoverstyringer",
+          "writable_override": "Skrivbare overstyringer",
+          "parameter_whitelist": "Parameterhviteliste",
+          "additional_parameter": "Tilleggsparameter"
+        },
+        "data_description": {
+          "platform_override": "Tving frem en spesifikk plattform for en gitt parameter-ID.\n\nDette er noen ganger nødvendig hvis myUplink API gir feil parameterdata og integrasjonen oppdager feil plattform.\n\nMå være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt vil ikke forårsake noen endring.",
+          "writable_override": "Sett spesifikk parameter til skrivbar eller ikke skrivbar.\n\nDette er noen ganger nødvendig hvis myUplink API gir feil tilstand for parameteralternativet `writable`.\n\nMå være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt vil ikke forårsake noen endring.",
+          "parameter_whitelist": "Begrensning av de forespurte parameterne til en spesifikk liste med parameter-ID-er.\n\nDette kan være nyttig hvis myUplink API gir et ekstremt stort antall parametere, hvorav noen er uviktige, og du ønsker å begrense den tilgjengelige listen over parametere.\n\nListe over parameter-ID-er atskilt med komma. En tom liste resulterer ikke i noen begrensning. Må være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt resulterer ikke i noen endring.",
+          "additional_parameter": "Legg til flere parameter-IDer i spørringen.\n\nI ekstremt sjeldne tilfeller gir ikke myUplink API alle tilgjengelige parametere. Med denne listen er det mulig å legge til kjente parameter-IDer, som deretter spørres direkte.\n\nKommaseparert liste over parameter-ID-er. En tom liste medfører ingen restriksjoner. Må være gyldig JSON. For å gjenopprette standarden, ugyldiggjør feltet og lagre. Et tomt felt resulterer ikke i noen endringer."
         }
       }
     }

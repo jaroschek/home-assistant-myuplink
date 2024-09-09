@@ -1,140 +1,199 @@
 {
-    "config": {
-      "abort": {
-        "already_configured": "Kontoen er allerede konfigureret",
-        "already_in_progress": "Konfigurationsprocessen er allerede i gang",
-        "authorize_url_timeout": "Timeout ved generering af autorisations-URL.",
-        "missing_configuration": "Komponenten er ikke konfigureret. Følg venligst dokumentationen.",
-        "no_url_available": "Ingen URL tilgængelig. For information om denne fejl, [se hjælpesektionen]({docs_url})",
-        "oauth_error": "Modtog ugyldige token-data.",
-        "user_rejected_authorize": "Konto-linking afvist: {error}"
+  "config": {
+    "abort": {
+      "already_configured": "Kontoen er allerede konfigureret",
+      "already_in_progress": "Konfigurationsprocessen er allerede i gang",
+      "authorize_url_timeout": "Timeout ved generering af autorisations-URL.",
+      "missing_configuration": "Komponenten er ikke konfigureret. Følg venligst dokumentationen.",
+      "no_url_available": "Ingen URL tilgængelig. For information om denne fejl, [se hjælpesektionen]({docs_url})",
+      "oauth_error": "Modtog ugyldige token-data.",
+      "user_rejected_authorize": "Konto-linking afvist: {error}"
+    },
+    "create_entry": {
+      "default": "Godkendt med succes"
+    },
+    "step": {
+      "pick_implementation": {
+        "title": "Vælg godkendelsesmetode"
       },
-      "create_entry": {
-        "default": "Godkendt med succes"
-      },
-      "step": {
-        "pick_implementation": {
-          "title": "Vælg godkendelsesmetode"
+      "options": {
+        "data": {
+          "fetch_firmware": "Hent firmwareoplysninger fra API?",
+          "fetch_notifications": "Vil du hente meddelelser fra API?",
+          "scan_interval": "Scan-interval (sekunder)",
+          "expert_mode": "Eksperttilstand"
         },
-        "options": {
-          "data": {
-            "scan_interval": "Scan-interval (sekunder)"
-          }
+        "data_description": {
+          "fetch_firmware": "Kræver et ekstra API-kald.",
+          "fetch_notifications": "Kræver et ekstra API-kald.",
+          "expert_mode": "Konfigurer avancerede indstillinger."
+        }
+      },
+      "expert": {
+        "title": "Ekspertindstillinger",
+        "data": {
+          "platform_override": "Platformtilsidesættelser",
+          "writable_override": "Skrivbare tilsidesættelser",
+          "parameter_whitelist": "Parameterhvidliste",
+          "additional_parameter": "Yderligere parameter"
+        },
+        "data_description": {
+          "platform_override": "Tving en specifik platform til et givet parameter-id.\n\nDette er nogle gange nødvendigt, hvis myUplink API'en leverer forkerte parameterdata, og integrationen registrerer den forkerte platform.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "writable_override": "Indstil specifik parameter til skrivbar eller ikke skrivbar.\n\nDette er nogle gange nødvendigt, hvis myUplink API'et giver den forkerte tilstand for parameterindstillingen `writable`.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "parameter_whitelist": "Begrænsning af de anmodede parametre til en specifik liste over parameter-id'er.\n\nDette kan være nyttigt, hvis myUplink API'en giver et ekstremt stort antal parametre, hvoraf nogle er ligegyldige, og du ønsker at begrænse den tilgængelige liste over parametre.\n\nListe over parameter-id'er adskilt af kommaer. En tom liste medfører ikke nogen begrænsning. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt resulterer ikke i nogen ændring.",
+          "additional_parameter": "Tilføj yderligere parameter-id'er til forespørgslen.\n\nI yderst sjældne tilfælde giver myUplink API ikke alle tilgængelige parametre. Med denne liste er det muligt at tilføje kendte parameter-id'er, som derefter forespørges direkte.\n\nKommasepareret liste over parameter-id'er. En tom liste medfører ingen begrænsninger. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændringer."
         }
       }
-    },
-    "entity": {
-      "sensor": {
-        "406": {
-          "state": {
-            "0": "Test",
-            "1": "Slukket",
-            "2": "Søvn",
-            "3": "Øko",
-            "4": "Normal",
-            "5": "Ekspres",
-            "6": "Pris",
-            "7": "Tidsplan",
-            "8": "Ekstern",
-            "9": "Legionella",
-            "10": "Ferie",
-            "11": "Boost"
-          }
-        },
-        "500": {
-          "state": {
-            "3": "Øko",
-            "4": "Normal",
-            "6": "Pris",
-            "7": "Tidsplan",
-            "8": "Ekstern",
-            "10": "Ferie",
-            "11": "Boost"
-          }
-        },
-        "517": {
-          "state": {
-            "0": "0",
-            "1": "700W",
-            "2": "1300W",
-            "3": "2000W"
-          }
-        },
-        "544": {
-          "state": {
-            "1": "NO1",
-            "2": "NO2",
-            "3": "NO3",
-            "4": "NO4",
-            "5": "NO5"
-          }
-        },
-        "549": {
-          "state": {
-            "0": "Ukendt",
-            "1": "Billig",
-            "2": "Normal",
-            "3": "Dyr"
-          }
-        },
-        "601": {
-          "state": {
-            "1": "Varm"
-          }
-        },
-        "1965": {
-          "state": {
-            "20": "Slukket",
-            "40": "Starter",
-            "60": "Tændt",
-            "100": "Stopper",
-            "120": "Afrimer",
-            "140": "Afrimer",
-            "160": "Afrimer"
-          }
-        },
-        "14950": {
-          "state": {
-            "0": "Slukket",
-            "1": "Opvarmning",
-            "2": "Køling",
-            "3": "Varmt vand",
-            "4": "Pool",
-            "5": "Pool 2",
-            "6": "Forvarmning"
-          }
-        },
-        "55000": {
-          "state": {
-            "10": "Slukket",
-            "20": "Varmt vand",
-            "30": "Opvarmning",
-            "40": "Pool",
-            "41": "Pool 2",
-            "50": "Overførsel",
-            "60": "Køling"
-          }
-        },
-        "55027": {
-          "state": {
-            "0": "Alarm",
-            "1": "Alarm",
-            "2": "Aktiv",
-            "3": "Slukket",
-            "4": "Blokeret",
-            "5": "Slukket",
-            "6": "Aktiv"
-          }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "406": {
+        "state": {
+          "0": "Test",
+          "1": "Slukket",
+          "2": "Søvn",
+          "3": "Øko",
+          "4": "Normal",
+          "5": "Ekspres",
+          "6": "Pris",
+          "7": "Tidsplan",
+          "8": "Ekstern",
+          "9": "Legionella",
+          "10": "Ferie",
+          "11": "Boost"
         }
+      },
+      "500": {
+        "state": {
+          "3": "Øko",
+          "4": "Normal",
+          "6": "Pris",
+          "7": "Tidsplan",
+          "8": "Ekstern",
+          "10": "Ferie",
+          "11": "Boost"
+        }
+      },
+      "517": {
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W"
+        }
+      },
+      "544": {
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5"
+        }
+      },
+      "549": {
+        "state": {
+          "0": "Ukendt",
+          "1": "Billig",
+          "2": "Normal",
+          "3": "Dyr"
+        }
+      },
+      "601": {
+        "state": {
+          "1": "Varm"
+        }
+      },
+      "1965": {
+        "state": {
+          "20": "Slukket",
+          "40": "Starter",
+          "60": "Tændt",
+          "100": "Stopper",
+          "120": "Afrimer",
+          "140": "Afrimer",
+          "160": "Afrimer"
+        }
+      },
+      "14950": {
+        "state": {
+          "0": "Slukket",
+          "1": "Opvarmning",
+          "2": "Køling",
+          "3": "Varmt vand",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Forvarmning"
+        }
+      },
+      "55000": {
+        "state": {
+          "10": "Slukket",
+          "20": "Varmt vand",
+          "30": "Opvarmning",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Overførsel",
+          "60": "Køling"
+        }
+      },
+      "55027": {
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Aktiv",
+          "3": "Slukket",
+          "4": "Blokeret",
+          "5": "Slukket",
+          "6": "Aktiv"
+        }
+      },
+      "myuplink_notifications": {
+        "name": "Meddelelser"
       }
     },
-    "options": {
-      "step": {
-        "init": {
-          "data": {
-            "scan_interval": "Scan-interval (sekunder)"
-          }
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Forbindelsestilstand"
+      }
+    },
+    "update": {
+      "myuplink_firmware": {
+        "name": "Firmware"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "options": {
+        "data": {
+          "fetch_firmware": "Hent firmwareoplysninger fra API?",
+          "fetch_notifications": "Vil du hente meddelelser fra API?",
+          "scan_interval": "Scan-interval (sekunder)",
+          "expert_mode": "Eksperttilstand"
+        },
+        "data_description": {
+          "fetch_firmware": "Kræver et ekstra API-kald.",
+          "fetch_notifications": "Kræver et ekstra API-kald.",
+          "expert_mode": "Konfigurer avancerede indstillinger."
+        }
+      },
+      "expert": {
+        "title": "Ekspertindstillinger",
+        "data": {
+          "platform_override": "Platformtilsidesættelser",
+          "writable_override": "Skrivbare tilsidesættelser",
+          "parameter_whitelist": "Parameterhvidliste",
+          "additional_parameter": "Yderligere parameter"
+        },
+        "data_description": {
+          "platform_override": "Tving en specifik platform til et givet parameter-id.\n\nDette er nogle gange nødvendigt, hvis myUplink API'en leverer forkerte parameterdata, og integrationen registrerer den forkerte platform.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "writable_override": "Indstil specifik parameter til skrivbar eller ikke skrivbar.\n\nDette er nogle gange nødvendigt, hvis myUplink API'et giver den forkerte tilstand for parameterindstillingen `writable`.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "parameter_whitelist": "Begrænsning af de anmodede parametre til en specifik liste over parameter-id'er.\n\nDette kan være nyttigt, hvis myUplink API'en giver et ekstremt stort antal parametre, hvoraf nogle er ligegyldige, og du ønsker at begrænse den tilgængelige liste over parametre.\n\nListe over parameter-id'er adskilt af kommaer. En tom liste medfører ikke nogen begrænsning. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt resulterer ikke i nogen ændring.",
+          "additional_parameter": "Tilføj yderligere parameter-id'er til forespørgslen.\n\nI yderst sjældne tilfælde giver myUplink API ikke alle tilgængelige parametre. Med denne liste er det muligt at tilføje kendte parameter-id'er, som derefter forespørges direkte.\n\nKommasepareret liste over parameter-id'er. En tom liste medfører ingen begrænsninger. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændringer."
         }
       }
     }
   }
+}

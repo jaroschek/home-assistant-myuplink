@@ -1,4 +1,5 @@
 """Support for myUplink sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -30,13 +31,13 @@ async def async_setup_entry(
     for system in coordinator.data:
         for device in system.devices:
             entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
-            for parameter in device.parameters:
-                if parameter.find_fitting_entity() == Platform.BINARY_SENSOR:
-                    entities.append(
-                        MyUplinkParameterBinarySensorEntity(
-                            coordinator, device, parameter
-                        )
-                    )
+            [
+                entities.append(
+                    MyUplinkParameterBinarySensorEntity(coordinator, device, parameter)
+                )
+                for parameter in device.parameters
+                if parameter.get_platform() == Platform.BINARY_SENSOR
+            ]
 
     async_add_entities(entities)
 
@@ -61,12 +62,13 @@ class MyUplinkConnectedBinarySensor(MyUplinkEntity, BinarySensorEntity):
 
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_name = f"{self._device.name} Connection State"
+        self._attr_translation_key = "myuplink_connection_state"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_connection_state"
 
     @property

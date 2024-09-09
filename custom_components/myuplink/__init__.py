@@ -1,8 +1,10 @@
 """The myUplink integration."""
+
 from __future__ import annotations
 
 import asyncio
 from datetime import timedelta
+from http import HTTPStatus
 import logging
 
 import aiohttp
@@ -39,23 +41,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = config_entry_oauth2_flow.OAuth2Session(hass, entry, implementation)
     try:
         await session.async_ensure_token_valid()
-    except aiohttp.ClientResponseError as ex:
-        _LOGGER.debug("API error: %s (%s)", ex.code, ex.message)
-        if ex.code in (401, 403):
-            raise ConfigEntryAuthFailed("Token not valid, trigger renewal") from ex
-        raise ConfigEntryNotReady from ex
+    except aiohttp.ClientResponseError as err:
+        _LOGGER.debug("API error: %s (%s)", err.code, err.message)
+        if err.code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+            raise ConfigEntryAuthFailed("Token not valid, trigger renewal") from err
+        raise ConfigEntryNotReady from err
+    except aiohttp.ClientError as err:
+        raise ConfigEntryNotReady from err
 
     api = MyUplink(
-        AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session)
+        AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session),
+        f"{hass.config.language}-{hass.config.country}",
+        entry,
     )
 
     async def async_update_data():
         try:
             async with asyncio.timeout(30):
                 return await api.get_systems()
-        except aiohttp.client_exceptions.ClientResponseError as err:
+        except aiohttp.ClientResponseError as err:
             raise UpdateFailed(f"Wrong credentials: {err}") from err
-        except aiohttp.client_exceptions.ClientConnectorError as err:
+        except aiohttp.ClientConnectorError as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
 
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
@@ -76,7 +82,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    entry.async_on_unload(entry.add_update_listener(async_update_options))
+
     return True
+
+
+async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update options."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

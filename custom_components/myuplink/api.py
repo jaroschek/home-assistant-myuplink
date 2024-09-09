@@ -1,4 +1,5 @@
 """API for myUplink bound to Home Assistant OAuth."""
+
 from __future__ import annotations
 
 import asyncio
@@ -9,10 +10,22 @@ import logging
 
 from aiohttp import ClientResponse, ClientSession
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.helpers import config_entry_oauth2_flow
 
-from .const import API_HOST, API_VERSION, PLATFORM_OVERRIDE, WRITABLE_OVERRIDE
+from .const import (
+    API_HOST,
+    API_VERSION,
+    CONF_ADDITIONAL_PARAMETER,
+    CONF_FETCH_FIRMWARE,
+    CONF_FETCH_NOTIFICATIONS,
+    CONF_PARAMETER_WHITELIST,
+    CONF_PLATFORM_OVERRIDE,
+    CONF_WRITABLE_OVERRIDE,
+    DEFAULT_PLATFORM_OVERRIDE,
+    DEFAULT_WRITABLE_OVERRIDE,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -181,7 +194,10 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        return WRITABLE_OVERRIDE.get(self.id, self.raw_data["writable"])
+        if self.id in self.device.system.api.writable_override:
+            return self.device.system.api.writable_override[self.id]
+
+        return self.raw_data["writable"]
 
     @property
     def timestamp(self) -> str:
@@ -247,25 +263,32 @@ class Parameter:
             self.device.id, str(self.id), str(value)
         )
 
-    def find_fitting_entity(self) -> Platform:
+    def get_platform(self) -> Platform:
         """Try to identify entity platform."""
-        if self.id in PLATFORM_OVERRIDE:
-            return PLATFORM_OVERRIDE[self.id]
-        on_off = (
+        if self.id in self.device.system.api.platform_override:
+            return self.device.system.api.platform_override[self.id]
+
+        if (
             len(self.enum_values) == 2
-            and self.enum_values[0]["text"].lower() == "off"
-            and self.enum_values[1]["text"].lower() == "on"
-        )
-        if on_off:
+            and self.enum_values[0]["value"] == "0"
+            and self.enum_values[1]["value"] == "1"
+        ) or (
+            len(self.enum_values) == 0
+            and self.min_value == 0
+            and self.max_value == 1
+            and self.step_value == 1
+        ):
             if self.is_writable:
                 return Platform.SWITCH
             return Platform.BINARY_SENSOR
-        elif len(self.enum_values) > 0 and self.is_writable:
+
+        if len(self.enum_values) > 0 and self.is_writable:
             return Platform.SELECT
-        elif (self.max_value or self.min_value) and self.is_writable:
+
+        if (self.max_value or self.min_value) and self.is_writable:
             return Platform.NUMBER
-        else:
-            return Platform.SENSOR
+
+        return Platform.SENSOR
 
 
 class Zone:
@@ -407,7 +430,8 @@ class Device:
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
         self.parameters = await self.system.api.get_parameters(self)
-        self.firmware_info = await self.system.api.get_firmware_info(self)
+        if self.system.api.entry.options.get(CONF_FETCH_FIRMWARE, True):
+            self.firmware_info = await self.system.api.get_firmware_info(self)
         # self.zones = await self.system.api.get_zones(self.id)
 
 
@@ -449,13 +473,16 @@ class System:
                 Device(device_data, self) for device_data in self.raw_data["devices"]
             ]
 
-        notifications = await self.api.get_notifications(self)
+        fetch_notifications = self.api.entry.options.get(CONF_FETCH_NOTIFICATIONS, True)
+        if fetch_notifications:
+            notifications = await self.api.get_notifications(self)
 
         for device in self.devices:
-            device.notifications = []
-            for notification in notifications:
-                if notification.device_id == device.id:
-                    device.notifications.append(notification)
+            if fetch_notifications:
+                device.notifications = []
+                for notification in notifications:
+                    if notification.device_id == device.id:
+                        device.notifications.append(notification)
 
             await device.async_fetch_data()
 
@@ -490,11 +517,50 @@ class MyUplink:
     # List of collected systems
     systems: list[System] = []
 
-    def __init__(self, auth: AsyncConfigEntryAuth) -> None:
+    def __init__(
+        self, auth: AsyncConfigEntryAuth, language_code: str, entry: ConfigEntry
+    ) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
+        self.entry = entry
         self.lock = asyncio.Lock()
         self.throttle = Throttle(timedelta(seconds=5))
+
+        self.header = {"Accept-Language": language_code}
+
+        try:
+            self.parameter_whitelist = json.loads(
+                entry.options.get(CONF_PARAMETER_WHITELIST, "[]")
+            )
+        except json.decoder.JSONDecodeError:
+            self.parameter_whitelist = []
+
+        try:
+            self.additional_parameter = json.loads(
+                entry.options.get(CONF_ADDITIONAL_PARAMETER, "[]")
+            )
+        except json.decoder.JSONDecodeError:
+            self.additional_parameter = []
+
+        try:
+            self.platform_override = json.loads(
+                entry.options.get(
+                    CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE)
+                ),
+                object_hook=self.parse_int_keys,
+            )
+        except json.decoder.JSONDecodeError:
+            self.platform_override = DEFAULT_PLATFORM_OVERRIDE
+
+        try:
+            self.writable_override = json.loads(
+                entry.options.get(
+                    CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE)
+                ),
+                object_hook=self.parse_int_keys,
+            )
+        except json.decoder.JSONDecodeError:
+            self.writable_override = DEFAULT_WRITABLE_OVERRIDE
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
@@ -519,6 +585,7 @@ class MyUplink:
             resp = await self.auth.request(
                 "get",
                 f"systems/{system.id}/notifications/active?page=1&itemsPerPage=99",
+                headers=self.header,
             )
         resp.raise_for_status()
         data = await resp.json()
@@ -537,31 +604,56 @@ class MyUplink:
         """Return firmware info for a device."""
         _LOGGER.debug("Fetch firmware info for device %s", device.id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device.id}/firmware-info")
+            resp = await self.auth.request(
+                "get", f"devices/{device.id}/firmware-info", headers=self.header
+            )
         resp.raise_for_status()
         return FirmwareInfo(await resp.json())
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
+        """Return parameters info for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
-        async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"devices/{device.id}/points")
-        resp.raise_for_status()
-        parameters_data = await resp.json()
-    
+        parameter_filters = []
+
+        if len(self.parameter_whitelist) == 0:
+            parameter_filters.append([])
+            if len(self.additional_parameter) > 0:
+                parameter_filters.append(self.additional_parameter)
+        else:
+            parameter_filters.append(
+                [*self.parameter_whitelist, *self.additional_parameter]
+            )
+
         unique_parameters = {}
         seen = set()
-    
-        for parameter_data in parameters_data:
-            unique_key = (parameter_data["parameterId"], parameter_data["parameterName"])
-            
-            if unique_key not in seen:
-                seen.add(unique_key)
-                unique_parameters[unique_key] = Parameter(parameter_data, device)
-    
-        duplicates_count = len(parameters_data) - len(unique_parameters)
-        if duplicates_count > 0:
-            _LOGGER.debug(f"Found {duplicates_count} duplicates.")
-    
+
+        for parameter_filter in parameter_filters:
+            query_parameters = {}
+            if len(parameter_filter) > 0:
+                query_parameters["parameters"] = ",".join(
+                    str(parameter_id) for parameter_id in parameter_filter
+                )
+
+            async with self.lock, self.throttle:
+                resp = await self.auth.request(
+                    "get",
+                    f"devices/{device.id}/points",
+                    headers=self.header,
+                    params=query_parameters,
+                )
+            resp.raise_for_status()
+            parameters_data = await resp.json()
+
+            for parameter_data in parameters_data:
+                unique_key = (
+                    parameter_data["parameterId"],
+                    parameter_data["parameterName"],
+                )
+
+                if unique_key not in seen:
+                    seen.add(unique_key)
+                    unique_parameters[unique_key] = Parameter(parameter_data, device)
+
         return list(unique_parameters.values())
 
     async def get_zones(self, device_id) -> list[Zone]:
@@ -569,7 +661,7 @@ class MyUplink:
         _LOGGER.debug("Fetch zones for device %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
-                "get", f"devices/{device_id}/smart-home-zones"
+                "get", f"devices/{device_id}/smart-home-zones", headers=self.header
             )
         resp.raise_for_status()
         return [Zone(zone) for zone in await resp.json()]
@@ -591,3 +683,17 @@ class MyUplink:
             )
         resp.raise_for_status()
         return resp.status == 200
+
+    def parse_int_keys(self, dct):
+        """Parse object keys into integers."""
+        rval = {}
+        for key, val in dct.items():
+            try:
+                # Convert the key to an integer
+                int_key = int(key)
+                # Assign value to the integer key in the new dict
+                rval[int_key] = val
+            except ValueError:
+                # Couldn't convert key to an integer; Use original key
+                rval[key] = val
+        return rval

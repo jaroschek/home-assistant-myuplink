@@ -18,7 +18,30 @@
       },
       "options": {
         "data": {
-          "scan_interval": "Scan Interval (seconds)"
+          "fetch_firmware": "Fetch Firmware Info from API?",
+          "fetch_notifications": "Fetch Notifications from API?",
+          "scan_interval": "Scan Interval (seconds)",
+          "expert_mode": "Expert Mode"
+        },
+        "data_description": {
+          "fetch_firmware": "Requires an additional API call.",
+          "fetch_notifications": "Requires an additional API call.",
+          "expert_mode": "Configure advanced options."
+        }
+      },
+      "expert": {
+        "title": "Expert Settings",
+        "data": {
+          "platform_override": "Platform Overrides",
+          "writable_override": "Writable Overrides",
+          "parameter_whitelist": "Parameter Whitelist",
+          "additional_parameter": "Additional Parameter"
+        },
+        "data_description": {
+          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
+          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
         }
       }
     }
@@ -125,14 +148,50 @@
           "5": "Off",
           "6": "Active"
         }
+      },
+      "myuplink_notifications": {
+        "name": "Notifications"
+      }
+    },
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Connection State"
+      }
+    },
+    "update": {
+      "myuplink_firmware": {
+        "name": "Firmware"
       }
     }
   },
   "options": {
     "step": {
-      "init": {
+      "options": {
         "data": {
-          "scan_interval": "Scan Interval (seconds)"
+          "fetch_firmware": "Fetch Firmware Info from API?",
+          "fetch_notifications": "Fetch Notifications from API?",
+          "scan_interval": "Scan Interval (seconds)",
+          "expert_mode": "Expert Mode"
+        },
+        "data_description": {
+          "fetch_firmware": "Requires an additional API call.",
+          "fetch_notifications": "Requires an additional API call.",
+          "expert_mode": "Configure advanced options."
+        }
+      },
+      "expert": {
+        "title": "Expert Settings",
+        "data": {
+          "platform_override": "Platform Overrides",
+          "writable_override": "Writable Overrides",
+          "parameter_whitelist": "Parameter Whitelist",
+          "additional_parameter": "Additional Parameter"
+        },
+        "data_description": {
+          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
+          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
         }
       }
     }
