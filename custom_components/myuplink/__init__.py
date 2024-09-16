@@ -66,7 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     _LOGGER.debug(
-        "Initialize coordinator with %d sesonds update interval", scan_interval
+        "Initialize coordinator with %d seconds update interval", scan_interval
     )
 
     coordinator = DataUpdateCoordinator(
@@ -82,6 +82,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    entry.current_options = {**entry.options}
+
     entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     return True
@@ -89,6 +91,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update options."""
+
+    if entry.current_options == entry.options:
+        return
+
     await hass.config_entries.async_reload(entry.entry_id)
 
 
