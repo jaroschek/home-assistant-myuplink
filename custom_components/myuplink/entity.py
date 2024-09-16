@@ -10,7 +10,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import Device, Parameter
-from .const import DOMAIN
+from .const import CONF_DISCONNECTED_AVAILABLE, DOMAIN
 
 
 class MyUplinkEntity(CoordinatorEntity):
@@ -90,4 +90,9 @@ class MyUplinkParameterEntity(MyUplinkEntity):
     @property
     def available(self):
         """Return if the device is online."""
-        return super().available and self._device.connection_state == "Connected"
+        return super().available and (
+            self._device.connection_state == "Connected"
+            or self._device.system.api.entry.options.get(
+                CONF_DISCONNECTED_AVAILABLE, False
+            )
+        )

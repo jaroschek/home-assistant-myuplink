@@ -9,11 +9,13 @@
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
+          "disconnected_available": "Keep disconnected parameters available?",
           "expert_mode": "Expert Mode"
         },
         "data_description": {
           "fetch_firmware": "Requires an additional API call.",
           "fetch_notifications": "Requires an additional API call.",
+          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
           "expert_mode": "Configure advanced options."
         }
       },
@@ -171,11 +173,13 @@
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
+          "disconnected_available": "Keep disconnected parameters available?",
           "expert_mode": "Expert Mode"
         },
         "data_description": {
           "fetch_firmware": "Requires an additional API call.",
           "fetch_notifications": "Requires an additional API call.",
+          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
           "expert_mode": "Configure advanced options."
         }
       },

@@ -31,6 +31,7 @@ PLATFORMS = [
 ]
 
 CONF_ADDITIONAL_PARAMETER = "additional_parameter"
+CONF_DISCONNECTED_AVAILABLE = "disconnected_available"
 CONF_EXPERT_MODE = "expert_mode"
 CONF_FETCH_FIRMWARE = "fetch_firmware"
 CONF_FETCH_NOTIFICATIONS = "fetch_notifications"

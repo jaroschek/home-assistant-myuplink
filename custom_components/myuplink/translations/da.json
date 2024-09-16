@@ -21,11 +21,13 @@
           "fetch_firmware": "Hent firmwareoplysninger fra API?",
           "fetch_notifications": "Vil du hente meddelelser fra API?",
           "scan_interval": "Scan-interval (sekunder)",
+          "disconnected_available": "Vil du holde afbrudte parametre tilgængelige?",
           "expert_mode": "Eksperttilstand"
         },
         "data_description": {
           "fetch_firmware": "Kræver et ekstra API-kald.",
           "fetch_notifications": "Kræver et ekstra API-kald.",
+          "disconnected_available": "Vis parameterenheder for afbrudte enheder som `tilgængelige`.",
           "expert_mode": "Konfigurer avancerede indstillinger."
         }
       },
@@ -171,11 +173,13 @@
           "fetch_firmware": "Hent firmwareoplysninger fra API?",
           "fetch_notifications": "Vil du hente meddelelser fra API?",
           "scan_interval": "Scan-interval (sekunder)",
+          "disconnected_available": "Vil du holde afbrudte parametre tilgængelige?",
           "expert_mode": "Eksperttilstand"
         },
         "data_description": {
           "fetch_firmware": "Kræver et ekstra API-kald.",
           "fetch_notifications": "Kræver et ekstra API-kald.",
+          "disconnected_available": "Vis parameterenheder for afbrudte enheder som `tilgængelige`.",
           "expert_mode": "Konfigurer avancerede indstillinger."
         }
       },
