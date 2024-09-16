@@ -21,11 +21,13 @@
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
+          "disconnected_available": "Getrennte Parameter verfügbar halten?",
           "expert_mode": "Expertenmodus"
         },
         "data_description": {
           "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
           "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
           "expert_mode": "Erweiterte Optionen konfigurieren."
         }
       },
@@ -137,11 +139,13 @@
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
+          "disconnected_available": "Getrennte Parameter verfügbar halten?",
           "expert_mode": "Expertenmodus"
         },
         "data_description": {
           "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
           "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
           "expert_mode": "Erweiterte Optionen konfigurieren."
         }
       },
