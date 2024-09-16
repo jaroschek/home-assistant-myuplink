@@ -21,11 +21,13 @@
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
+          "disconnected_available": "Vil du holde frakoblede parametere tilgjengelige?",
           "expert_mode": "Ekspertmodus"
         },
         "data_description": {
           "fetch_firmware": "Krever et ekstra API-kall.",
           "fetch_notifications": "Krever et ekstra API-kall.",
+          "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
           "expert_mode": "Konfigurer avanserte alternativer."
         }
       },
@@ -218,11 +220,13 @@
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
+          "disconnected_available": "Vil du holde frakoblede parametere tilgjengelige?",
           "expert_mode": "Ekspertmodus"
         },
         "data_description": {
           "fetch_firmware": "Krever et ekstra API-kall.",
           "fetch_notifications": "Krever et ekstra API-kall.",
+          "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
           "expert_mode": "Konfigurer avanserte alternativer."
         }
       },
