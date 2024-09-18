@@ -18,6 +18,7 @@
       },
       "options": {
         "data": {
+          "enable_smart_home_mode": "Smart-Home-Modus aktivieren?",
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
@@ -25,8 +26,9 @@
           "expert_mode": "Expertenmodus"
         },
         "data_description": {
-          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
-          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "enable_smart_home_mode": "Der Smart-Home-Modus ist eine systembezogene Entität in der myUplink-API.\n\nWenn ein System nur über ein einziges Gerät verfügt, wird der Smart-Home-Modus diesem Gerät hinzugefügt. Andernfalls wird der Smart-Home-Modus einem zusätzlichen Gerät hinzugfügt, dass auf den verfügbaren Systeminformationen basiert.\n\nDie Unterstützung des Smart-Home-Modus erfordert einen zusätzlichen API-Aufruf pro System.",
+          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
+          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf pro System.",
           "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
           "expert_mode": "Erweiterte Optionen konfigurieren."
         }
@@ -126,6 +128,18 @@
         "name": "Verbindungsstatus"
       }
     },
+    "select": {
+      "myuplink_smart_home_mode": {
+        "name": "Smart-Home-Modus",
+        "state": {
+          "default": "Standard",
+          "normal": "Normal",
+          "away": "Abwesend",
+          "vacation": "Urlaub",
+          "home": "Zuhause"
+        }
+      }
+    },
     "update": {
       "myuplink_firmware": {
         "name": "Firmware"
@@ -136,6 +150,7 @@
     "step": {
       "options": {
         "data": {
+          "enable_smart_home_mode": "Smart-Home-Modus aktivieren?",
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
@@ -143,8 +158,9 @@
           "expert_mode": "Expertenmodus"
         },
         "data_description": {
-          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf.",
-          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf.",
+          "enable_smart_home_mode": "Der Smart-Home-Modus ist eine systembezogene Entität in der myUplink-API.\n\nWenn ein System nur über ein einziges Gerät verfügt, wird der Smart-Home-Modus diesem Gerät hinzugefügt. Andernfalls wird der Smart-Home-Modus einem zusätzlichen Gerät hinzugfügt, dass auf den verfügbaren Systeminformationen basiert.\n\nDie Unterstützung des Smart-Home-Modus erfordert einen zusätzlichen API-Aufruf pro System.",
+          "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
+          "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf pro System.",
           "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
           "expert_mode": "Erweiterte Optionen konfigurieren."
         }

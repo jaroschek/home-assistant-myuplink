@@ -1,4 +1,5 @@
 """Support for myUplink sensors."""
+
 from __future__ import annotations
 
 import logging
@@ -15,7 +16,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import Device, Parameter
 from .const import DOMAIN, WATER_HEATERS
-from .entity import MyUplinkEntity
+from .entity import MyUplinkDeviceEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up the sensors."""
+    """Set up the platform entities."""
 
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[WaterHeaterEntity] = []
@@ -36,7 +37,7 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class MyUplinkWaterHeaterEntity(MyUplinkEntity, WaterHeaterEntity):
+class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
     """Representation of a myUplink paramater binary sensor."""
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: Device) -> None:
