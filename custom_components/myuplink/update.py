@@ -7,13 +7,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device
 from .const import CONF_FETCH_FIRMWARE, DOMAIN
-from .entity import MyUplinkEntity
+from .entity import MyUplinkDeviceEntity
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up update entities."""
+    """Set up update platform entities."""
 
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[UpdateEntity] = []
@@ -28,7 +28,7 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
+class MyUplinkUpdateEntity(MyUplinkDeviceEntity, UpdateEntity):
     """Representation of a myUplink update entity."""
 
     _attr_device_class = UpdateDeviceClass.FIRMWARE
@@ -38,7 +38,7 @@ class MyUplinkUpdateEntity(MyUplinkEntity, UpdateEntity):
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_translation_key = "myuplink_firmware"
+        self._attr_translation_key = f"{DOMAIN}_firmware"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_firmware"
 
     @property

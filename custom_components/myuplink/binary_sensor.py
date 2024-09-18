@@ -15,7 +15,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter
 from .const import DOMAIN
-from .entity import MyUplinkEntity, MyUplinkParameterEntity
+from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up the sensors."""
+    """Set up the platform entities."""
 
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[BinarySensorEntity] = []
@@ -57,7 +57,7 @@ class MyUplinkParameterBinarySensorEntity(MyUplinkParameterEntity, BinarySensorE
             self._attr_device_class = BinarySensorDeviceClass.RUNNING
 
 
-class MyUplinkConnectedBinarySensor(MyUplinkEntity, BinarySensorEntity):
+class MyUplinkConnectedBinarySensor(MyUplinkDeviceEntity, BinarySensorEntity):
     """Representation of an myUplink connected sensor."""
 
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
