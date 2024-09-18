@@ -608,9 +608,7 @@ class MyUplink:
         _LOGGER.debug("Fetch smart home mode for system %s", system.id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
-                "get",
-                f"systems/{system.id}/smart-home-mode",
-                headers=self.header,
+                "get", f"systems/{system.id}/smart-home-mode"
             )
         resp.raise_for_status()
         data = await resp.json()
