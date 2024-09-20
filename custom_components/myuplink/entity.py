@@ -77,6 +77,7 @@ class MyUplinkDeviceEntity(CoordinatorEntity):
             manufacturer=manufacturer,
             model=model,
             name=self._device.name,
+            serial_number=self._device.serial_number,
             sw_version=self._device.current_firmware_version,
         )
 
