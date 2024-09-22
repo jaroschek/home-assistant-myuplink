@@ -18,6 +18,7 @@
       },
       "options": {
         "data": {
+          "enable_smart_home_mode": "Aktiver Smart Home Mode?",
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
@@ -25,8 +26,9 @@
           "expert_mode": "Ekspertmodus"
         },
         "data_description": {
-          "fetch_firmware": "Krever et ekstra API-kall.",
-          "fetch_notifications": "Krever et ekstra API-kall.",
+          "enable_smart_home_mode": "Smart Home Mode er en systemrelatert enhet i myUplink API.\n\nHvis et system bare har én enkelt enhet, vil Smart Home Mode bli lagt til denne enheten. Ellers vil Smart Home Mode bli lagt til en ekstra enhet, som er basert på tilgjengelig systeminformasjon.\n\nStøtte for Smart Home Mode krever ett ekstra API-kall per system.",
+          "fetch_firmware": "Krever et ekstra API-kall per enhet.",
+          "fetch_notifications": "Krever et ekstra API-kall per system.",
           "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
           "expert_mode": "Konfigurer avanserte alternativer."
         }
@@ -207,6 +209,18 @@
         "name": "Tilkoblingstilstand"
       }
     },
+    "select": {
+      "myuplink_smart_home_mode": {
+        "name": "Smart Home Mode",
+        "state": {
+          "default": "Misligholde",
+          "normal": "Normal",
+          "away": "Borte",
+          "vacation": "Ferie",
+          "home": "Hjemme"
+        }
+      }
+    },
     "update": {
       "myuplink_firmware": {
         "name": "Fastvare"
@@ -217,6 +231,7 @@
     "step": {
       "options": {
         "data": {
+          "enable_smart_home_mode": "Aktiver Smart Home Mode?",
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
@@ -224,8 +239,9 @@
           "expert_mode": "Ekspertmodus"
         },
         "data_description": {
-          "fetch_firmware": "Krever et ekstra API-kall.",
-          "fetch_notifications": "Krever et ekstra API-kall.",
+          "enable_smart_home_mode": "Smart Home Mode er en systemrelatert enhet i myUplink API.\n\nHvis et system bare har én enkelt enhet, vil Smart Home Mode bli lagt til denne enheten. Ellers vil Smart Home Mode bli lagt til en ekstra enhet, som er basert på tilgjengelig systeminformasjon.\n\nStøtte for Smart Home Mode krever ett ekstra API-kall per system.",
+          "fetch_firmware": "Krever et ekstra API-kall per enhet.",
+          "fetch_notifications": "Krever et ekstra API-kall per system.",
           "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
           "expert_mode": "Konfigurer avanserte alternativer."
         }

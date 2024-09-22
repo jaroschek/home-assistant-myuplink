@@ -18,6 +18,7 @@
       },
       "options": {
         "data": {
+          "enable_smart_home_mode": "Enable Smart Home Mode?",
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
@@ -25,8 +26,9 @@
           "expert_mode": "Expert Mode"
         },
         "data_description": {
-          "fetch_firmware": "Requires an additional API call.",
-          "fetch_notifications": "Requires an additional API call.",
+          "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
+          "fetch_firmware": "Requires an additional API call per device.",
+          "fetch_notifications": "Requires an additional API call per system.",
           "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
           "expert_mode": "Configure advanced options."
         }
@@ -160,6 +162,18 @@
         "name": "Connection State"
       }
     },
+    "select": {
+      "myuplink_smart_home_mode": {
+        "name": "Smart Home Mode",
+        "state": {
+          "default": "Default",
+          "normal": "Normal",
+          "away": "Away",
+          "vacation": "Vacation",
+          "home": "Home"
+        }
+      }
+    },
     "update": {
       "myuplink_firmware": {
         "name": "Firmware"
@@ -170,6 +184,7 @@
     "step": {
       "options": {
         "data": {
+          "enable_smart_home_mode": "Enable Smart Home Mode?",
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
@@ -177,8 +192,9 @@
           "expert_mode": "Expert Mode"
         },
         "data_description": {
-          "fetch_firmware": "Requires an additional API call.",
-          "fetch_notifications": "Requires an additional API call.",
+          "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
+          "fetch_firmware": "Requires an additional API call per device.",
+          "fetch_notifications": "Requires an additional API call per system.",
           "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
           "expert_mode": "Configure advanced options."
         }

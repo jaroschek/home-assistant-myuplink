@@ -18,6 +18,7 @@ from .const import (
     API_HOST,
     API_VERSION,
     CONF_ADDITIONAL_PARAMETER,
+    CONF_ENABLE_SMART_HOME_MODE,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -441,6 +442,9 @@ class System:
     # List of collected devices
     devices: list[Device] = []
 
+    # Smart home mode of the system
+    smart_home_mode: str = "Default"
+
     def __init__(self, raw_data: dict, api: MyUplink) -> None:
         """Initialize a system object."""
         self.raw_data = raw_data
@@ -473,6 +477,9 @@ class System:
                 Device(device_data, self) for device_data in self.raw_data["devices"]
             ]
 
+        if self.api.entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True):
+            self.smart_home_mode = await self.api.get_smart_home_mode(self)
+
         fetch_notifications = self.api.entry.options.get(CONF_FETCH_NOTIFICATIONS, True)
         if fetch_notifications:
             notifications = await self.api.get_notifications(self)
@@ -485,6 +492,10 @@ class System:
                         device.notifications.append(notification)
 
             await device.async_fetch_data()
+
+    async def update_smart_home_mode(self, value) -> None:
+        """Put smart home mode for system."""
+        await self.api.put_smart_home_mode(self.id, str(value))
 
 
 class Throttle:
@@ -592,6 +603,43 @@ class MyUplink:
 
         return [Notification(notification) for notification in data["notifications"]]
 
+    async def get_smart_home_mode(self, system: System) -> str:
+        """Return smart home mode by system id."""
+        _LOGGER.debug("Fetch smart home mode for system %s", system.id)
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "get", f"systems/{system.id}/smart-home-mode"
+            )
+        resp.raise_for_status()
+        data = await resp.json()
+
+        return data["smartHomeMode"]
+
+    async def put_smart_home_mode(self, system_id, value: str) -> bool:
+        """Set the smart home mode for a system."""
+        _LOGGER.debug(
+            "Put smart home mode for system %s with value %s",
+            system_id,
+            value,
+        )
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "put",
+                f"systems/{system_id}/smart-home-mode",
+                data=json.dumps({"smartHomeMode": value}),
+                headers={"Content-Type": "application/json-patch+json"},
+            )
+        resp.raise_for_status()
+        if resp.status == 200:
+            data = await resp.json()
+            return (
+                "payload" in data
+                and "state" in data["payload"]
+                and data["payload"]["state"] == "ok"
+            )
+
+        return False
+
     async def get_device(self, device_id: str) -> Device:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
@@ -667,7 +715,7 @@ class MyUplink:
         return [Zone(zone) for zone in await resp.json()]
 
     async def patch_parameter(self, device_id, parameter_id: str, value: str) -> bool:
-        """Return all smart home zones for a device."""
+        """Update the value of a parameter for a device."""
         _LOGGER.debug(
             "Patch parameter %s for device %s with value %s",
             parameter_id,

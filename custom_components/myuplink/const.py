@@ -32,6 +32,7 @@ PLATFORMS = [
 
 CONF_ADDITIONAL_PARAMETER = "additional_parameter"
 CONF_DISCONNECTED_AVAILABLE = "disconnected_available"
+CONF_ENABLE_SMART_HOME_MODE = "enable_smart_home_mode"
 CONF_EXPERT_MODE = "expert_mode"
 CONF_FETCH_FIRMWARE = "fetch_firmware"
 CONF_FETCH_NOTIFICATIONS = "fetch_notifications"
@@ -82,3 +83,13 @@ class CustomUnits(StrEnum):
     TIME_DAYS = "days"
     TIME_HOUR = "hour"
     TIME_HOURS = "hours"
+
+
+class SmartHomeModes(StrEnum):
+    """Smart home modes."""
+
+    DEFAULT = "Default"
+    NORMAL = "Normal"
+    AWAY = "Away"
+    VACATION = "Vacation"
+    HOME = "Home"

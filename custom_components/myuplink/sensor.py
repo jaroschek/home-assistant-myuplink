@@ -25,7 +25,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter
 from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
-from .entity import MyUplinkEntity, MyUplinkParameterEntity
+from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set up the sensors."""
+    """Set up the platform entities."""
 
     coordinator = hass.data[DOMAIN][entry.entry_id]
     entities: list[SensorEntity] = []
@@ -109,7 +109,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
             self._attr_native_value = self._parameter.value
 
 
-class MyUplinkNotificationsSensorEntity(MyUplinkEntity, SensorEntity):
+class MyUplinkNotificationsSensorEntity(MyUplinkDeviceEntity, SensorEntity):
     """Representation of a myUplink alarm sensor entity."""
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -119,7 +119,7 @@ class MyUplinkNotificationsSensorEntity(MyUplinkEntity, SensorEntity):
         """Update attrs from device."""
         super()._update_from_device(device)
 
-        self._attr_translation_key = "myuplink_notifications"
+        self._attr_translation_key = f"{DOMAIN}_notifications"
         self._attr_unique_id = f"{DOMAIN}_{device.id}_notifications"
 
         self._attr_native_value = len(device.notifications)
