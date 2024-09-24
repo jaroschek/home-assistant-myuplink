@@ -19,6 +19,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import AsyncConfigEntryAuth, MyUplink
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, PLATFORMS
+from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,6 +83,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    await async_setup_services(hass)
+
     entry.current_options = {**entry.options}
 
     entry.async_on_unload(entry.add_update_listener(async_update_options))
@@ -102,5 +105,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
+
+    await async_unload_services(hass)
 
     return unload_ok

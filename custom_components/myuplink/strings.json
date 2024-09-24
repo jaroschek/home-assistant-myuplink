@@ -215,5 +215,25 @@
         }
       }
     }
+  },
+  "services": {
+    "set_device_parameter_value": {
+      "name": "Set device parameter to value",
+      "description": "Service for setting any parameter identified by ID for a specific device to the desired value.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink Device",
+          "description": "Select the myUplink device the parameter belongs to."
+        },
+        "parameter_id": {
+          "name": "myUplink Parameter ID",
+          "description": "Enter the id of the parameter point in the myUplink API."
+        },
+        "value": {
+          "name": "Value",
+          "description": "Enter the value to set."
+        }
+      }
+    }
   }
 }

@@ -181,5 +181,25 @@
         }
       }
     }
+  },
+  "services": {
+    "set_device_parameter_value": {
+      "name": "Geräteparameter auf Wert setzen",
+      "description": "Dienst zum Setzen jeglicher durch die ID identifizierter Parameter für ein bestimmtes Gerät auf den gewünschten Wert.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-Gerät",
+          "description": "Wählen Sie das myUplink-Gerät aus, zu dem der Parameter gehört."
+        },
+        "parameter_id": {
+          "name": "myUplink-Parameter-ID",
+          "description": "Geben Sie die ID des Parameterpunkts in der myUplink-API ein."
+        },
+        "value": {
+          "name": "Wert",
+          "description": "Geben Sie den festzulegenden Wert ein."
+        }
+      }
+    }
   }
 }

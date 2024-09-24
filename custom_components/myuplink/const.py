@@ -30,6 +30,9 @@ PLATFORMS = [
     Platform.WATER_HEATER,
 ]
 
+ATTR_PARAMETER_ID = "parameter_id"
+ATTR_VALUE = "value"
+
 CONF_ADDITIONAL_PARAMETER = "additional_parameter"
 CONF_DISCONNECTED_AVAILABLE = "disconnected_available"
 CONF_ENABLE_SMART_HOME_MODE = "enable_smart_home_mode"
