@@ -1,0 +1,15 @@
+set_device_parameter_value:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: myuplink
+    parameter_id:
+      required: true
+      selector:
+        text:
+    value:
+      required: true
+      selector:
+        text:
