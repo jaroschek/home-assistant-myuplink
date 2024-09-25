@@ -215,5 +215,25 @@
         }
       }
     }
+  },
+  "services": {
+    "set_device_parameter_value": {
+      "name": "Indstil enhedsparameter til værdi",
+      "description": "Tjeneste til at indstille eventuelle parametre identificeret af ID'et for en specifik enhed til den ønskede værdi.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-enhed",
+          "description": "Vælg den myUplink-enhed, parameteren tilhører."
+        },
+        "parameter_id": {
+          "name": "myUplink Parameter ID",
+          "description": "Indtast id'et for parameterpunktet i myUplink API'et."
+        },
+        "value": {
+          "name": "Værdi",
+          "description": "Indtast den værdi, der skal indstilles."
+        }
+      }
+    }
   }
 }
