@@ -11,7 +11,14 @@ import logging
 from aiohttp import ClientResponse, ClientSession
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
+from homeassistant.const import (
+    Platform,
+    UnitOfEnergy,
+    UnitOfFrequency,
+    UnitOfPower,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.helpers import config_entry_oauth2_flow
 
 from .const import (
@@ -190,7 +197,7 @@ class Parameter:
     @property
     def unit(self) -> str:
         """Return the unit of the parameter."""
-        return self.raw_data["parameterUnit"]
+        return self.get_unit(self.raw_data["parameterUnit"])
 
     @property
     def is_writable(self) -> bool:
@@ -290,6 +297,22 @@ class Parameter:
             return Platform.NUMBER
 
         return Platform.SENSOR
+
+    def get_unit(self, parameter_unit) -> str:
+        """Try to get the correct home assistant unit."""
+        if parameter_unit != "":
+            for units in (
+                UnitOfEnergy,
+                UnitOfFrequency,
+                UnitOfPower,
+                UnitOfTemperature,
+                UnitOfTime,
+            ):
+                for unit in units:
+                    if parameter_unit.lower() == unit.lower():
+                        return str(unit)
+
+        return parameter_unit
 
 
 class Zone:
