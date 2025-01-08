@@ -7,6 +7,11 @@
       "missing_configuration": "Die Komponente ist nicht konfiguriert. Bitte folgen Sie der Dokumentation.",
       "no_url_available": "Keine URL verfügbar. Informationen zu diesem Fehler finden Sie im [Hilfeabschnitt]({docs_url})",
       "oauth_error": "Ungültige Tokendaten empfangen.",
+      "oauth_failed": "Fehler beim Abrufen des Zugriffstokens",
+      "oauth_timeout": "Zeitüberschreitung beim Auflösen des OAuth-Tokens.",
+      "oauth_unauthorized": "OAuth-Autorisierungsfehler beim Abrufen des Zugriffstokens",
+      "reauth_successful": "Re-Authentifizierung war erfolgreich",
+      "reconfigure_successful": "Neukonfiguration war erfolgreich",
       "user_rejected_authorize": "Kontoverknüpfung abgelehnt: {error}"
     },
     "create_entry": {
