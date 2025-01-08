@@ -14,11 +14,10 @@ from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import aiohttp_client, config_entry_oauth2_flow
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import AsyncConfigEntryAuth, MyUplink
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, PLATFORMS
+from .const import DEFAULT_SCAN_INTERVAL, PLATFORMS, SCOPES
 from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,21 +32,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     session = config_entry_oauth2_flow.OAuth2Session(hass, entry, implementation)
+    auth = AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session)
+
     try:
-        await session.async_ensure_token_valid()
+        await auth.async_get_access_token()
     except aiohttp.ClientResponseError as err:
         _LOGGER.debug("API error: %s (%s)", err.code, err.message)
         if err.code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
-            raise ConfigEntryAuthFailed("Token not valid, trigger renewal") from err
+            raise ConfigEntryAuthFailed from err
         raise ConfigEntryNotReady from err
     except aiohttp.ClientError as err:
         raise ConfigEntryNotReady from err
 
-    api = MyUplink(
-        AsyncConfigEntryAuth(aiohttp_client.async_get_clientsession(hass), session),
-        f"{hass.config.language}-{hass.config.country}",
-        entry,
-    )
+    if set(entry.data["token"]["scope"].split(" ")) != set(SCOPES):
+        raise ConfigEntryAuthFailed
+
+    api = MyUplink(auth, f"{hass.config.language}-{hass.config.country}", entry)
 
     async def async_update_data():
         try:
