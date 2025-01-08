@@ -27,7 +27,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the platform entities."""
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[SelectEntity] = []
 
     enable_smart_home_mode = entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True)
