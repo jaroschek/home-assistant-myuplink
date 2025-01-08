@@ -8,6 +8,7 @@ from http import HTTPStatus
 import logging
 
 import aiohttp
+import jwt
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL
@@ -100,3 +101,22 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await async_unload_services(hass)
 
     return unload_ok
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old entry."""
+    _LOGGER.debug("Migrating from version %s.%s", entry.version, entry.minor_version)
+
+    if entry.version == 1 and entry.minor_version == 1:
+        token = jwt.decode(
+            entry.data["token"]["access_token"], options={"verify_signature": False}
+        )
+        hass.config_entries.async_update_entry(
+            entry, unique_id=token["sub"], minor_version=2
+        )
+
+    _LOGGER.info(
+        "Migration to version %s.%s successful", entry.version, entry.minor_version
+    )
+
+    return True
