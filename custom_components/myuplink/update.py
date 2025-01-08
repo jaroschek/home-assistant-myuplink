@@ -1,5 +1,7 @@
 """Support for myUplink update platform."""
 
+from __future__ import annotations
+
 from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -8,6 +10,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .api import Device
 from .const import CONF_FETCH_FIRMWARE, DOMAIN
 from .entity import MyUplinkDeviceEntity
+
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
