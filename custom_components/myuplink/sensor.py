@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -27,7 +25,7 @@ from .api import Device, Parameter
 from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
 from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
 
-_LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
