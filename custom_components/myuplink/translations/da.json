@@ -7,6 +7,11 @@
       "missing_configuration": "Komponenten er ikke konfigureret. Følg venligst dokumentationen.",
       "no_url_available": "Ingen URL tilgængelig. For information om denne fejl, [se hjælpesektionen]({docs_url})",
       "oauth_error": "Modtog ugyldige token-data.",
+      "oauth_failed": "Fejl under indhentning af adgangstoken.",
+      "oauth_timeout": "Timeout ved opløsning af OAuth-token.",
+      "oauth_unauthorized": "OAuth-autorisationsfejl under indhentning af adgangstoken.",
+      "reauth_successful": "Genautentificering var vellykket",
+      "reconfigure_successful": "Genkonfigurationen var vellykket",
       "user_rejected_authorize": "Konto-linking afvist: {error}"
     },
     "create_entry": {

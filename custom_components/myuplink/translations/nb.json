@@ -7,6 +7,11 @@
       "missing_configuration": "Komponenten er ikke konfigurert. Vennligst følg dokumentasjonen.",
       "no_url_available": "Ingen URL tilgjengelig. For mer informasjon rundt denne feilen, [sjekk hjelp-delen]({docs_url})",
       "oauth_error": "Mottok ugyldig nøkkeldata.",
+      "oauth_failed": "Feil under innhenting av tilgangstoken.",
+      "oauth_timeout": "Tidsavbrudd for å løse OAuth-token.",
+      "oauth_unauthorized": "OAuth-autorisasjonsfeil under innhenting av tilgangstoken.",
+      "reauth_successful": "Ny autentisering var vellykket",
+      "reconfigure_successful": "Omkonfigurasjonen var vellykket",
       "user_rejected_authorize": "Kontotilkobling avvist: {error}"
     },
     "create_entry": {
