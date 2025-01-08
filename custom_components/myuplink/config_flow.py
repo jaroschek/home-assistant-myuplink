@@ -146,6 +146,9 @@ class OAuth2FlowHandler(
 
     DOMAIN = DOMAIN
 
+    VERSION = 1
+    MINOR_VERSION = 2
+
     _data: dict[str, Any] = {}
 
     _options: dict[str, Any] = {}
