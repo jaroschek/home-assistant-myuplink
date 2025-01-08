@@ -13,6 +13,7 @@ from voluptuous.schema_builder import Schema
 
 from homeassistant.config_entries import (
     SOURCE_REAUTH,
+    SOURCE_RECONFIGURE,
     ConfigEntry,
     OptionsFlowWithConfigEntry,
 )
@@ -169,11 +170,17 @@ class OAuth2FlowHandler(
         return await self.async_step_reauth_confirm()
 
     async def async_step_reauth_confirm(
-        self, user_input: dict | None = None
+        self, user_input: Mapping[str, Any] | None = None
     ) -> FlowResult:
         """Dialog that informs the user that reauth is required."""
         if user_input is None:
             return self.async_show_form(step_id="reauth_confirm")
+        return await self.async_step_user()
+
+    async def async_step_reconfigure(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> FlowResult:
+        """User initiated reconfiguration."""
         return await self.async_step_user()
 
     async def async_oauth_create_entry(self, data: dict) -> FlowResult:
@@ -189,6 +196,11 @@ class OAuth2FlowHandler(
             self._abort_if_unique_id_mismatch()
             return self.async_update_reload_and_abort(
                 self._get_reauth_entry(), data_updates=data
+            )
+        if self.source == SOURCE_RECONFIGURE:
+            self._abort_if_unique_id_mismatch()
+            return self.async_update_reload_and_abort(
+                self._get_reconfigure_entry(), data_updates=data
             )
         self._abort_if_unique_id_configured()
 
