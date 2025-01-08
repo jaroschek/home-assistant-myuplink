@@ -35,7 +35,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the platform entities."""
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[SensorEntity] = []
 
     for system in coordinator.data:

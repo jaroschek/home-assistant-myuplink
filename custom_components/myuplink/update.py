@@ -15,7 +15,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up update platform entities."""
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[UpdateEntity] = []
 
     if entry.options.get(CONF_FETCH_FIRMWARE, True):
