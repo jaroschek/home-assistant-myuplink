@@ -7,6 +7,7 @@ import json
 import logging
 from typing import Any
 
+import jwt
 import voluptuous as vol
 from voluptuous.schema_builder import Schema
 
@@ -178,9 +179,19 @@ class OAuth2FlowHandler(
     async def async_oauth_create_entry(self, data: dict) -> FlowResult:
         """Create an entry for the flow."""
         _LOGGER.debug("Finishing post-oauth configuration")
+
+        token = jwt.decode(
+            data["token"]["access_token"], options={"verify_signature": False}
+        )
+
+        await self.async_set_unique_id(token["sub"])
         if self.source == SOURCE_REAUTH:
-            _LOGGER.debug("Skipping post-oauth configuration")
-            return self.async_create_entry(title=self.flow_impl.name, data=data)
+            self._abort_if_unique_id_mismatch()
+            return self.async_update_reload_and_abort(
+                self._get_reauth_entry(), data_updates=data
+            )
+        self._abort_if_unique_id_configured()
+
         self._data = data
         return await self.async_step_options()
 
