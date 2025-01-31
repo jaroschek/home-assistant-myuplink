@@ -7,11 +7,13 @@ import json
 import logging
 from typing import Any
 
+import jwt
 import voluptuous as vol
 from voluptuous.schema_builder import Schema
 
 from homeassistant.config_entries import (
     SOURCE_REAUTH,
+    SOURCE_RECONFIGURE,
     ConfigEntry,
     OptionsFlowWithConfigEntry,
 )
@@ -146,6 +148,9 @@ class OAuth2FlowHandler(
 
     DOMAIN = DOMAIN
 
+    VERSION = 1
+    MINOR_VERSION = 2
+
     _data: dict[str, Any] = {}
 
     _options: dict[str, Any] = {}
@@ -165,19 +170,40 @@ class OAuth2FlowHandler(
         return await self.async_step_reauth_confirm()
 
     async def async_step_reauth_confirm(
-        self, user_input: dict | None = None
+        self, user_input: Mapping[str, Any] | None = None
     ) -> FlowResult:
         """Dialog that informs the user that reauth is required."""
         if user_input is None:
             return self.async_show_form(step_id="reauth_confirm")
         return await self.async_step_user()
 
+    async def async_step_reconfigure(
+        self, user_input: Mapping[str, Any] | None = None
+    ) -> FlowResult:
+        """User initiated reconfiguration."""
+        return await self.async_step_user()
+
     async def async_oauth_create_entry(self, data: dict) -> FlowResult:
         """Create an entry for the flow."""
         _LOGGER.debug("Finishing post-oauth configuration")
+
+        token = jwt.decode(
+            data["token"]["access_token"], options={"verify_signature": False}
+        )
+
+        await self.async_set_unique_id(token["sub"])
         if self.source == SOURCE_REAUTH:
-            _LOGGER.debug("Skipping post-oauth configuration")
-            return self.async_create_entry(title=self.flow_impl.name, data=data)
+            self._abort_if_unique_id_mismatch()
+            return self.async_update_reload_and_abort(
+                self._get_reauth_entry(), data_updates=data
+            )
+        if self.source == SOURCE_RECONFIGURE:
+            self._abort_if_unique_id_mismatch()
+            return self.async_update_reload_and_abort(
+                self._get_reconfigure_entry(), data_updates=data
+            )
+        self._abort_if_unique_id_configured()
+
         self._data = data
         return await self.async_step_options()
 

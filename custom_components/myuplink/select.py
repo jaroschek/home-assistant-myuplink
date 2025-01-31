@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -19,7 +17,7 @@ from .const import (
 )
 from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, MyUplinkSystemEntity
 
-_LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
@@ -27,7 +25,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the platform entities."""
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[SelectEntity] = []
 
     enable_smart_home_mode = entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True)

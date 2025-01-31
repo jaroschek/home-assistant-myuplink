@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -17,7 +15,7 @@ from .api import Device, Parameter
 from .const import DOMAIN
 from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
 
-_LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
@@ -25,7 +23,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the platform entities."""
 
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     entities: list[BinarySensorEntity] = []
 
     for system in coordinator.data:
