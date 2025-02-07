@@ -68,7 +68,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
             )
         except ClientResponseError as ex:
             raise HomeAssistantError(
-                f"The myUplink API returned an error trying to set the parameter {parameter_id} to value {value} for device {device.id,}"
+                f"The myUplink API returned an error trying to set the parameter {parameter_id} to value {value} for device {device.id}"
                 f" Code: {ex.status}  Message: {ex.message}"
             ) from ex
 
@@ -93,7 +93,7 @@ async def _async_get_selected_myuplink_device(
             and config_entry.domain == DOMAIN
             and config_entry.state == ConfigEntryState.LOADED
         ):
-            coordinator: DataUpdateCoordinator = hass.data[DOMAIN][entry_id]
+            coordinator: DataUpdateCoordinator = config_entry.runtime_data
             for myuplink_system in coordinator.data:
                 for myuplink_device in myuplink_system.devices:
                     hass_device = device_registry.async_get_device(
