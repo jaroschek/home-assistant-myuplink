@@ -31,6 +31,7 @@ from .const import (
     CONF_PARAMETER_WHITELIST,
     CONF_PLATFORM_OVERRIDE,
     CONF_WRITABLE_OVERRIDE,
+    CONF_WRITABLE_WITHOUT_SUBSCRIPTION,
     DEFAULT_PLATFORM_OVERRIDE,
     DEFAULT_WRITABLE_OVERRIDE,
 )
@@ -212,10 +213,12 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        if self.id in self.device.system.api.writable_override:
-            return self.device.system.api.writable_override[self.id]
+        if self.device.system.premium_manage or self.device.system.api.writable_without_subscription:
+            if self.id in self.device.system.api.writable_override:
+                return self.device.system.api.writable_override[self.id]
 
-        return self.raw_data["writable"]
+            return self.raw_data["writable"]
+        return False
 
     @property
     def timestamp(self) -> str:
@@ -577,6 +580,8 @@ class MyUplink:
         self.throttle = Throttle(timedelta(seconds=5))
 
         self.header = {"Accept-Language": language_code}
+        
+        self.writable_without_subscription = entry.options.get(CONF_WRITABLE_WITHOUT_SUBSCRIPTION, True)
 
         try:
             self.parameter_whitelist = json.loads(

@@ -42,6 +42,7 @@ CONF_FETCH_NOTIFICATIONS = "fetch_notifications"
 CONF_PARAMETER_WHITELIST = "parameter_whitelist"
 CONF_PLATFORM_OVERRIDE = "platform_override"
 CONF_WRITABLE_OVERRIDE = "writable_override"
+CONF_WRITABLE_WITHOUT_SUBSCRIPTION = "writable_without_subscription"
 
 DEFAULT_SCAN_INTERVAL = 300
 MAX_SCAN_INTERVAL = 600
