@@ -33,6 +33,7 @@ from .const import (
     CONF_PARAMETER_WHITELIST,
     CONF_PLATFORM_OVERRIDE,
     CONF_WRITABLE_OVERRIDE,
+    CONF_WRITABLE_WITHOUT_SUBSCRIPTION,
     DEFAULT_PLATFORM_OVERRIDE,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WRITABLE_OVERRIDE,
@@ -125,6 +126,9 @@ def get_expert_schema(data: ConfigType) -> Schema:
                 CONF_PLATFORM_OVERRIDE,
                 default=platform_override,
             ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
+            vol.Optional(CONF_WRITABLE_WITHOUT_SUBSCRIPTION,
+                         default=data.get(CONF_WRITABLE_WITHOUT_SUBSCRIPTION, True),
+            ): selector.BooleanSelector(),
             vol.Optional(
                 CONF_WRITABLE_OVERRIDE,
                 default=writable_override,

@@ -25,12 +25,14 @@
         "title": "Expert Settings",
         "data": {
           "platform_override": "Platform Overrides",
+          "writable_without_subscription": "Writable without subscription",
           "writable_override": "Writable Overrides",
           "parameter_whitelist": "Parameter Whitelist",
           "additional_parameter": "Additional Parameter"
         },
         "data_description": {
           "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_without_subscription": "When you do not have a Premium subscription and are not able to write parameter values, create writable entities in Home Assistant anyway\n\nThis is enabled by default to avoid issues with lapsed subscriptions, non-Premium users adding subscriptions, and the possibility of myUplink providing manage permissions unilaterally.",
           "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
           "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
           "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
@@ -208,12 +210,14 @@
         "title": "Expert Settings",
         "data": {
           "platform_override": "Platform Overrides",
+          "writable_without_subscription": "Writable without subscription",
           "writable_override": "Writable Overrides",
           "parameter_whitelist": "Parameter Whitelist",
           "additional_parameter": "Additional Parameter"
         },
         "data_description": {
           "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_without_subscription": "When you do not have a Premium subscription and are not able to write parameter values, create writable entities in Home Assistant anyway\n\nThis is enabled by default to avoid issues with lapsed subscriptions, non-Premium users adding subscriptions, and the possibility of myUplink providing manage permissions unilaterally.",
           "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
           "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
           "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."

@@ -42,12 +42,14 @@
         "title": "Ekspertindstillinger",
         "data": {
           "platform_override": "Platformtilsidesættelser",
+          "writable_without_subscription": "Skrivbar uden abonnement",
           "writable_override": "Skrivbare tilsidesættelser",
           "parameter_whitelist": "Parameterhvidliste",
           "additional_parameter": "Yderligere parameter"
         },
         "data_description": {
           "platform_override": "Tving en specifik platform til et givet parameter-id.\n\nDette er nogle gange nødvendigt, hvis myUplink API'en leverer forkerte parameterdata, og integrationen registrerer den forkerte platform.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "writable_without_subscription": "Når du ikke har et Premium-abonnement og kan ikke skrive værdier, oprette skrivbare enheder i Home Assistant alligevel.\n\nAktiveret som standard for at undgå problemer med bortfaldte abonnementer, ikke-Premium brugere som tilføjer abonnementer, og muligheden at myUplink tillader at brugere kan skrive værdier uden abonnement.",
           "writable_override": "Indstil specifik parameter til skrivbar eller ikke skrivbar.\n\nDette er nogle gange nødvendigt, hvis myUplink API'et giver den forkerte tilstand for parameterindstillingen `writable`.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
           "parameter_whitelist": "Begrænsning af de anmodede parametre til en specifik liste over parameter-id'er.\n\nDette kan være nyttigt, hvis myUplink API'en giver et ekstremt stort antal parametre, hvoraf nogle er ligegyldige, og du ønsker at begrænse den tilgængelige liste over parametre.\n\nListe over parameter-id'er adskilt af kommaer. En tom liste medfører ikke nogen begrænsning. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt resulterer ikke i nogen ændring.",
           "additional_parameter": "Tilføj yderligere parameter-id'er til forespørgslen.\n\nI yderst sjældne tilfælde giver myUplink API ikke alle tilgængelige parametre. Med denne liste er det muligt at tilføje kendte parameter-id'er, som derefter forespørges direkte.\n\nKommasepareret liste over parameter-id'er. En tom liste medfører ingen begrænsninger. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændringer."
@@ -208,12 +210,14 @@
         "title": "Ekspertindstillinger",
         "data": {
           "platform_override": "Platformtilsidesættelser",
+          "writable_without_subscription": "Skrivbar uden abonnement",
           "writable_override": "Skrivbare tilsidesættelser",
           "parameter_whitelist": "Parameterhvidliste",
           "additional_parameter": "Yderligere parameter"
         },
         "data_description": {
           "platform_override": "Tving en specifik platform til et givet parameter-id.\n\nDette er nogle gange nødvendigt, hvis myUplink API'en leverer forkerte parameterdata, og integrationen registrerer den forkerte platform.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
+          "writable_without_subscription": "Når du ikke har et Premium-abonnement og kan ikke skrive værdier, oprette skrivbare enheder i Home Assistant alligevel.\n\nAktiveret som standard for at undgå problemer med bortfaldte abonnementer, ikke-Premium brugere som tilføjer abonnementer, og muligheden at myUplink tillader at brugere kan skrive værdier uden abonnement.",
           "writable_override": "Indstil specifik parameter til skrivbar eller ikke skrivbar.\n\nDette er nogle gange nødvendigt, hvis myUplink API'et giver den forkerte tilstand for parameterindstillingen `writable`.\n\nSkal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændring.",
           "parameter_whitelist": "Begrænsning af de anmodede parametre til en specifik liste over parameter-id'er.\n\nDette kan være nyttigt, hvis myUplink API'en giver et ekstremt stort antal parametre, hvoraf nogle er ligegyldige, og du ønsker at begrænse den tilgængelige liste over parametre.\n\nListe over parameter-id'er adskilt af kommaer. En tom liste medfører ikke nogen begrænsning. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt resulterer ikke i nogen ændring.",
           "additional_parameter": "Tilføj yderligere parameter-id'er til forespørgslen.\n\nI yderst sjældne tilfælde giver myUplink API ikke alle tilgængelige parametre. Med denne liste er det muligt at tilføje kendte parameter-id'er, som derefter forespørges direkte.\n\nKommasepareret liste over parameter-id'er. En tom liste medfører ingen begrænsninger. Skal være gyldig JSON. For at gendanne standarden skal du ugyldiggøre feltet og gemme. Et tomt felt medfører ingen ændringer."
