@@ -76,17 +76,24 @@ class AsyncConfigEntryAuth:
             headers=headers,
         )
 
+
 class Subscription:
+    """Class that represents the subscription in the myUplink API."""
+
     def __init__(self, raw_data: dict) -> None:
+        """Initialize a subscription object."""
         self.raw_data = raw_data
-    
+
     @property
     def type(self) -> str:
+        """Return the subscription type."""
         return self.raw_data["type"]
-    
+
     @property
-    def validUntil(self) -> datetime:
+    def valid_until(self) -> datetime:
+        """Return datetime value of 'validUntil'."""
         return datetime(self.raw_data("validUntil"))
+
 
 class Notification:
     """Class that represents the notificationobject in the myUplink API."""
@@ -213,7 +220,10 @@ class Parameter:
     @property
     def is_writable(self) -> bool:
         """Return if the parameter is writable."""
-        if self.device.system.premium_manage or self.device.system.api.writable_without_subscription:
+        if (
+            self.device.system.premium_manage
+            or self.device.system.api.writable_without_subscription
+        ):
             if self.id in self.device.system.api.writable_override:
                 return self.device.system.api.writable_override[self.id]
 
@@ -279,8 +289,6 @@ class Parameter:
     async def update_parameter(self, value) -> None:
         """Patch parameter if writable."""
         if not self.is_writable:
-            return
-        if not self.device.system.premium_manage:
             return
         await self.device.system.api.patch_parameter(
             self.device.id, str(self.id), str(value)
@@ -516,7 +524,7 @@ class System:
             self.devices = [
                 Device(device_data, self) for device_data in self.raw_data["devices"]
             ]
-        
+
         self.premium_manage = await self.api.get_premium_manage(self)
 
         if self.api.entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True):
@@ -580,8 +588,10 @@ class MyUplink:
         self.throttle = Throttle(timedelta(seconds=5))
 
         self.header = {"Accept-Language": language_code}
-        
-        self.writable_without_subscription = entry.options.get(CONF_WRITABLE_WITHOUT_SUBSCRIPTION, True)
+
+        self.writable_without_subscription = entry.options.get(
+            CONF_WRITABLE_WITHOUT_SUBSCRIPTION, True
+        )
 
         try:
             self.parameter_whitelist = json.loads(
@@ -651,20 +661,15 @@ class MyUplink:
         """Check for a premium subscription to allow writing values."""
         _LOGGER.debug("Fetch subscriptions for system %s", system.id)
         async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "get", f"systems/{system.id}/subscriptions"
-            )
+            resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
         resp.raise_for_status()
         if resp.status == 200:
             data = await resp.json()
-            for element in data:
-                for subscription in data["subscriptions"]:
-                    if Subscription(subscription).type == "manage":
-                        return True
+            for subscription in data["subscriptions"]:
+                if Subscription(subscription).type == "manage":
+                    return True
         return False
 
-
-        
     async def get_smart_home_mode(self, system: System) -> str:
         """Return smart home mode by system id."""
         _LOGGER.debug("Fetch smart home mode for system %s", system.id)
