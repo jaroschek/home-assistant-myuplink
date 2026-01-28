@@ -660,14 +660,24 @@ class MyUplink:
     async def get_premium_manage(self, system: System) -> bool:
         """Check for a premium subscription to allow writing values."""
         _LOGGER.debug("Fetch subscriptions for system %s", system.id)
-        async with self.lock, self.throttle:
-            resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
-        resp.raise_for_status()
-        if resp.status == 200:
-            data = await resp.json()
-            for subscription in data["subscriptions"]:
-                if Subscription(subscription).type == "manage":
-                    return True
+
+        try:
+            async with self.lock, self.throttle:
+                resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
+
+            # This will raise an exception for 4xx or 5xx errors
+            resp.raise_for_status()
+
+            if resp.status == 200:
+                data = await resp.json()
+                for subscription in data.get("subscriptions", []):
+                    if Subscription(subscription).type == "manage":
+                        return True
+
+        except Exception as err:
+            # We catch the 500 error (and others) here so the integration keeps running
+            _LOGGER.error("Error fetching subscriptions for system %s: %s", system.id, err)
+
         return False
 
     async def get_smart_home_mode(self, system: System) -> str:
