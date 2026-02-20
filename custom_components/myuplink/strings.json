@@ -160,6 +160,49 @@
           "6": "Active"
         }
       },
+      "62005": {
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        }
+      },
+      "62017": {
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        }
+      },
+      "62246": {
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
+        }
+      },
       "myuplink_notifications": {
         "name": "Notifications"
       }
