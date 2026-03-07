@@ -290,6 +290,28 @@
           "description": "Angi verdien som skal angis."
         }
       }
+    },
+    "set_device_zone_property_value": {
+      "name": "Sett smart hjem-soneegenskap til verdie",
+      "description": "Tjeneste for å angi en egenskap identifisert ved navn for en bestemt smarthjemmesone identifisert ved ID for en enhet til ønsket verdi.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-enhet",
+          "description": "Velg myUplink-enheten parameteren tilhører."
+        },
+        "zone_id": {
+          "name": "myUplink Smart Home Zone ID",
+          "description": "Skriv inn ID-en til den myUplink smart home zone egenskappen tilhører."
+        },
+        "property_name": {
+          "name": "Egenskapsnavn",
+          "description": "Skriv inn navnet på egenskappen."
+        },
+        "value": {
+          "name": "Verdi",
+          "description": "Angi verdien som skal angis."
+        }
+      }
     }
   }
 }

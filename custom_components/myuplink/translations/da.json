@@ -243,6 +243,28 @@
           "description": "Indtast den værdi, der skal indstilles."
         }
       }
+    },
+    "set_device_zone_property_value": {
+      "name": "Indstil smart home zone egenskab til værdi",
+      "description": "Tjeneste til at indstille en egenskab identificeret ved dens navn for en specifik smart home zone identificeret ved ID af en enhed til den ønskede værdi.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-enhed",
+          "description": "Vælg den myUplink-enhed, parameteren tilhører."
+        },
+        "zone_id": {
+          "name": "myUplink Smart Home Zone ID",
+          "description": "Indtast id'et for den myUplink smart home zone, egenskaben tilhører."
+        },
+        "property_name": {
+          "name": "Egenskabsnavn",
+          "description": "Indtast navnet på egenskaben."
+        },
+        "value": {
+          "name": "Værdi",
+          "description": "Indtast den værdi, der skal indstilles."
+        }
+      }
     }
   }
 }
