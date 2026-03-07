@@ -209,6 +209,28 @@
           "description": "Geben Sie den festzulegenden Wert ein."
         }
       }
+    },
+    "set_device_zone_property_value": {
+      "name": "Smart-Home-Zone-Eigenschaft auf Wert setzen",
+      "description": "Dienst zum Setzen einer durch ihren Namen identifizierten Eigenschaft für eine bestimmte Smart-Home-Zone (identifiziert durch die ID) eines bestimmten Geräts auf den gewünschten Wert.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-Gerät",
+          "description": "Wählen Sie das myUplink-Gerät aus, zu dem der Parameter gehört."
+        },
+        "zone_id": {
+          "name": "myUplink-Smart-Home-Zone-ID",
+          "description": "Geben Sie die ID der myUplink-Smart-Home-Zone ein, zu der die Eigenschaft gehört."
+        },
+        "property_name": {
+          "name": "Eigenschaftsname",
+          "description": "Geben Sie den Namen der Eigenschaft ein."
+        },
+        "value": {
+          "name": "Wert",
+          "description": "Geben Sie den festzulegenden Wert ein."
+        }
+      }
     }
   }
 }
