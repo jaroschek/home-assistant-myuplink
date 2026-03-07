@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 
-from aiohttp import ClientResponse, ClientSession
+from aiohttp import ClientResponse, ClientResponseError, ClientSession
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -479,7 +479,7 @@ class Device:
         self.parameters = await self.system.api.get_parameters(self)
         if self.system.api.entry.options.get(CONF_FETCH_FIRMWARE, True):
             self.firmware_info = await self.system.api.get_firmware_info(self)
-        # self.zones = await self.system.api.get_zones(self.id)
+        self.zones = await self.system.api.get_zones(self.id)
 
 
 class System:
@@ -663,7 +663,9 @@ class MyUplink:
 
         try:
             async with self.lock, self.throttle:
-                resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
+                resp = await self.auth.request(
+                    "get", f"systems/{system.id}/subscriptions"
+                )
 
             # This will raise an exception for 4xx or 5xx errors
             resp.raise_for_status()
@@ -674,9 +676,11 @@ class MyUplink:
                     if Subscription(subscription).type == "manage":
                         return True
 
-        except Exception as err:
+        except ClientResponseError as err:
             # We catch the 500 error (and others) here so the integration keeps running
-            _LOGGER.error("Error fetching subscriptions for system %s: %s", system.id, err)
+            _LOGGER.error(
+                "Error fetching subscriptions for system %s: %s", system.id, err
+            )
 
         return False
 
@@ -804,6 +808,27 @@ class MyUplink:
                 "patch",
                 f"devices/{device_id}/points",
                 data=json.dumps({parameter_id: value}),
+                headers={"Content-Type": "application/json-patch+json"},
+            )
+        resp.raise_for_status()
+        return resp.status == 200
+
+    async def patch_zone_property(
+        self, device_id, zone_id: str, property_name: str, value: str
+    ) -> bool:
+        """Update the value of a zone property for a device."""
+        _LOGGER.debug(
+            "Patch property %s for zone %s of device %s with value %s",
+            property_name,
+            zone_id,
+            device_id,
+            value,
+        )
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "patch",
+                f"devices/{device_id}/zones/{zone_id}",
+                data=json.dumps({property_name: value}),
                 headers={"Content-Type": "application/json-patch+json"},
             )
         resp.raise_for_status()

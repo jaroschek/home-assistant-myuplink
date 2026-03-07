@@ -31,7 +31,9 @@ PLATFORMS = [
 ]
 
 ATTR_PARAMETER_ID = "parameter_id"
+ATTR_PROPERTY_NAME = "property_name"
 ATTR_VALUE = "value"
+ATTR_ZONE_ID = "zone_id"
 
 CONF_ADDITIONAL_PARAMETER = "additional_parameter"
 CONF_DISCONNECTED_AVAILABLE = "disconnected_available"

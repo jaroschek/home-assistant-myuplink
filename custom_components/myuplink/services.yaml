@@ -13,3 +13,22 @@ set_device_parameter_value:
       required: true
       selector:
         text:
+set_device_zone_property_value:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: myuplink
+    zone_id:
+      required: true
+      selector:
+        text:
+    property_name:
+      required: true
+      selector:
+        text:
+    value:
+      required: true
+      selector:
+        text:
