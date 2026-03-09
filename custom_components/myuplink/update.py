@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device
+from .api import Device, System
 from .const import CONF_FETCH_FIRMWARE, DOMAIN
 from .entity import MyUplinkDeviceEntity
 
@@ -24,6 +24,7 @@ async def async_setup_entry(
 
     if entry.options.get(CONF_FETCH_FIRMWARE, True):
         for system in coordinator.data:
+            system: System
             [
                 entities.append(MyUplinkUpdateEntity(coordinator, device))
                 for device in system.devices
