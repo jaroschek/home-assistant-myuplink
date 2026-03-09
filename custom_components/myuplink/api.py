@@ -27,6 +27,7 @@ from .const import (
     API_VERSION,
     CONF_ADDITIONAL_PARAMETER,
     CONF_ENABLE_SMART_HOME_MODE,
+    CONF_ENABLE_SMART_HOME_ZONE,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -526,7 +527,8 @@ class Device:
         self.parameters = await self.system.api.get_parameters(self)
         if self.system.api.entry.options.get(CONF_FETCH_FIRMWARE, True):
             self.firmware_info = await self.system.api.get_firmware_info(self)
-        self.zones = await self.system.api.get_zones(self)
+        if self.system.api.entry.options.get(CONF_ENABLE_SMART_HOME_ZONE, True):
+            self.zones = await self.system.api.get_zones(self)
 
 
 class System:
