@@ -22,6 +22,7 @@ API_VERSION = "v2"
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SELECT,
     Platform.SENSOR,
