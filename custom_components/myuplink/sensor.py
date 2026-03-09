@@ -21,9 +21,9 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter
+from .api import Device, Parameter, System, Zone
 from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
-from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
+from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, MyUplinkZoneEntity
 
 PARALLEL_UPDATES = 0
 
@@ -37,10 +37,13 @@ async def async_setup_entry(
     entities: list[SensorEntity] = []
 
     for system in coordinator.data:
+        system: System
         for device in system.devices:
+            device: Device
             if entry.options.get(CONF_FETCH_NOTIFICATIONS, True):
                 entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
             for parameter in device.parameters:
+                parameter: Parameter
                 if parameter.get_platform() == Platform.SENSOR:
                     if (
                         not parameter.unit
@@ -51,6 +54,27 @@ async def async_setup_entry(
                     entities.append(
                         MyUplinkParameterSensorEntity(coordinator, device, parameter)
                     )
+            for zone in device.zones:
+                zone: Zone
+                if zone.is_command_only:
+                    entities.append(
+                        MyUplinkZoneModeSensorEntity(coordinator, device, zone)
+                    )
+                else:
+                    if zone.indoor_co2 is not None and zone.indoor_co2 != 0:
+                        entities.append(
+                            MyUplinkZoneCO2SensorEntity(coordinator, device, zone)
+                        )
+                    if zone.indoor_humidity is not None and zone.indoor_humidity != 0:
+                        entities.append(
+                            MyUplinkZoneHumiditySensorEntity(coordinator, device, zone)
+                        )
+                    if zone.temperature is not None and zone.temperature != 0:
+                        entities.append(
+                            MyUplinkZoneTemperatureSensorEntity(
+                                coordinator, device, zone
+                            )
+                        )
 
     async_add_entities(entities)
 
@@ -136,3 +160,65 @@ class MyUplinkNotificationsSensorEntity(MyUplinkDeviceEntity, SensorEntity):
                 for notification in device.notifications
             ]
         }
+
+
+class MyUplinkZoneModeSensorEntity(MyUplinkZoneEntity, SensorEntity):
+    """Representation of a myUplink zone mode sensor entity."""
+
+    def _update_from_zone(self, zone: Zone) -> None:
+        """Update attrs from zone."""
+        super()._update_from_zone(zone)
+
+        self._attr_name = f"{zone.name} Mode"
+        self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_mode"
+
+        self._attr_native_value = zone.mode
+
+
+class MyUplinkZoneCO2SensorEntity(MyUplinkZoneEntity, SensorEntity):
+    """Representation of a myUplink zone CO2 sensor entity."""
+
+    _attr_device_class = SensorDeviceClass.CO2
+
+    def _update_from_zone(self, zone: Zone) -> None:
+        """Update attrs from zone."""
+        super()._update_from_zone(zone)
+
+        self._attr_name = f"{zone.name} CO2"
+        self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_co2"
+
+        self._attr_native_value = zone.indoor_co2
+
+
+class MyUplinkZoneHumiditySensorEntity(MyUplinkZoneEntity, SensorEntity):
+    """Representation of a myUplink zone humidity sensor entity."""
+
+    _attr_device_class = SensorDeviceClass.HUMIDITY
+
+    def _update_from_zone(self, zone: Zone) -> None:
+        """Update attrs from zone."""
+        super()._update_from_zone(zone)
+
+        self._attr_name = f"{zone.name} Humidity"
+        self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_humidity"
+
+        self._attr_native_value = zone.indoor_humidity
+
+
+class MyUplinkZoneTemperatureSensorEntity(MyUplinkZoneEntity, SensorEntity):
+    """Representation of a myUplink zone temperature sensor entity."""
+
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+
+    def _update_from_zone(self, zone: Zone) -> None:
+        """Update attrs from zone."""
+        super()._update_from_zone(zone)
+
+        self._attr_name = f"{zone.name} Temperature"
+        self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_temperature"
+
+        self._attr_native_value = zone.temperature
+        if zone.is_celsius:
+            self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        else:
+            self._attr_native_unit_of_measurement = UnitOfTemperature.FAHRENHEIT

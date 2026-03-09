@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .api import Device, Parameter, System
+from .api import Device, Parameter, System, Zone
 from .const import CONF_DISCONNECTED_AVAILABLE, DOMAIN
 
 
@@ -137,3 +137,34 @@ class MyUplinkParameterEntity(MyUplinkDeviceEntity):
                 CONF_DISCONNECTED_AVAILABLE, False
             )
         )
+
+
+class MyUplinkZoneEntity(MyUplinkDeviceEntity):
+    """Base class for myUplink zone entities."""
+
+    def __init__(
+        self, coordinator: DataUpdateCoordinator, device: Device, zone: Zone
+    ) -> None:
+        """Initialize class."""
+        super().__init__(coordinator, device)
+        self._attr_unique_id = f"{DOMAIN}_{device.id}_zone_{zone.id}"
+        self._update_from_zone(zone)
+
+    def _update_from_zone(self, zone: Zone) -> None:
+        """Update attrs from device."""
+        self._zone = zone
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        for system in self.coordinator.data:
+            system: System
+            for device in system.devices:
+                device: Device
+                if device.id == self._device.id:
+                    super()._update_from_device(device)
+                    for zone in device.zones:
+                        if zone.id == self._zone.id:
+                            self._update_from_zone(zone)
+
+        super().async_write_ha_state()
