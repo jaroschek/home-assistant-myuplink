@@ -68,20 +68,20 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
 
         self._attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
 
-        if zone.supported_modes is not None:
+        if zone.supported_modes is not None and zone.supported_modes != "":
             self._attr_hvac_modes = [
                 THERMOSTAT_MODE_MAP[mode] for mode in zone.supported_modes.split(",")
             ]
         elif zone.mode is not None:
             self._attr_hvac_modes = [THERMOSTAT_MODE_MAP.get(zone.mode)]
-
         self._attr_hvac_mode = THERMOSTAT_MODE_MAP.get(zone.mode)
 
         self._attr_current_temperature = zone.temperature
         if zone.is_celsius:
-            self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+            self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         else:
-            self._attr_native_unit_of_measurement = UnitOfTemperature.FAHRENHEIT
+            self._attr_temperature_unit = UnitOfTemperature.FAHRENHEIT
+
         if (zone.indoor_humidity is not None) and (zone.indoor_humidity != 0):
             self._attr_current_humidity = zone.indoor_humidity
         if zone.setpoint_range_max is not None:
