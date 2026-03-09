@@ -169,6 +169,11 @@
         "name": "Connection State"
       }
     },
+    "climate": {
+      "myuplink_thermostat": {
+        "name": "Thermostat"
+      }
+    },
     "select": {
       "myuplink_smart_home_mode": {
         "name": "Smart Home Mode",
