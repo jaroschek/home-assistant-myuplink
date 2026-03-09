@@ -368,11 +368,7 @@ class Zone:
     @property
     def supported_modes(self) -> str | None:
         """Return the supported modes of the zone."""
-        return (
-            float(self.raw_data["supportedModes"])
-            if self.raw_data.get("supportedModes") is not None
-            else None
-        )
+        return self.raw_data.get("supportedModes")
 
     @property
     def mode(self) -> str:
@@ -383,7 +379,7 @@ class Zone:
     def temperature(self) -> float | None:
         """Return the current temperature of the zone."""
         return (
-            float(self.raw_data["temperature"])
+            float(self.raw_data.get("temperature"))
             if self.raw_data.get("temperature") is not None
             else None
         )
@@ -392,7 +388,7 @@ class Zone:
     def setpoint(self) -> float | None:
         """Return the target temperature of the zone."""
         return (
-            float(self.raw_data["setpoint"])
+            float(self.raw_data.get("setpoint"))
             if self.raw_data.get("setpoint") is not None
             else None
         )
@@ -401,7 +397,7 @@ class Zone:
     def setpoint_heating(self) -> float | None:
         """Return the heating setpoint value of the zone."""
         return (
-            float(self.raw_data["setpointHeat"])
+            float(self.raw_data.get("setpointHeat"))
             if self.raw_data.get("setpointHeat") is not None
             else None
         )
@@ -410,7 +406,7 @@ class Zone:
     def setpoint_cooling(self) -> float | None:
         """Return the cooling setpoint value of the zone."""
         return (
-            float(self.raw_data["setpointCool"])
+            float(self.raw_data.get("setpointCool"))
             if self.raw_data.get("setpointCool") is not None
             else None
         )
@@ -419,7 +415,7 @@ class Zone:
     def setpoint_range_min(self) -> int | None:
         """Return the minimum temperature range of the zone."""
         return (
-            int(self.raw_data["setpointRangeMin"])
+            int(self.raw_data.get("setpointRangeMin"))
             if self.raw_data.get("setpointRangeMin") is not None
             else None
         )
@@ -428,7 +424,7 @@ class Zone:
     def setpoint_range_max(self) -> int | None:
         """Return the maximum temperature range of the zone."""
         return (
-            int(self.raw_data["setpointRangeMax"])
+            int(self.raw_data.get("setpointRangeMax"))
             if self.raw_data.get("setpointRangeMax") is not None
             else None
         )
@@ -442,7 +438,7 @@ class Zone:
     def indoor_co2(self) -> int | None:
         """Return the indoor co2 level of the zone."""
         return (
-            int(self.raw_data["indoorCo2"])
+            int(self.raw_data.get("indoorCo2"))
             if self.raw_data.get("indoorCo2") is not None
             else None
         )
@@ -451,7 +447,7 @@ class Zone:
     def indoor_humidity(self) -> float | None:
         """Return the indoor humidity of the zone."""
         return (
-            float(self.raw_data["indoorHumidity"])
+            float(self.raw_data.get("indoorHumidity"))
             if self.raw_data.get("indoorHumidity") is not None
             else None
         )
