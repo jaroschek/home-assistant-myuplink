@@ -12,8 +12,8 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import Device, Parameter
-from .const import DOMAIN, WATER_HEATERS
+from .api import Device, Parameter, System
+from .const import WATER_HEATERS
 from .entity import MyUplinkDeviceEntity
 
 PARALLEL_UPDATES = 0
@@ -28,7 +28,9 @@ async def async_setup_entry(
     entities: list[WaterHeaterEntity] = []
 
     for system in coordinator.data:
+        system: System
         for device in system.devices:
+            device: Device
             if device.name[:7] in WATER_HEATERS:
                 entities.append(MyUplinkWaterHeaterEntity(coordinator, device))
 

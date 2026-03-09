@@ -31,6 +31,7 @@ async def async_setup_entry(
     enable_smart_home_mode = entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True)
 
     for system in coordinator.data:
+        system: System
         if enable_smart_home_mode:
             if len(system.devices) == 1:
                 entities.append(
@@ -44,6 +45,7 @@ async def async_setup_entry(
                 )
 
         for device in system.devices:
+            device: Device
             [
                 entities.append(
                     MyUplinkParameterSelectEntity(coordinator, device, parameter)

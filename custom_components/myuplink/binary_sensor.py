@@ -11,7 +11,7 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter
+from .api import Device, Parameter, System
 from .const import DOMAIN
 from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
 
@@ -27,7 +27,9 @@ async def async_setup_entry(
     entities: list[BinarySensorEntity] = []
 
     for system in coordinator.data:
+        system: System
         for device in system.devices:
+            device: Device
             entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
             [
                 entities.append(
