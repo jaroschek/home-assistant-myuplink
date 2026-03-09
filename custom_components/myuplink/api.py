@@ -432,7 +432,11 @@ class Zone:
     @property
     def is_celsius(self) -> bool:
         """Return if the temperature in the zone is specified as celsius (true) or fahrenheit (false)."""
-        return self.raw_data["isCelsius"]
+        return (
+            bool(self.raw_data.get("isCelsius"))
+            if self.raw_data.get("isCelsius") is not None
+            else True
+        )
 
     @property
     def indoor_co2(self) -> int | None:
