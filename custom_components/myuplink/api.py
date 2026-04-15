@@ -558,9 +558,10 @@ class Throttle:
 
     async def __aenter__(self):
         """Enter async throttle."""
-        timestamp = datetime.now()
-        delay = (self._timestamp - timestamp).total_seconds()
-        self._timestamp = datetime.now() + self._delay
+        now = datetime.now()
+        scheduled = max(self._timestamp, now)
+        delay = (scheduled - now).total_seconds()
+        self._timestamp = scheduled + self._delay
         if delay > 0:
             _LOGGER.debug("Delaying request by %s seconds due to throttle", delay)
             with suppress(asyncio.CancelledError):
