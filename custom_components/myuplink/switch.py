@@ -47,9 +47,11 @@ class MyUplinkParameterSwitchEntityEntity(MyUplinkParameterEntity, SwitchEntity)
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""
         await self._parameter.update_parameter(1)
-        await self.async_update()
+        self._attr_is_on = True
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
         """Turn the entity off."""
         await self._parameter.update_parameter(0)
-        await self.async_update()
+        self._attr_is_on = False
+        self.async_write_ha_state()

@@ -62,4 +62,5 @@ class MyUplinkParameterNumberEntity(MyUplinkParameterEntity, NumberEntity):
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
         await self._parameter.update_parameter(value)
-        await self.async_update()
+        self._attr_native_value = value
+        self.async_write_ha_state()

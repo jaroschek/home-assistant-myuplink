@@ -560,6 +560,7 @@ class Throttle:
         """Enter async throttle."""
         timestamp = datetime.now()
         delay = (self._timestamp - timestamp).total_seconds()
+        self._timestamp = datetime.now() + self._delay
         if delay > 0:
             _LOGGER.debug("Delaying request by %s seconds due to throttle", delay)
             with suppress(asyncio.CancelledError):
@@ -569,7 +570,7 @@ class Throttle:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Exit async throttle."""
-        self._timestamp = datetime.now() + self._delay
+        pass
 
 
 class MyUplink:
@@ -630,7 +631,7 @@ class MyUplink:
     async def get_systems(self) -> list[System]:
         """Return all systems."""
         _LOGGER.debug("Fetch systems")
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request("get", "systems/me?page=1&itemsPerPage=99")
         resp.raise_for_status()
         data = await resp.json()
@@ -646,7 +647,7 @@ class MyUplink:
     async def get_notifications(self, system: System) -> list[Notification]:
         """Return all active notifications by system id."""
         _LOGGER.debug("Fetch notifications for system %s", system.id)
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "get",
                 f"systems/{system.id}/notifications/active?page=1&itemsPerPage=99",
@@ -662,7 +663,7 @@ class MyUplink:
         _LOGGER.debug("Fetch subscriptions for system %s", system.id)
 
         try:
-            async with self.lock, self.throttle:
+            async with self.throttle, self.lock:
                 resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
 
             # This will raise an exception for 4xx or 5xx errors
@@ -683,7 +684,7 @@ class MyUplink:
     async def get_smart_home_mode(self, system: System) -> str:
         """Return smart home mode by system id."""
         _LOGGER.debug("Fetch smart home mode for system %s", system.id)
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "get", f"systems/{system.id}/smart-home-mode"
             )
@@ -699,7 +700,7 @@ class MyUplink:
             system_id,
             value,
         )
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "put",
                 f"systems/{system_id}/smart-home-mode",
@@ -720,7 +721,7 @@ class MyUplink:
     async def get_device(self, device_id: str) -> Device:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
         return Device(await resp.json(), self)
@@ -728,7 +729,7 @@ class MyUplink:
     async def get_firmware_info(self, device: Device) -> FirmwareInfo:
         """Return firmware info for a device."""
         _LOGGER.debug("Fetch firmware info for device %s", device.id)
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "get", f"devices/{device.id}/firmware-info", headers=self.header
             )
@@ -759,7 +760,7 @@ class MyUplink:
                     str(parameter_id) for parameter_id in parameter_filter
                 )
 
-            async with self.lock, self.throttle:
+            async with self.throttle, self.lock:
                 resp = await self.auth.request(
                     "get",
                     f"devices/{device.id}/points",
@@ -784,7 +785,7 @@ class MyUplink:
     async def get_zones(self, device_id) -> list[Zone]:
         """Return all smart home zones for a device."""
         _LOGGER.debug("Fetch zones for device %s", device_id)
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "get", f"devices/{device_id}/smart-home-zones", headers=self.header
             )
@@ -799,7 +800,7 @@ class MyUplink:
             device_id,
             value,
         )
-        async with self.lock, self.throttle:
+        async with self.throttle, self.lock:
             resp = await self.auth.request(
                 "patch",
                 f"devices/{device_id}/points",

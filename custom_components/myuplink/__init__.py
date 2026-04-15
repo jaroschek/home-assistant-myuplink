@@ -52,7 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def async_update_data():
         try:
-            async with asyncio.timeout(30):
+            async with asyncio.timeout(60):
                 return await api.get_systems()
         except aiohttp.ClientResponseError as err:
             raise UpdateFailed(f"Wrong credentials: {err}") from err

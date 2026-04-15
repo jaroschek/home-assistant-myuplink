@@ -77,7 +77,9 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
         for parameter in self._device.parameters:
             if parameter.id == 527:
                 await parameter.update_parameter(temperature)
-        await self.async_update()
+        self._attr_target_temperature = temperature
+        self._attr_target_temperature_high = temperature
+        self.async_write_ha_state()
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
         """Update the current value."""
@@ -87,7 +89,8 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
                 for enum in parameter.enum_values:
                     operation_types[enum["text"]] = enum["value"]
                 await parameter.update_parameter(operation_types[operation_mode])
-        await self.async_update()
+        self._attr_current_operation = operation_mode
+        self.async_write_ha_state()
 
     @callback
     def _handle_coordinator_update(self) -> None:

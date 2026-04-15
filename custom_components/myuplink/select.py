@@ -73,7 +73,8 @@ class MyUplinkParameterSelectEntity(MyUplinkParameterEntity, SelectEntity):
         for enum in self._parameter.enum_values:
             options[enum["text"]] = enum["value"]
         await self._parameter.update_parameter(options[option])
-        await self.async_update()
+        self._attr_current_option = option
+        self.async_write_ha_state()
 
 
 class MyUplinkSmartHomeModeDeviceSelectEntity(MyUplinkDeviceEntity, SelectEntity):
@@ -94,7 +95,8 @@ class MyUplinkSmartHomeModeDeviceSelectEntity(MyUplinkDeviceEntity, SelectEntity
     async def async_select_option(self, option: str) -> None:
         """Change the selected smart home mode option."""
         await self._device.system.update_smart_home_mode(option.title())
-        await self.async_update()
+        self._attr_current_option = option
+        self.async_write_ha_state()
 
     @property
     def available(self):
@@ -125,4 +127,5 @@ class MyUplinkSmartHomeModeSystemSelectEntity(MyUplinkSystemEntity, SelectEntity
     async def async_select_option(self, option: str) -> None:
         """Change the selected smart home mode option."""
         await self._system.update_smart_home_mode(option.title())
-        await self.async_update()
+        self._attr_current_option = option
+        self.async_write_ha_state()
