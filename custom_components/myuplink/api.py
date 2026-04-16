@@ -464,6 +464,7 @@ class Zone:
         await self.device.system.api.patch_zone_property(
             self.device.id, str(self.id), property_name, value
         )
+        self.raw_data[property_name] = value
 
 
 class Device:
