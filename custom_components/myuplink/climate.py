@@ -97,24 +97,20 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
+        temperature = float(kwargs.get(ATTR_TEMPERATURE))
         if self._zone.mode == "heatcool":
-            await self._zone.update_zone_property(
-                "setpoint", float(kwargs.get(ATTR_TEMPERATURE))
-            )
+            await self._zone.update_zone_property("setpoint", temperature)
         elif self._zone.mode == "heat":
-            await self._zone.update_zone_property(
-                "setpointHeat", float(kwargs.get(ATTR_TEMPERATURE))
-            )
+            await self._zone.update_zone_property("setpointHeat", temperature)
         elif self._zone.mode == "cool":
-            await self._zone.update_zone_property(
-                "setpointCool", float(kwargs.get(ATTR_TEMPERATURE))
-            )
-        self._attr_target_temperature = float(kwargs.get(ATTR_TEMPERATURE))
-        await self.async_update()
+            await self._zone.update_zone_property("setpointCool", temperature)
+        self._attr_target_temperature = temperature
+        self.async_write_ha_state()
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
         await self._zone.update_zone_property(
             "mode", THERMOSTAT_MODE_MAP_INVERTED.get(hvac_mode, "heatcool")
         )
+        self._attr_hvac_mode = hvac_mode
         self.async_write_ha_state()
