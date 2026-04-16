@@ -124,7 +124,7 @@ async def _async_get_selected_myuplink_device(
     device_id = service_call.data.get(ATTR_DEVICE_ID)
     device_registry = dr.async_get(hass)
 
-    for entry_id in await async_extract_config_entry_ids(hass, service_call):
+    for entry_id in await async_extract_config_entry_ids(service_call):
         config_entry = hass.config_entries.async_get_entry(entry_id)
         if (
             config_entry
