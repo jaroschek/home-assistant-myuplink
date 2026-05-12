@@ -108,8 +108,10 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_state_class = SensorStateClass.TOTAL
             elif self._parameter.unit == UnitOfFrequency.HERTZ:
                 self._attr_device_class = SensorDeviceClass.FREQUENCY
+                self._attr_state_class = SensorStateClass.MEASUREMENT
             elif self._parameter.unit in (UnitOfPower.KILO_WATT, UnitOfPower.WATT):
                 self._attr_device_class = SensorDeviceClass.POWER
+                self._attr_state_class = SensorStateClass.MEASUREMENT
             elif self._parameter.unit in (
                 UnitOfTime.DAYS,
                 UnitOfTime.HOURS,
@@ -122,6 +124,7 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
                 self._attr_device_class = SensorDeviceClass.DURATION
             elif self._parameter.unit == CustomUnits.POWER_WS:
                 self._attr_device_class = SensorDeviceClass.POWER
+                self._attr_state_class = SensorStateClass.MEASUREMENT
                 self._attr_native_unit_of_measurement = UnitOfPower.WATT
             elif self._parameter.unit == CustomUnits.DEGREE_MINUTES:
                 self._attr_device_class = "degree_minutes"
