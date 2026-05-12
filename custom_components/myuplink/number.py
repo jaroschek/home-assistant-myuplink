@@ -8,8 +8,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Parameter
-from .const import DOMAIN
+from .api import Device, Parameter, System
 from .entity import MyUplinkParameterEntity
 
 PARALLEL_UPDATES = 0
@@ -24,7 +23,9 @@ async def async_setup_entry(
     entities: list[NumberEntity] = []
 
     for system in coordinator.data:
+        system: System
         for device in system.devices:
+            device: Device
             [
                 entities.append(
                     MyUplinkParameterNumberEntity(coordinator, device, parameter)

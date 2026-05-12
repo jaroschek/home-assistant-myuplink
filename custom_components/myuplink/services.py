@@ -16,7 +16,13 @@ from homeassistant.helpers.service import async_extract_config_entry_ids
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import Device
-from .const import ATTR_PARAMETER_ID, ATTR_VALUE, DOMAIN
+from .const import (
+    ATTR_PARAMETER_ID,
+    ATTR_PROPERTY_NAME,
+    ATTR_VALUE,
+    ATTR_ZONE_ID,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,8 +38,23 @@ SERVICE_SCHEMA_SET_DEVICE_PARAMETER_VALUE = vol.Schema(
     }
 )
 
+SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE = "set_device_zone_property_value"
+
+SERVICE_SCHEMA_SET_DEVICE_ZONE_PROPERTY_VALUE = vol.Schema(
+    {
+        vol.Required(ATTR_DEVICE_ID): selector.TextSelector(),
+        vol.Required(ATTR_ZONE_ID): selector.TextSelector(),
+        vol.Required(ATTR_PROPERTY_NAME): selector.TextSelector(),
+        vol.Required(ATTR_VALUE): selector.TextSelector(),
+    }
+)
+
 SERVICE_LIST: list[tuple[str, vol.Schema | None]] = [
     (SERVICE_SET_DEVICE_PARAMETER_VALUE, SERVICE_SCHEMA_SET_DEVICE_PARAMETER_VALUE),
+    (
+        SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE,
+        SERVICE_SCHEMA_SET_DEVICE_ZONE_PROPERTY_VALUE,
+    ),
 ]
 
 
@@ -56,21 +77,38 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                 translation_placeholders={"service": service_call.service},
             )
 
+        value = service_call.data.get(ATTR_VALUE)
+
         _LOGGER.debug("Executing service %s", service_call.service)
 
-        try:
+        if service_call.service == SERVICE_SET_DEVICE_PARAMETER_VALUE:
             parameter_id = service_call.data.get(ATTR_PARAMETER_ID)
-            value = service_call.data.get(ATTR_VALUE)
-            await device.system.api.patch_parameter(
-                device.id,
-                parameter_id,
-                value,
-            )
-        except ClientResponseError as ex:
-            raise HomeAssistantError(
-                f"The myUplink API returned an error trying to set the parameter {parameter_id} to value {value} for device {device.id}"
-                f" Code: {ex.status}  Message: {ex.message}"
-            ) from ex
+            try:
+                await device.system.api.patch_parameter(
+                    device.id,
+                    parameter_id,
+                    value,
+                )
+            except ClientResponseError as ex:
+                raise HomeAssistantError(
+                    f"The myUplink API returned an error trying to set the parameter {parameter_id} to value {value} for device {device.id}"
+                    f" Code: {ex.status}  Message: {ex.message}"
+                ) from ex
+        elif service_call.service == SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE:
+            zone_id = service_call.data.get(ATTR_ZONE_ID)
+            property_name = service_call.data.get(ATTR_PROPERTY_NAME)
+            try:
+                await device.system.api.patch_zone_property(
+                    device.id,
+                    zone_id,
+                    property_name,
+                    value,
+                )
+            except ClientResponseError as ex:
+                raise HomeAssistantError(
+                    f"The myUplink API returned an error trying to set the property {property_name} to value {value} for zone {zone_id} of device {device.id}"
+                    f" Code: {ex.status}  Message: {ex.message}"
+                ) from ex
 
     for service, schema in SERVICE_LIST:
         hass.services.async_register(
@@ -86,7 +124,7 @@ async def _async_get_selected_myuplink_device(
     device_id = service_call.data.get(ATTR_DEVICE_ID)
     device_registry = dr.async_get(hass)
 
-    for entry_id in await async_extract_config_entry_ids(hass, service_call):
+    for entry_id in await async_extract_config_entry_ids(service_call):
         config_entry = hass.config_entries.async_get_entry(entry_id)
         if (
             config_entry

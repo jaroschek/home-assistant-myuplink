@@ -24,6 +24,7 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Smart-Home-Modus aktivieren?",
+          "enable_smart_home_zone": "Smart-Home-Zone aktivieren?",
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
@@ -32,6 +33,7 @@
         },
         "data_description": {
           "enable_smart_home_mode": "Der Smart-Home-Modus ist eine systembezogene Entität in der myUplink-API.\n\nWenn ein System nur über ein einziges Gerät verfügt, wird der Smart-Home-Modus diesem Gerät hinzugefügt. Andernfalls wird der Smart-Home-Modus einem zusätzlichen Gerät hinzugfügt, dass auf den verfügbaren Systeminformationen basiert.\n\nDie Unterstützung des Smart-Home-Modus erfordert einen zusätzlichen API-Aufruf pro System.",
+          "enable_smart_home_zone": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
           "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
           "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf pro System.",
           "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
@@ -135,6 +137,11 @@
         "name": "Verbindungsstatus"
       }
     },
+    "climate": {
+      "myuplink_thermostat": {
+        "name": "Thermostat"
+      }
+    },
     "select": {
       "myuplink_smart_home_mode": {
         "name": "Smart-Home-Modus",
@@ -203,6 +210,28 @@
         "parameter_id": {
           "name": "myUplink-Parameter-ID",
           "description": "Geben Sie die ID des Parameterpunkts in der myUplink-API ein."
+        },
+        "value": {
+          "name": "Wert",
+          "description": "Geben Sie den festzulegenden Wert ein."
+        }
+      }
+    },
+    "set_device_zone_property_value": {
+      "name": "Smart-Home-Zone-Eigenschaft auf Wert setzen",
+      "description": "Dienst zum Setzen einer durch ihren Namen identifizierten Eigenschaft für eine bestimmte Smart-Home-Zone (identifiziert durch die ID) eines bestimmten Geräts auf den gewünschten Wert.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-Gerät",
+          "description": "Wählen Sie das myUplink-Gerät aus, zu dem der Parameter gehört."
+        },
+        "zone_id": {
+          "name": "myUplink-Smart-Home-Zone-ID",
+          "description": "Geben Sie die ID der myUplink-Smart-Home-Zone ein, zu der die Eigenschaft gehört."
+        },
+        "property_name": {
+          "name": "Eigenschaftsname",
+          "description": "Geben Sie den Namen der Eigenschaft ein."
         },
         "value": {
           "name": "Wert",

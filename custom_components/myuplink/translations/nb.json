@@ -216,6 +216,11 @@
         "name": "Tilkoblingstilstand"
       }
     },
+    "climate": {
+      "myuplink_thermostat": {
+        "name": "Termostat"
+      }
+    },
     "select": {
       "myuplink_smart_home_mode": {
         "name": "Smart Home Mode",
@@ -239,6 +244,7 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Aktiver Smart Home Mode?",
+          "enable_smart_home_zone": "Aktiver Smart Home Zone?",
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
@@ -247,6 +253,7 @@
         },
         "data_description": {
           "enable_smart_home_mode": "Smart Home Mode er en systemrelatert enhet i myUplink API.\n\nHvis et system bare har én enkelt enhet, vil Smart Home Mode bli lagt til denne enheten. Ellers vil Smart Home Mode bli lagt til en ekstra enhet, som er basert på tilgjengelig systeminformasjon.\n\nStøtte for Smart Home Mode krever ett ekstra API-kall per system.",
+          "enable_smart_home_zone": "Krever et ekstra API-kall per enhet.",
           "fetch_firmware": "Krever et ekstra API-kall per enhet.",
           "fetch_notifications": "Krever et ekstra API-kall per system.",
           "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
@@ -284,6 +291,28 @@
         "parameter_id": {
           "name": "myUplink-parameter-ID",
           "description": "Skriv inn ID-en til parameterpunktet i myUplink API."
+        },
+        "value": {
+          "name": "Verdi",
+          "description": "Angi verdien som skal angis."
+        }
+      }
+    },
+    "set_device_zone_property_value": {
+      "name": "Sett smart hjem-soneegenskap til verdie",
+      "description": "Tjeneste for å angi en egenskap identifisert ved navn for en bestemt smarthjemmesone identifisert ved ID for en enhet til ønsket verdi.",
+      "fields": {
+        "device_id": {
+          "name": "myUplink-enhet",
+          "description": "Velg myUplink-enheten parameteren tilhører."
+        },
+        "zone_id": {
+          "name": "myUplink Smart Home Zone ID",
+          "description": "Skriv inn ID-en til den myUplink smart home zone egenskappen tilhører."
+        },
+        "property_name": {
+          "name": "Egenskapsnavn",
+          "description": "Skriv inn navnet på egenskappen."
         },
         "value": {
           "name": "Verdi",

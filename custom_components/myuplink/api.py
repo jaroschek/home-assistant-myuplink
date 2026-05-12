@@ -7,8 +7,9 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 import json
 import logging
+from typing import Any
 
-from aiohttp import ClientResponse, ClientSession
+from aiohttp import ClientResponse, ClientResponseError, ClientSession
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -26,6 +27,7 @@ from .const import (
     API_VERSION,
     CONF_ADDITIONAL_PARAMETER,
     CONF_ENABLE_SMART_HOME_MODE,
+    CONF_ENABLE_SMART_HOME_ZONE,
     CONF_FETCH_FIRMWARE,
     CONF_FETCH_NOTIFICATIONS,
     CONF_PARAMETER_WHITELIST,
@@ -92,7 +94,7 @@ class Subscription:
     @property
     def valid_until(self) -> datetime:
         """Return datetime value of 'validUntil'."""
-        return datetime(self.raw_data("validUntil"))
+        return datetime.fromisoformat(self.raw_data["validUntil"])
 
 
 class Notification:
@@ -166,23 +168,23 @@ class FirmwareInfo:
         return int(self.raw_data["firmwareId"])
 
     @property
-    def current_version(self) -> str:
+    def current_version(self) -> str | None:
         """Return the current firmware version of the device."""
-        if self.raw_data["currentFwVersion"].strip() == "":
+        if self.raw_data.get("currentFwVersion", "").strip() == "":
             return None
         return self.raw_data["currentFwVersion"].strip()
 
     @property
-    def pending_version(self) -> str:
+    def pending_version(self) -> str | None:
         """Return the pending firmware version of the device."""
-        if self.raw_data["pendingFwVersion"].strip() == "":
+        if self.raw_data.get("pendingFwVersion", "").strip() == "":
             return None
         return self.raw_data["pendingFwVersion"].strip()
 
     @property
-    def desired_version(self) -> str:
+    def desired_version(self) -> str | None:
         """Return the desired firmware version of the device."""
-        if self.raw_data["desiredFwVersion"].strip() == "":
+        if self.raw_data.get("desiredFwVersion", "").strip() == "":
             return None
         return self.raw_data["desiredFwVersion"].strip()
 
@@ -266,7 +268,7 @@ class Parameter:
     @property
     def step_value(self) -> int:
         """Return the step value of the parameter."""
-        return self.raw_data["stepValue"]
+        return self.raw_data.get("stepValue", 1)
 
     @property
     def enum_values(self) -> list[dict]:
@@ -274,7 +276,7 @@ class Parameter:
         return self.raw_data["enumValues"]
 
     @property
-    def scale_value(self) -> float | None:
+    def scale_value(self) -> float:
         """Return the scale value of the parameter."""
         if self.raw_data["scaleValue"]:
             return float(self.raw_data["scaleValue"])
@@ -287,11 +289,11 @@ class Parameter:
         return self.raw_data["zoneId"]
 
     async def update_parameter(self, value) -> None:
-        """Patch parameter if writable."""
+        """Set parameter value if writable."""
         if not self.is_writable:
             return
         await self.device.system.api.patch_parameter(
-            self.device.id, str(self.id), str(value)
+            self.device.id, str(self.id), value
         )
 
     def get_platform(self) -> Platform:
@@ -316,7 +318,9 @@ class Parameter:
         if len(self.enum_values) > 0 and self.is_writable:
             return Platform.SELECT
 
-        if (self.max_value or self.min_value) and self.is_writable:
+        if (
+            self.max_value is not None or self.min_value is not None
+        ) and self.is_writable:
             return Platform.NUMBER
 
         return Platform.SENSOR
@@ -331,9 +335,10 @@ class Parameter:
                 UnitOfTemperature,
                 UnitOfTime,
             ):
-                for unit in units:
-                    if parameter_unit.lower() == unit.lower():
-                        return str(unit)
+                with suppress(ValueError):
+                    for unit in units:
+                        if parameter_unit.lower() == unit.lower():
+                            return str(unit)
 
         return parameter_unit
 
@@ -341,14 +346,15 @@ class Parameter:
 class Zone:
     """Class that represents a zone object in the myUplink API."""
 
-    def __init__(self, raw_data: dict) -> None:
+    def __init__(self, raw_data: dict, device: Device) -> None:
         """Initialize a zone object."""
         self.raw_data = raw_data
+        self.device = device
 
     @property
     def id(self) -> int:
         """Return the ID of the zone."""
-        return self.raw_data["zoneId"]
+        return int(self.raw_data["zoneId"])
 
     @property
     def name(self) -> str:
@@ -358,12 +364,12 @@ class Zone:
     @property
     def is_command_only(self) -> bool:
         """Return if the zone is command only."""
-        return self.raw_data["commandOnly"]
+        return bool(self.raw_data["commandOnly"])
 
     @property
-    def supported_modes(self) -> str:
+    def supported_modes(self) -> str | None:
         """Return the supported modes of the zone."""
-        return self.raw_data["supportedModes"]
+        return self.raw_data.get("supportedModes")
 
     @property
     def mode(self) -> str:
@@ -371,49 +377,94 @@ class Zone:
         return self.raw_data["mode"]
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> float | None:
         """Return the current temperature of the zone."""
-        return self.raw_data["temperature"]
+        return (
+            float(self.raw_data.get("temperature"))
+            if self.raw_data.get("temperature") is not None
+            else None
+        )
 
     @property
-    def setpoint(self) -> float:
+    def setpoint(self) -> float | None:
         """Return the target temperature of the zone."""
-        return self.raw_data["setpoint"]
+        return (
+            float(self.raw_data.get("setpoint"))
+            if self.raw_data.get("setpoint") is not None
+            else None
+        )
 
     @property
-    def setpoint_heating(self) -> float:
+    def setpoint_heating(self) -> float | None:
         """Return the heating setpoint value of the zone."""
-        return self.raw_data["setpointHeat"]
+        return (
+            float(self.raw_data.get("setpointHeat"))
+            if self.raw_data.get("setpointHeat") is not None
+            else None
+        )
 
     @property
-    def setpoint_cooling(self) -> float:
+    def setpoint_cooling(self) -> float | None:
         """Return the cooling setpoint value of the zone."""
-        return self.raw_data["setpointCool"]
+        return (
+            float(self.raw_data.get("setpointCool"))
+            if self.raw_data.get("setpointCool") is not None
+            else None
+        )
 
     @property
-    def setpoint_range_min(self) -> int:
+    def setpoint_range_min(self) -> int | None:
         """Return the minimum temperature range of the zone."""
-        return self.raw_data["setpointRangeMin"]
+        return (
+            int(self.raw_data.get("setpointRangeMin"))
+            if self.raw_data.get("setpointRangeMin") is not None
+            else None
+        )
 
     @property
-    def setpoint_range_max(self) -> int:
+    def setpoint_range_max(self) -> int | None:
         """Return the maximum temperature range of the zone."""
-        return self.raw_data["setpointRangeMax"]
+        return (
+            int(self.raw_data.get("setpointRangeMax"))
+            if self.raw_data.get("setpointRangeMax") is not None
+            else None
+        )
 
     @property
     def is_celsius(self) -> bool:
         """Return if the temperature in the zone is specified as celsius (true) or fahrenheit (false)."""
-        return self.raw_data["isCelsius"]
+        return (
+            bool(self.raw_data.get("isCelsius"))
+            if self.raw_data.get("isCelsius") is not None
+            else True
+        )
 
     @property
-    def indoor_co2(self) -> int:
+    def indoor_co2(self) -> int | None:
         """Return the indoor co2 level of the zone."""
-        return self.raw_data["indoorCo2"]
+        return (
+            int(self.raw_data.get("indoorCo2"))
+            if self.raw_data.get("indoorCo2") is not None
+            else None
+        )
 
     @property
-    def indoor_umidity(self) -> float:
+    def indoor_humidity(self) -> float | None:
         """Return the indoor humidity of the zone."""
-        return self.raw_data["indoorHumidity"]
+        return (
+            float(self.raw_data.get("indoorHumidity"))
+            if self.raw_data.get("indoorHumidity") is not None
+            else None
+        )
+
+    async def update_zone_property(self, property_name: str, value) -> None:
+        """Patch zone if writable."""
+        if self.is_command_only:
+            return
+        await self.device.system.api.patch_zone_property(
+            self.device.id, str(self.id), property_name, value
+        )
+        self.raw_data[property_name] = value
 
 
 class Device:
@@ -463,15 +514,13 @@ class Device:
         """Return the current firmware version of the device."""
         if "firmware" in self.raw_data:
             return self.raw_data["firmware"]["currentFwVersion"]
-
-        return self.raw_data["currentFwVersion"]
+        return self.raw_data.get("currentFwVersion", "N/A")
 
     @property
     def desired_firmware_version(self) -> str:
         """Return the desired firmware version of the device."""
         if "firmware" in self.raw_data:
             return self.raw_data["firmware"]["desiredFwVersion"]
-
         return "?"
 
     async def async_fetch_data(self) -> None:
@@ -479,7 +528,8 @@ class Device:
         self.parameters = await self.system.api.get_parameters(self)
         if self.system.api.entry.options.get(CONF_FETCH_FIRMWARE, True):
             self.firmware_info = await self.system.api.get_firmware_info(self)
-        # self.zones = await self.system.api.get_zones(self.id)
+        if self.system.api.entry.options.get(CONF_ENABLE_SMART_HOME_ZONE, True):
+            self.zones = await self.system.api.get_zones(self)
 
 
 class System:
@@ -516,7 +566,7 @@ class System:
     @property
     def has_alaram(self) -> bool:
         """Return if the system has an alaram."""
-        return self.raw_data["has_alaram"]
+        return self.raw_data.get("hasAlarm", False)
 
     async def async_fetch_data(self) -> None:
         """Fetch data from myUplink API."""
@@ -663,7 +713,9 @@ class MyUplink:
 
         try:
             async with self.lock, self.throttle:
-                resp = await self.auth.request("get", f"systems/{system.id}/subscriptions")
+                resp = await self.auth.request(
+                    "get", f"systems/{system.id}/subscriptions"
+                )
 
             # This will raise an exception for 4xx or 5xx errors
             resp.raise_for_status()
@@ -674,9 +726,11 @@ class MyUplink:
                     if Subscription(subscription).type == "manage":
                         return True
 
-        except Exception as err:
+        except ClientResponseError as err:
             # We catch the 500 error (and others) here so the integration keeps running
-            _LOGGER.error("Error fetching subscriptions for system %s: %s", system.id, err)
+            _LOGGER.error(
+                "Error fetching subscriptions for system %s: %s", system.id, err
+            )
 
         return False
 
@@ -781,17 +835,17 @@ class MyUplink:
 
         return list(unique_parameters.values())
 
-    async def get_zones(self, device_id) -> list[Zone]:
+    async def get_zones(self, device: Device) -> list[Zone]:
         """Return all smart home zones for a device."""
-        _LOGGER.debug("Fetch zones for device %s", device_id)
+        _LOGGER.debug("Fetch zones for device %s", device.id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
-                "get", f"devices/{device_id}/smart-home-zones", headers=self.header
+                "get", f"devices/{device.id}/smart-home-zones", headers=self.header
             )
         resp.raise_for_status()
-        return [Zone(zone) for zone in await resp.json()]
+        return [Zone(zone, device) for zone in await resp.json()]
 
-    async def patch_parameter(self, device_id, parameter_id: str, value: str) -> bool:
+    async def patch_parameter(self, device_id, parameter_id: str, value: Any) -> bool:
         """Update the value of a parameter for a device."""
         _LOGGER.debug(
             "Patch parameter %s for device %s with value %s",
@@ -804,6 +858,27 @@ class MyUplink:
                 "patch",
                 f"devices/{device_id}/points",
                 data=json.dumps({parameter_id: value}),
+                headers={"Content-Type": "application/json-patch+json"},
+            )
+        resp.raise_for_status()
+        return resp.status == 200
+
+    async def patch_zone_property(
+        self, device_id, zone_id: str, property_name: str, value: str
+    ) -> bool:
+        """Update the value of a zone property for a device."""
+        _LOGGER.debug(
+            "Patch property %s for zone %s of device %s with value %s",
+            property_name,
+            zone_id,
+            device_id,
+            value,
+        )
+        async with self.lock, self.throttle:
+            resp = await self.auth.request(
+                "patch",
+                f"devices/{device_id}/zones/{zone_id}",
+                data=json.dumps({property_name: value}),
                 headers={"Content-Type": "application/json-patch+json"},
             )
         resp.raise_for_status()

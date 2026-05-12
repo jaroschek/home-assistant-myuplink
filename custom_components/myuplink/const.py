@@ -22,6 +22,7 @@ API_VERSION = "v2"
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,
+    Platform.CLIMATE,
     Platform.NUMBER,
     Platform.SELECT,
     Platform.SENSOR,
@@ -31,11 +32,14 @@ PLATFORMS = [
 ]
 
 ATTR_PARAMETER_ID = "parameter_id"
+ATTR_PROPERTY_NAME = "property_name"
 ATTR_VALUE = "value"
+ATTR_ZONE_ID = "zone_id"
 
 CONF_ADDITIONAL_PARAMETER = "additional_parameter"
 CONF_DISCONNECTED_AVAILABLE = "disconnected_available"
 CONF_ENABLE_SMART_HOME_MODE = "enable_smart_home_mode"
+CONF_ENABLE_SMART_HOME_ZONE = "enable_smart_home_zone"
 CONF_EXPERT_MODE = "expert_mode"
 CONF_FETCH_FIRMWARE = "fetch_firmware"
 CONF_FETCH_NOTIFICATIONS = "fetch_notifications"
