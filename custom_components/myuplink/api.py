@@ -52,6 +52,9 @@ class AsyncConfigEntryAuth:
         """Initialize myUplink auth."""
         self._websession = websession
         self._oauth_session = oauth_session
+        self.rate_limit_limit: int | None = None
+        self.rate_limit_remaining: int | None = None
+        self.rate_limit_reset_at: datetime | None = None
 
     async def async_get_access_token(self) -> str:
         """Return a valid access token."""
@@ -59,8 +62,29 @@ class AsyncConfigEntryAuth:
 
         return self._oauth_session.token["access_token"]
 
+    def _update_rate_limit_headers(self, response: ClientResponse) -> None:
+        """Extract and update rate limit headers from response.
+
+        RateLimit-Limit: maximum requests allowed in the current window (e.g., 25)
+        RateLimit-Remaining: requests still available in the current window
+        RateLimit-Reset: seconds until the current window expires
+        """
+        if "RateLimit-Limit" in response.headers:
+            self.rate_limit_limit = int(response.headers["RateLimit-Limit"])
+        if "RateLimit-Remaining" in response.headers:
+            self.rate_limit_remaining = int(response.headers["RateLimit-Remaining"])
+        if "RateLimit-Reset" in response.headers:
+            reset_seconds = int(response.headers["RateLimit-Reset"])
+            self.rate_limit_reset_at = datetime.now() + timedelta(seconds=reset_seconds)
+            _LOGGER.debug(
+                "Rate limit window: %d/%d remaining, resets in %d seconds",
+                self.rate_limit_remaining,
+                self.rate_limit_limit,
+                reset_seconds,
+            )
+
     async def request(self, method, path, **kwargs) -> ClientResponse:
-        """Make an authorized request."""
+        """Make an authorized request with rate limit window awareness."""
         headers = kwargs.pop("headers", None)
 
         if headers is None:
@@ -71,12 +95,31 @@ class AsyncConfigEntryAuth:
         access_token = await self.async_get_access_token()
         headers["authorization"] = f"Bearer {access_token}"
 
-        return await self._websession.request(
+        url = f"{API_HOST}/{API_VERSION}/{path}"
+
+        response = await self._websession.request(
             method,
-            f"{API_HOST}/{API_VERSION}/{path}",
+            url,
             **kwargs,
             headers=headers,
         )
+
+        self._update_rate_limit_headers(response)
+
+        if response.status == 429:
+            if self.rate_limit_reset_at:
+                wait_time = (self.rate_limit_reset_at - datetime.now()).total_seconds()
+                if wait_time > 0:
+                    _LOGGER.warning(
+                        "Rate limit exceeded (429). Waiting %d seconds until window resets for %s %s",
+                        int(wait_time),
+                        method.upper(),
+                        path,
+                    )
+                    await asyncio.sleep(wait_time + 0.1)
+                    return response
+
+        return response
 
 
 class Subscription:
@@ -599,27 +642,53 @@ class System:
 
 
 class Throttle:
-    """Throttling requests to API."""
+    """Throttling requests to API with rate limit window awareness.
 
-    def __init__(self, delay) -> None:
+    The throttle respects the 25 requests per minute limit by:
+    1. Tracking RateLimit-Remaining in the current window
+    2. When RateLimit-Remaining = 0, waiting until RateLimit-Reset window expires
+    3. Otherwise, maintaining a minimum delay of 60/25 = 2.4 seconds between requests
+    """
+
+    MIN_DELAY_SECONDS = 60 / 25
+
+    def __init__(self, auth: AsyncConfigEntryAuth) -> None:
         """Initialize throttle."""
-        self._delay = delay
-        self._timestamp = datetime.now()
+        self._auth = auth
+        self._last_request_time = datetime.now()
 
     async def __aenter__(self):
-        """Enter async throttle."""
-        timestamp = datetime.now()
-        delay = (self._timestamp - timestamp).total_seconds()
-        if delay > 0:
-            _LOGGER.debug("Delaying request by %s seconds due to throttle", delay)
-            with suppress(asyncio.CancelledError):
-                await asyncio.sleep(delay)
+        """Enter async throttle - apply delay before making request."""
+        now = datetime.now()
+
+        if (
+            self._auth.rate_limit_reset_at
+            and self._auth.rate_limit_remaining is not None
+        ):
+            if self._auth.rate_limit_remaining <= 0:
+                wait_seconds = (self._auth.rate_limit_reset_at - now).total_seconds()
+                if wait_seconds > 0:
+                    _LOGGER.debug(
+                        "Rate limit window exhausted (0 requests remaining). Waiting %d seconds for window reset",
+                        int(wait_seconds),
+                    )
+                    await asyncio.sleep(wait_seconds + 0.1)
+                    return self
+
+        time_since_last_request = (now - self._last_request_time).total_seconds()
+        if time_since_last_request < self.MIN_DELAY_SECONDS:
+            delay = self.MIN_DELAY_SECONDS - time_since_last_request
+            _LOGGER.debug(
+                "Throttling request: waiting %.2f seconds to maintain rate limit (25 req/min)",
+                delay,
+            )
+            await asyncio.sleep(delay)
 
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Exit async throttle."""
-        self._timestamp = datetime.now() + self._delay
+        """Exit async throttle - record request time."""
+        self._last_request_time = datetime.now()
 
 
 class MyUplink:
@@ -635,7 +704,7 @@ class MyUplink:
         self.auth = auth
         self.entry = entry
         self.lock = asyncio.Lock()
-        self.throttle = Throttle(timedelta(seconds=5))
+        self.throttle = Throttle(auth)
 
         self.header = {"Accept-Language": language_code}
 
