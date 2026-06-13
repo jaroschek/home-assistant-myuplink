@@ -69,20 +69,34 @@ class AsyncConfigEntryAuth:
         RateLimit-Remaining: requests still available in the current window
         RateLimit-Reset: seconds until the current window expires
         """
-        if "RateLimit-Limit" in response.headers:
-            self.rate_limit_limit = int(response.headers["RateLimit-Limit"])
-        if "RateLimit-Remaining" in response.headers:
-            self.rate_limit_remaining = int(response.headers["RateLimit-Remaining"])
-        if "RateLimit-Reset" in response.headers:
-            reset_seconds = int(response.headers["RateLimit-Reset"])
+        limit = _header_int("RateLimit-Limit")
+        if limit is not None:
+            self.rate_limit_limit = limit
+
+        remaining = _header_int("RateLimit-Remaining")
+        if remaining is not None:
+            self.rate_limit_remaining = remaining
+
+        reset_seconds = _header_int("RateLimit-Reset")
+        if reset_seconds is not None:
             self.rate_limit_reset_at = datetime.now() + timedelta(seconds=reset_seconds)
             _LOGGER.debug(
-                "Rate limit window: %d/%d remaining, resets in %d seconds",
+                "Rate limit window: %s/%s remaining, resets in %d seconds",
                 self.rate_limit_remaining,
                 self.rate_limit_limit,
                 reset_seconds,
             )
 
+    def _header_int(name: str) -> int | None:
+        value = response.headers.get(name)
+        if value is None:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            _LOGGER.debug("Could not parse %s header value: %r", name, value)
+            return None
+                
     async def request(self, method, path, **kwargs) -> ClientResponse:
         """Make an authorized request with rate limit window awareness."""
         headers = kwargs.pop("headers", None)
@@ -651,6 +665,9 @@ class Throttle:
     """
 
     MIN_DELAY_SECONDS = 60 / 25
+    # Start pacing requests only once the window has this many or fewer
+    # requests left; above this, fire requests back-to-back.
+    LOW_REMAINING_THRESHOLD = 5
 
     def __init__(self, auth: AsyncConfigEntryAuth) -> None:
         """Initialize throttle."""
@@ -675,14 +692,21 @@ class Throttle:
                     await asyncio.sleep(wait_seconds + 0.1)
                     return self
 
-        time_since_last_request = (now - self._last_request_time).total_seconds()
-        if time_since_last_request < self.MIN_DELAY_SECONDS:
-            delay = self.MIN_DELAY_SECONDS - time_since_last_request
-            _LOGGER.debug(
-                "Throttling request: waiting %.2f seconds to maintain rate limit (25 req/min)",
-                delay,
-            )
-            await asyncio.sleep(delay)
+        # Only pace requests when the rate-limit window is running low.
+        # With plenty of headroom there is no need to insert a fixed delay
+        # before every call; doing so serializes startup and can overrun
+        # Home Assistant's setup timeout on accounts with several devices.
+        remaining = self._auth.rate_limit_remaining
+        if remaining is not None and remaining <= self.LOW_REMAINING_THRESHOLD:
+            time_since_last_request = (now - self._last_request_time).total_seconds()
+            if time_since_last_request < self.MIN_DELAY_SECONDS:
+                delay = self.MIN_DELAY_SECONDS - time_since_last_request
+                _LOGGER.debug(
+                    "Rate limit low (%d remaining): waiting %.2f seconds",
+                    remaining,
+                    delay,
+                )
+                await asyncio.sleep(delay)
 
         return self
 
