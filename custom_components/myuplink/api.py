@@ -1,3 +1,4 @@
+
 """API for myUplink bound to Home Assistant OAuth."""
 
 from __future__ import annotations
@@ -69,15 +70,15 @@ class AsyncConfigEntryAuth:
         RateLimit-Remaining: requests still available in the current window
         RateLimit-Reset: seconds until the current window expires
         """
-        limit = _header_int("RateLimit-Limit")
+        limit = self._header_int(response, "RateLimit-Limit")
         if limit is not None:
             self.rate_limit_limit = limit
 
-        remaining = _header_int("RateLimit-Remaining")
+        remaining = self._header_int(response, "RateLimit-Remaining")
         if remaining is not None:
             self.rate_limit_remaining = remaining
 
-        reset_seconds = _header_int("RateLimit-Reset")
+        reset_seconds = self._header_int(response, "RateLimit-Reset")
         if reset_seconds is not None:
             self.rate_limit_reset_at = datetime.now() + timedelta(seconds=reset_seconds)
             _LOGGER.debug(
@@ -87,7 +88,7 @@ class AsyncConfigEntryAuth:
                 reset_seconds,
             )
 
-    def _header_int(name: str) -> int | None:
+    def _header_int(self, response: ClientResponse, name: str) -> int | None:
         value = response.headers.get(name)
         if value is None:
             return None
@@ -96,7 +97,7 @@ class AsyncConfigEntryAuth:
         except (TypeError, ValueError):
             _LOGGER.debug("Could not parse %s header value: %r", name, value)
             return None
-                
+
     async def request(self, method, path, **kwargs) -> ClientResponse:
         """Make an authorized request with rate limit window awareness."""
         headers = kwargs.pop("headers", None)
