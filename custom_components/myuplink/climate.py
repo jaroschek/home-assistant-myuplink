@@ -14,9 +14,9 @@ from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, System, Zone
+from .api import Zone
 from .const import DOMAIN
-from .entity import MyUplinkZoneEntity
+from .entity import MyUplinkZoneEntity, async_setup_entities
 
 THERMOSTAT_MODE_MAP: dict[str, HVACMode] = {
     "off": HVACMode.OFF,
@@ -42,20 +42,21 @@ async def async_setup_entry(
     """Set up the climate platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[ClimateEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            for zone in device.zones:
-                zone: Zone
-                if not zone.is_command_only:
-                    entities.append(
-                        MyUplinkZoneClimateEntity(coordinator, device, zone)
-                    )
+    def build_entities() -> list[ClimateEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[ClimateEntity] = []
 
-    async_add_entities(entities)
+        for system in coordinator.data:
+            for device in system.devices:
+                for zone in device.zones:
+                    if not zone.is_command_only:
+                        entities.append(
+                            MyUplinkZoneClimateEntity(coordinator, device, zone)
+                        )
+        return entities
+
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):

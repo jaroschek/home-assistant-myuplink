@@ -26,17 +26,17 @@ rules:
   test-before-setup: done
   unique-config-entry: done
   action-exceptions: done
-  config-entry-unloading: todo
+  config-entry-unloading: done
   docs-configuration-parameters: todo
   docs-installation-parameters: todo
-  entity-unavailable: todo
+  entity-unavailable: done
   integration-owner: done
   log-when-unavailable: done
   parallel-updates: done
   reauthentication-flow: done
   test-coverage: todo
   devices: done
-  diagnostics: todo
+  diagnostics: done
   discovery:
     status: exempt
     comment: Devices are available through an authenticated cloud account and cannot be discovered locally.
@@ -50,7 +50,7 @@ rules:
   docs-supported-functions: todo
   docs-troubleshooting: done
   docs-use-cases: todo
-  dynamic-devices: todo
+  dynamic-devices: done
   entity-category: todo
   entity-device-class: todo
   entity-disabled-by-default: todo
@@ -61,7 +61,9 @@ rules:
   repair-issues:
     status: exempt
     comment: Authentication repairs are handled by Home Assistant's reauthentication flow; no other persistent repair condition is currently identified.
-  stale-devices: todo
+  stale-devices:
+    status: done
+    comment: Cloud absence is not confirmation of permanent removal. Missing entities become unavailable, and the device-removal hook allows explicit cleanup of absent devices or unloaded accounts.
   async-dependency:
     status: exempt
     comment: There is no separate API dependency; the included client uses asynchronous aiohttp requests.

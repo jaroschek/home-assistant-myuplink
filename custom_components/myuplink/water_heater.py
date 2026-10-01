@@ -10,15 +10,15 @@ from homeassistant.components.water_heater import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import Device, Parameter, System
+from .api import Device, Parameter
 from .const import WATER_HEATERS
-from .entity import MyUplinkDeviceEntity
+from .entity import MyUplinkDeviceEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
+REQUIRED_PARAMETERS = {406, 500, 516, 527, 528}
 
 
 async def async_setup_entry(
@@ -27,16 +27,20 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[WaterHeaterEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            if device.name[:7] in WATER_HEATERS:
-                entities.append(MyUplinkWaterHeaterEntity(coordinator, device))
+    def build_entities() -> list[WaterHeaterEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[WaterHeaterEntity] = []
 
-    async_add_entities(entities)
+        for system in coordinator.data:
+            for device in system.devices:
+                if device.name[:7] in WATER_HEATERS and REQUIRED_PARAMETERS.issubset(
+                    parameter.id for parameter in device.parameters
+                ):
+                    entities.append(MyUplinkWaterHeaterEntity(coordinator, device))
+        return entities
+
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
@@ -44,28 +48,42 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
 
     _attr_name = None
 
-    def __init__(self, coordinator: DataUpdateCoordinator, device: Device) -> None:
-        super().__init__(coordinator, device)
-        self._update_from_parameters()
+    @property
+    def available(self) -> bool:
+        """Require all points needed for water-heater controls."""
+        return super().available and self._parameters_available
+
+    def _update_from_device(self, device: Device) -> None:
+        """Update controls only while the required points are present."""
+        super()._update_from_device(device)
+        self._parameters_available = REQUIRED_PARAMETERS.issubset(
+            parameter.id for parameter in device.parameters
+        )
+        if self._parameters_available:
+            self._update_from_parameters()
 
     def _update_from_parameters(self) -> None:
         """Update attrs from parameter."""
-        # super()._update_from_parameter(parameter)
         parameter_map: dict[int, Parameter] = {}
         for parameter in self._device.parameters:
             parameter_map[parameter.id] = parameter
-        # for some reason the min_value is formated like this: "2000" = 20.00 Celcius
-        self._attr_min_temp = (
-            parameter_map[527].min_value * parameter_map[527].scale_value
-        )
-        self._attr_max_temp = (
-            parameter_map[527].max_value * parameter_map[527].scale_value
-        )
+        # API bounds are raw values; readings are already scaled.
+        if parameter_map[527].min_value is not None:
+            self._attr_min_temp = (
+                parameter_map[527].min_value * parameter_map[527].scale_value
+            )
+        if parameter_map[527].max_value is not None:
+            self._attr_max_temp = (
+                parameter_map[527].max_value * parameter_map[527].scale_value
+            )
         self._attr_current_temperature = parameter_map[528].value
         self._attr_target_temperature = parameter_map[527].value
         self._attr_target_temperature_high = self._attr_target_temperature
+        hysteresis = parameter_map[516].value
         self._attr_target_temperature_low = (
-            self._attr_target_temperature - parameter_map[516].value
+            self._attr_target_temperature - hysteresis
+            if self._attr_target_temperature is not None and hysteresis is not None
+            else None
         )
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         operation_types = []
@@ -95,14 +113,3 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
                     operation_types[enum["text"]] = enum["value"]
                 await parameter.update_parameter(operation_types[operation_mode])
         await self.async_update()
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        for system in self.coordinator.data:
-            for device in system.devices:
-                if device.id == self._device.id:
-                    super()._update_from_device(device)
-                    self._update_from_parameters()
-
-        super().async_write_ha_state()
