@@ -33,6 +33,8 @@ THERMOSTAT_MODE_MAP_INVERTED: dict[HVACMode, str] = {
     HVACMode.HEAT_COOL: "heatcool",
 }
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -97,13 +99,11 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
-        temperature = float(kwargs.get(ATTR_TEMPERATURE))
-        if self._zone.mode == "heatcool":
-            await self._zone.update_zone_property("setpoint", temperature)
-        elif self._zone.mode == "heat":
-            await self._zone.update_zone_property("setpointHeat", temperature)
-        elif self._zone.mode == "cool":
-            await self._zone.update_zone_property("setpointCool", temperature)
+        temperature = float(kwargs[ATTR_TEMPERATURE])
+        property_name = {"heat": "setpointHeat", "cool": "setpointCool"}.get(
+            self._zone.mode, "setpoint"
+        )
+        await self._zone.update_zone_property(property_name, temperature)
         self._attr_target_temperature = temperature
         self.async_write_ha_state()
 

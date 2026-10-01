@@ -40,6 +40,7 @@ from custom_components.myuplink.const import PLATFORMS
             ConfigEntryNotReady,
             id="connection-failed",
         ),
+        pytest.param(TimeoutError(), ConfigEntryNotReady, id="token-timeout"),
     ],
 )
 async def test_token_failure(

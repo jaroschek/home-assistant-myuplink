@@ -6,10 +6,19 @@ import asyncio
 import json
 import logging
 from contextlib import suppress
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
+from email.utils import parsedate_to_datetime
+from http import HTTPStatus
+from math import ceil
 from typing import Any
 
-from aiohttp import ClientResponse, ClientResponseError, ClientSession
+from aiohttp import (
+    ClientError,
+    ClientResponse,
+    ClientResponseError,
+    ClientSession,
+    ClientTimeout,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
@@ -19,6 +28,7 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfTime,
 )
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_entry_oauth2_flow
 
 from .const import (
@@ -35,9 +45,19 @@ from .const import (
     CONF_WRITABLE_WITHOUT_SUBSCRIPTION,
     DEFAULT_PLATFORM_OVERRIDE,
     DEFAULT_WRITABLE_OVERRIDE,
+    DOMAIN,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class MyUplinkRateLimitError(Exception):
+    """A request must wait until the API rate-limit window resets."""
+
+    def __init__(self, retry_after: float) -> None:
+        """Carry the server's backoff to the polling coordinator."""
+        super().__init__("myUplink request limit reached")
+        self.retry_after = max(1, retry_after)
 
 
 class AsyncConfigEntryAuth:
@@ -57,7 +77,8 @@ class AsyncConfigEntryAuth:
 
     async def async_get_access_token(self) -> str:
         """Return a valid access token."""
-        await self._oauth_session.async_ensure_token_valid()
+        async with asyncio.timeout(30):
+            await self._oauth_session.async_ensure_token_valid()
 
         return self._oauth_session.token["access_token"]
 
@@ -78,7 +99,9 @@ class AsyncConfigEntryAuth:
 
         reset_seconds = self._header_int(response, "RateLimit-Reset")
         if reset_seconds is not None:
-            self.rate_limit_reset_at = datetime.now() + timedelta(seconds=reset_seconds)
+            self.rate_limit_reset_at = datetime.now(UTC) + timedelta(
+                seconds=reset_seconds
+            )
             _LOGGER.debug(
                 "Rate limit window: %s/%s remaining, resets in %d seconds",
                 self.rate_limit_remaining,
@@ -109,30 +132,45 @@ class AsyncConfigEntryAuth:
         headers["authorization"] = f"Bearer {access_token}"
 
         url = f"{API_HOST}/{API_VERSION}/{path}"
+        kwargs.setdefault("timeout", ClientTimeout(total=30))
 
-        response = await self._websession.request(
-            method,
-            url,
-            **kwargs,
-            headers=headers,
-        )
+        async with asyncio.timeout(30):
+            response = await self._websession.request(
+                method, url, **kwargs, headers=headers
+            )
 
         self._update_rate_limit_headers(response)
 
-        if response.status == 429:
-            if self.rate_limit_reset_at:
-                wait_time = (self.rate_limit_reset_at - datetime.now()).total_seconds()
-                if wait_time > 0:
-                    _LOGGER.warning(
-                        "Rate limit exceeded (429). Waiting %d seconds until window resets for %s %s",
-                        int(wait_time),
-                        method.upper(),
-                        path,
-                    )
-                    await asyncio.sleep(wait_time + 0.1)
-                    return response
+        if response.status == HTTPStatus.TOO_MANY_REQUESTS:
+            retry_after = self._retry_after(response)
+            self.rate_limit_remaining = 0
+            self.rate_limit_reset_at = datetime.now(UTC) + timedelta(
+                seconds=retry_after
+            )
+            response.release()
+            raise MyUplinkRateLimitError(retry_after)
 
         return response
+
+    def _retry_after(self, response: ClientResponse) -> float:
+        """Read Retry-After seconds or HTTP date, then the rate-limit reset."""
+        if value := response.headers.get("Retry-After"):
+            try:
+                return max(1, float(value))
+            except ValueError:
+                try:
+                    return max(
+                        1,
+                        parsedate_to_datetime(value).timestamp()
+                        - datetime.now(UTC).timestamp(),
+                    )
+                except TypeError, ValueError, OverflowError:
+                    pass
+        if self.rate_limit_reset_at is not None:
+            return max(
+                1, (self.rate_limit_reset_at - datetime.now(UTC)).total_seconds()
+            )
+        return 60
 
 
 class Subscription:
@@ -347,7 +385,9 @@ class Parameter:
     async def update_parameter(self, value) -> None:
         """Set parameter value if writable."""
         if not self.is_writable:
-            return
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="parameter_not_writable"
+            )
         await self.device.system.api.patch_parameter(
             self.device.id, str(self.id), value
         )
@@ -516,7 +556,9 @@ class Zone:
     async def update_zone_property(self, property_name: str, value) -> None:
         """Patch zone if writable."""
         if self.is_command_only:
-            return
+            raise ServiceValidationError(
+                translation_domain=DOMAIN, translation_key="zone_command_only"
+            )
         await self.device.system.api.patch_zone_property(
             self.device.id, str(self.id), property_name, value
         )
@@ -671,11 +713,11 @@ class Throttle:
     def __init__(self, auth: AsyncConfigEntryAuth) -> None:
         """Initialize throttle."""
         self._auth = auth
-        self._last_request_time = datetime.now()
+        self._last_request_time = datetime.now(UTC)
 
     async def __aenter__(self):
         """Enter async throttle - apply delay before making request."""
-        now = datetime.now()
+        now = datetime.now(UTC)
 
         if (
             self._auth.rate_limit_reset_at
@@ -684,12 +726,7 @@ class Throttle:
             if self._auth.rate_limit_remaining <= 0:
                 wait_seconds = (self._auth.rate_limit_reset_at - now).total_seconds()
                 if wait_seconds > 0:
-                    _LOGGER.debug(
-                        "Rate limit window exhausted (0 requests remaining). Waiting %d seconds for window reset",
-                        int(wait_seconds),
-                    )
-                    await asyncio.sleep(wait_seconds + 0.1)
-                    return self
+                    raise MyUplinkRateLimitError(wait_seconds)
 
         # Only pace requests when the rate-limit window is running low.
         # With plenty of headroom there is no need to insert a fixed delay
@@ -711,7 +748,7 @@ class Throttle:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Exit async throttle - record request time."""
-        self._last_request_time = datetime.now()
+        self._last_request_time = datetime.now(UTC)
 
 
 class MyUplink:
@@ -728,6 +765,8 @@ class MyUplink:
         self.entry = entry
         self.lock = asyncio.Lock()
         self.throttle = Throttle(auth)
+        self._subscription_failures: set[str] = set()
+        self._premium_manage: dict[str, bool] = {}
 
         self.header = {"Accept-Language": language_code}
 
@@ -809,21 +848,29 @@ class MyUplink:
                     "get", f"systems/{system.id}/subscriptions"
                 )
 
-            # This will raise an exception for 4xx or 5xx errors
             resp.raise_for_status()
 
             if resp.status == 200:
                 data = await resp.json()
                 for subscription in data.get("subscriptions", []):
                     if Subscription(subscription).type == "manage":
+                        self._subscription_failures.discard(system.id)
+                        self._premium_manage[system.id] = True
                         return True
 
         except ClientResponseError as err:
-            # We catch the 500 error (and others) here so the integration keeps running
-            _LOGGER.error(
-                "Error fetching subscriptions for system %s: %s", system.id, err
-            )
+            if err.status != HTTPStatus.INTERNAL_SERVER_ERROR:
+                raise
+            # This optional endpoint sometimes fails while point reads still work.
+            if system.id not in self._subscription_failures:
+                _LOGGER.warning(
+                    "myUplink subscription lookup failed; retaining known permissions"
+                )
+                self._subscription_failures.add(system.id)
+            return self._premium_manage.get(system.id, False)
 
+        self._subscription_failures.discard(system.id)
+        self._premium_manage[system.id] = False
         return False
 
     async def get_smart_home_mode(self, system: System) -> str:
@@ -838,30 +885,30 @@ class MyUplink:
 
         return data["smartHomeMode"]
 
-    async def put_smart_home_mode(self, system_id, value: str) -> bool:
+    async def put_smart_home_mode(self, system_id, value: str) -> None:
         """Set the smart home mode for a system."""
         _LOGGER.debug(
             "Put smart home mode for system %s with value %s",
             system_id,
             value,
         )
-        async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "put",
-                f"systems/{system_id}/smart-home-mode",
-                data=json.dumps({"smartHomeMode": value}),
-                headers={"Content-Type": "application/json-patch+json"},
-            )
-        resp.raise_for_status()
+        resp = await self._async_write(
+            "put",
+            f"systems/{system_id}/smart-home-mode",
+            data=json.dumps({"smartHomeMode": value}),
+            headers={"Content-Type": "application/json-patch+json"},
+        )
         if resp.status == 200:
-            data = await resp.json()
-            return (
-                "payload" in data
-                and "state" in data["payload"]
-                and data["payload"]["state"] == "ok"
-            )
-
-        return False
+            try:
+                data = await resp.json()
+            except (ClientError, TimeoutError, ValueError) as err:
+                raise HomeAssistantError(
+                    translation_domain=DOMAIN, translation_key="write_rejected"
+                ) from err
+            if data.get("payload", {}).get("state") != "ok":
+                raise HomeAssistantError(
+                    translation_domain=DOMAIN, translation_key="write_rejected"
+                )
 
     async def get_device(self, device_id: str) -> Device:
         """Return a device by id."""
@@ -937,7 +984,7 @@ class MyUplink:
         resp.raise_for_status()
         return [Zone(zone, device) for zone in await resp.json()]
 
-    async def patch_parameter(self, device_id, parameter_id: str, value: Any) -> bool:
+    async def patch_parameter(self, device_id, parameter_id: str, value: Any) -> None:
         """Update the value of a parameter for a device."""
         _LOGGER.debug(
             "Patch parameter %s for device %s with value %s",
@@ -945,19 +992,16 @@ class MyUplink:
             device_id,
             value,
         )
-        async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "patch",
-                f"devices/{device_id}/points",
-                data=json.dumps({parameter_id: value}),
-                headers={"Content-Type": "application/json-patch+json"},
-            )
-        resp.raise_for_status()
-        return resp.status == 200
+        await self._async_write(
+            "patch",
+            f"devices/{device_id}/points",
+            data=json.dumps({parameter_id: value}),
+            headers={"Content-Type": "application/json-patch+json"},
+        )
 
     async def patch_zone_property(
         self, device_id, zone_id: str, property_name: str, value: str
-    ) -> bool:
+    ) -> None:
         """Update the value of a zone property for a device."""
         _LOGGER.debug(
             "Patch property %s for zone %s of device %s with value %s",
@@ -966,15 +1010,45 @@ class MyUplink:
             device_id,
             value,
         )
-        async with self.lock, self.throttle:
-            resp = await self.auth.request(
-                "patch",
-                f"devices/{device_id}/zones/{zone_id}",
-                data=json.dumps({property_name: value}),
-                headers={"Content-Type": "application/json-patch+json"},
+        await self._async_write(
+            "patch",
+            f"devices/{device_id}/zones/{zone_id}",
+            data=json.dumps({property_name: value}),
+            headers={"Content-Type": "application/json-patch+json"},
+        )
+
+    async def _async_write(
+        self, method: str, path: str, **kwargs: Any
+    ) -> ClientResponse:
+        """Report every failed write consistently across actions and platforms."""
+        try:
+            async with self.lock, self.throttle:
+                response = await self.auth.request(method, path, **kwargs)
+            response.raise_for_status()
+            await response.read()
+        except MyUplinkRateLimitError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="rate_limited",
+                translation_placeholders={"seconds": str(ceil(err.retry_after))},
+            ) from err
+        except ClientResponseError as err:
+            if err.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+                self.entry.async_start_reauth(self.entry.runtime_data.hass)
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="api_error",
+                translation_placeholders={"status": str(err.status)},
+            ) from err
+        except (ClientError, TimeoutError) as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN, translation_key="connection_error"
+            ) from err
+        if not 200 <= response.status < 300:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN, translation_key="write_rejected"
             )
-        resp.raise_for_status()
-        return resp.status == 200
+        return response
 
     def parse_int_keys(self, dct):
         """Parse object keys into integers."""

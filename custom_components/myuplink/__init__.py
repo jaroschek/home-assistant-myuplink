@@ -2,24 +2,21 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from datetime import timedelta
 from http import HTTPStatus
 
 import aiohttp
 import jwt
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import aiohttp_client, config_entry_oauth2_flow
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import AsyncConfigEntryAuth, MyUplink
-from .const import DEFAULT_SCAN_INTERVAL, PLATFORMS, SCOPES
+from .const import PLATFORMS, SCOPES
+from .coordinator import MyUplinkCoordinator
 from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,39 +42,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         await auth.async_get_access_token()
     except aiohttp.ClientResponseError as err:
-        _LOGGER.debug("API error: %s (%s)", err.code, err.message)
-        if err.code in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
+        _LOGGER.debug("API error: %s (%s)", err.status, err.message)
+        if err.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
             raise ConfigEntryAuthFailed from err
         raise ConfigEntryNotReady from err
-    except aiohttp.ClientError as err:
+    except (aiohttp.ClientError, TimeoutError) as err:
         raise ConfigEntryNotReady from err
 
-    if set(entry.data["token"]["scope"].split(" ")) != set(SCOPES):
+    if not set(SCOPES).issubset(entry.data["token"]["scope"].split()):
         raise ConfigEntryAuthFailed
 
     api = MyUplink(auth, f"{hass.config.language}-{hass.config.country}", entry)
 
-    async def async_update_data():
-        try:
-            async with asyncio.timeout(30):
-                return await api.get_systems()
-        except aiohttp.ClientResponseError as err:
-            raise UpdateFailed(f"Wrong credentials: {err}") from err
-        except aiohttp.ClientConnectorError as err:
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
-
-    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
-    _LOGGER.debug(
-        "Initialize coordinator with %d seconds update interval", scan_interval
-    )
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name="myUplink",
-        update_method=async_update_data,
-        update_interval=timedelta(seconds=scan_interval),
-    )
+    coordinator = MyUplinkCoordinator(hass, entry, api)
     await coordinator.async_config_entry_first_refresh()
 
     entry.runtime_data = coordinator
