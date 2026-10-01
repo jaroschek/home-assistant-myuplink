@@ -92,7 +92,7 @@ async def test_select_loaded_device(
     api.patch_parameter = AsyncMock()
     api.patch_zone_property = AsyncMock()
     device = SimpleNamespace(id="api-device", system=SimpleNamespace(api=api))
-    entry.runtime_data = SimpleNamespace(data=[SimpleNamespace(devices=[device])])
+    entry.runtime_data = SimpleNamespace(devices_by_id={device.id: device})
     registered = dr.async_get(hass).async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, device.id)},
@@ -108,3 +108,51 @@ async def test_select_loaded_device(
         context=Context(user_id="admin"),
     )
     getattr(api, method).assert_awaited_once_with(*expected)
+
+
+@pytest.mark.parametrize(
+    "selected",
+    [
+        pytest.param(None, id="removed-entry"),
+        pytest.param(
+            SimpleNamespace(domain="other", state=ConfigEntryState.LOADED),
+            id="other-integration",
+        ),
+        pytest.param(
+            SimpleNamespace(domain=DOMAIN, state=ConfigEntryState.NOT_LOADED),
+            id="unloaded-account",
+        ),
+        pytest.param(
+            SimpleNamespace(
+                domain=DOMAIN,
+                state=ConfigEntryState.LOADED,
+                runtime_data=SimpleNamespace(devices_by_id={}),
+            ),
+            id="missing-cloud-device",
+        ),
+    ],
+)
+async def test_missing_action_target(
+    hass: HomeAssistant, entry: ConfigEntry, selected: object
+) -> None:
+    """A stale or unrelated registry target cannot write to an account."""
+    await async_setup(hass, {})
+    registered = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, "absent-device"), ("other", "other-device")},
+    )
+    with (
+        patch(
+            "custom_components.myuplink.services.async_extract_config_entry_ids",
+            new=AsyncMock(return_value={"selected"}),
+        ),
+        patch.object(hass.config_entries, "async_get_entry", return_value=selected),
+        pytest.raises(ServiceValidationError) as error,
+    ):
+        await hass.services.async_call(
+            DOMAIN,
+            SERVICE_SET_DEVICE_PARAMETER_VALUE,
+            {"device_id": registered.id, "parameter_id": "123", "value": "20"},
+            blocking=True,
+        )
+    assert error.value.translation_key == "device_not_found"

@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Parameter
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 
@@ -27,15 +31,11 @@ async def async_setup_entry(
 
         for system in coordinator.data:
             for device in system.devices:
-                [
-                    entities.append(
-                        MyUplinkParameterSwitchEntityEntity(
-                            coordinator, device, parameter
-                        )
-                    )
+                entities.extend(
+                    MyUplinkParameterSwitchEntityEntity(coordinator, device, parameter)
                     for parameter in device.parameters
                     if coordinator.parameter_platform(parameter) == Platform.SWITCH
-                ]
+                )
         return entities
 
     async_setup_entities(entry, async_add_entities, build_entities)
@@ -50,12 +50,12 @@ class MyUplinkParameterSwitchEntityEntity(MyUplinkParameterEntity, SwitchEntity)
         value = self._parameter.value
         self._attr_is_on = bool(int(value)) if value is not None else None
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
         await self._parameter.update_parameter(1)
         await self.async_update()
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
         await self._parameter.update_parameter(0)
         await self.async_update()

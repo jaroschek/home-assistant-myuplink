@@ -2,20 +2,20 @@
 
 from collections.abc import Callable, Iterable
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
-from homeassistant.helpers.entity import DeviceInfo, Entity
+from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Device, Parameter, System, Zone
 from .const import CONF_DISCONNECTED_AVAILABLE, DOMAIN
-from .coordinator import MyUplinkCoordinator
+from .coordinator import MyUplinkConfigEntry, MyUplinkCoordinator
 
 
 @callback
 def async_setup_entities(
-    entry: ConfigEntry,
+    entry: MyUplinkConfigEntry,
     async_add_entities: AddEntitiesCallback,
     build_entities: Callable[[], Iterable[Entity]],
 ) -> None:

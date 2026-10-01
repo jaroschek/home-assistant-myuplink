@@ -13,11 +13,11 @@ from homeassistant.config_entries import (
     SOURCE_REAUTH,
     SOURCE_RECONFIGURE,
     ConfigEntry,
+    ConfigFlowResult,
     OptionsFlowWithReload,
 )
 from homeassistant.const import CONF_SCAN_INTERVAL, UnitOfTime
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_entry_oauth2_flow, selector
 from homeassistant.helpers.typing import ConfigType
 from voluptuous.schema_builder import Schema
@@ -160,9 +160,11 @@ class OAuth2FlowHandler(
     VERSION = 1
     MINOR_VERSION = 2
 
-    _data: dict[str, Any] = {}
-
-    _options: dict[str, Any] = {}
+    def __init__(self) -> None:
+        """Initialize account data independently for each flow."""
+        super().__init__()
+        self._data: dict[str, Any] = {}
+        self._options: dict[str, Any] = {}
 
     @property
     def logger(self) -> logging.Logger:
@@ -170,17 +172,19 @@ class OAuth2FlowHandler(
         return logging.getLogger(__name__)
 
     @property
-    def extra_authorize_data(self) -> dict:
+    def extra_authorize_data(self) -> dict[str, str]:
         """Extra data that needs to be appended to the authorize url."""
         return {"scope": " ".join(SCOPES)}
 
-    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> FlowResult:
+    async def async_step_reauth(
+        self, entry_data: Mapping[str, Any]
+    ) -> ConfigFlowResult:
         """Perform reauth upon an API authentication error."""
         return await self.async_step_reauth_confirm()
 
     async def async_step_reauth_confirm(
         self, user_input: Mapping[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Dialog that informs the user that reauth is required."""
         if user_input is None:
             return self.async_show_form(step_id="reauth_confirm")
@@ -188,11 +192,11 @@ class OAuth2FlowHandler(
 
     async def async_step_reconfigure(
         self, user_input: Mapping[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """User initiated reconfiguration."""
         return await self.async_step_user()
 
-    async def async_oauth_create_entry(self, data: dict) -> FlowResult:
+    async def async_oauth_create_entry(self, data: dict[str, Any]) -> ConfigFlowResult:
         """Create an entry for the flow."""
         _LOGGER.debug("Finishing post-oauth configuration")
 
@@ -218,7 +222,7 @@ class OAuth2FlowHandler(
 
     async def async_step_options(
         self, options_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the options step."""
         if options_input is None:
             return self.async_show_form(
@@ -233,7 +237,7 @@ class OAuth2FlowHandler(
 
     async def async_step_expert(
         self, expert_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the expert step."""
         if expert_input is None:
             return self.async_show_form(
@@ -258,14 +262,14 @@ class OptionsFlow(OptionsFlowWithReload):
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Initialize form."""
         self.options = dict(self.config_entry.options)
         return await self.async_step_options(options_input=user_input)
 
     async def async_step_options(
         self, options_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the options step."""
         if options_input is None:
             return self.async_show_form(
@@ -278,7 +282,7 @@ class OptionsFlow(OptionsFlowWithReload):
 
     async def async_step_expert(
         self, expert_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the expert step."""
         if expert_input is None:
             return self.async_show_form(

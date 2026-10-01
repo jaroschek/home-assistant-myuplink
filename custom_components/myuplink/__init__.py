@@ -7,17 +7,19 @@ from http import HTTPStatus
 
 import aiohttp
 import jwt
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import aiohttp_client, config_entry_oauth2_flow
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 
 from .api import AsyncConfigEntryAuth, MyUplink
 from .const import DOMAIN, PLATFORMS, SCOPES
-from .coordinator import MyUplinkCoordinator
+from .coordinator import MyUplinkConfigEntry, MyUplinkCoordinator
 from .services import async_setup_services
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: MyUplinkConfigEntry) -> bool:
     """Set up myUplink from a config entry."""
     implementation = (
         await config_entry_oauth2_flow.async_get_config_entry_implementation(
@@ -52,7 +54,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not set(SCOPES).issubset(entry.data["token"]["scope"].split()):
         raise ConfigEntryAuthFailed
 
-    api = MyUplink(auth, f"{hass.config.language}-{hass.config.country}", entry)
+    language = hass.config.language
+    if hass.config.country:
+        language = f"{language}-{hass.config.country}"
+    api = MyUplink(auth, language, entry)
 
     coordinator = MyUplinkCoordinator(hass, entry, api)
     await coordinator.async_config_entry_first_refresh()
@@ -64,12 +69,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: MyUplinkConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
-async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_migrate_entry(hass: HomeAssistant, entry: MyUplinkConfigEntry) -> bool:
     """Migrate old entry."""
     _LOGGER.debug("Migrating from version %s.%s", entry.version, entry.minor_version)
 
@@ -89,7 +94,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_config_entry_device(
-    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+    hass: HomeAssistant, config_entry: MyUplinkConfigEntry, device_entry: DeviceEntry
 ) -> bool:
     """Allow manual removal after a device disappears from the account."""
     coordinator = getattr(config_entry, "runtime_data", None)
