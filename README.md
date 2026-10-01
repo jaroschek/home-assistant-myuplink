@@ -59,7 +59,7 @@ Open the integration entry's **Configure** menu to change options. Saving change
 | Keep disconnected device readings available | Off | Keep cached device readings available when the device disconnects; cloud update failures still make entities unavailable |
 | Expert mode | Off | Show the advanced fields below |
 
-Expert fields use JSON. An empty field preserves the existing setting; invalid JSON restores the client's default.
+Expert fields use JSON. An empty field preserves the existing setting; invalid JSON or an unsupported structure restores the client's default. Parameter lists accept integers or integer text, platform overrides accept the five parameter platforms, and writable overrides require JSON booleans.
 
 | Expert option | Default | Example and purpose |
 | --- | --- | --- |
@@ -73,7 +73,7 @@ Water-heater controls require all five listed points. A whitelist that omits the
 
 ## Data updates and availability
 
-The default cloud polling interval is five minutes. A refresh reads the account's systems, each device's points, and the optional endpoints you enable. Without a whitelist, additional parameter IDs require another point request per device.
+The default cloud polling interval is five minutes. Each refresh reads the account's systems, each device's points, and enabled mode, zone, and notification endpoints. Subscription permissions are cached for 15 minutes and firmware metadata for one hour. These caches are cleared when the account reloads; failed lookups are retried without caching the failure. Without a whitelist, additional parameter IDs require another point request per device.
 
 The API's quota headers determine backoff. The client paces requests near the reported limit and defers an exhausted window. HTTP 429 responses use **Retry-After** seconds or an HTTP date, then **RateLimit-Reset**, then a 60-second fallback. Home Assistant schedules a retry after that delay. Token and HTTP requests have 30-second timeouts; intentional pacing is outside those timeouts.
 
@@ -201,14 +201,16 @@ Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer:
 
 ~~~sh
 script/setup
-uv run --no-sync pytest tests --cov --cov-report=term-missing
+uv run --no-sync pytest tests --cov --cov-report=term-missing --cov-report=json
+uv run --no-sync python3 script/check_coverage.py
+uv run --no-sync mypy
 uv run --no-sync prek run --all-files
 uv run --no-sync python3 script/sync_translations.py --check
 ~~~
 
 Setup creates the project's **.venv** and installs Git hooks. If your IDE sets **UV_PROJECT_ENVIRONMENT** to a shared environment, set it to **.venv** for these commands.
 
-CI checks formatting, lint, English translation synchronization, and tests, including 100% config-flow coverage. The Silver target is above 95% coverage of every integration module; the checklist keeps this rule pending until measured coverage meets it.
+CI checks formatting, lint, English translation synchronization, strict mypy typing, and tests. Every integration module must exceed 95% statement and branch coverage, and config flows require 100%. Network sockets are blocked during tests; local Unix sockets remain enabled for asyncio.
 
 After editing strings.json, run **python3 script/sync_translations.py** before tests. The script preserves already-resolved Home Assistant common strings and regenerates integration-owned English values. New common references need their resolved English value in translations/en.json. Keep the other language files updated alongside changed labels.
 

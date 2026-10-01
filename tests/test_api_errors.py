@@ -209,8 +209,11 @@ async def test_subscription_outage_logged_once(
     """Keep known permissions during repeated failures of the optional endpoint."""
     response.json.return_value = {"subscriptions": [{"type": "manage"}]}
     error = ClientResponseError(MagicMock(), (), status=500)
-    with patch.object(
-        api.auth, "request", new=AsyncMock(side_effect=[response, error, error])
+    with (
+        patch("custom_components.myuplink.api.monotonic", side_effect=[0, 901, 902]),
+        patch.object(
+            api.auth, "request", new=AsyncMock(side_effect=[response, error, error])
+        ),
     ):
         assert await api.get_premium_manage(system)
         assert await api.get_premium_manage(system)
@@ -251,4 +254,77 @@ async def test_unconfirmed_redirect(api: MyUplink, response: MagicMock) -> None:
         pytest.raises(HomeAssistantError) as error,
     ):
         await api.patch_parameter("device-1", "123", 20)
+    assert error.value.translation_key == "write_rejected"
+
+
+async def test_headers_and_timeout(
+    auth: AsyncConfigEntryAuth, response: MagicMock
+) -> None:
+    """Preserve caller headers and enforce the HTTP timeout alongside OAuth."""
+    response.headers = {
+        "RateLimit-Limit": "25",
+        "RateLimit-Remaining": "5",
+        "RateLimit-Reset": "60",
+    }
+    assert (
+        await auth.request("get", "systems/me", headers={"Accept-Language": "de-DE"})
+        is response
+    )
+    request = auth._websession.request.call_args
+    assert request.args == ("get", "https://api.myuplink.com/v2/systems/me")
+    assert request.kwargs["headers"] == {
+        "Accept-Language": "de-DE",
+        "authorization": "Bearer synthetic-token",
+    }
+    assert request.kwargs["timeout"].total == 30
+    assert auth.rate_limit_limit == 25
+    assert auth.rate_limit_remaining == 5
+    assert 59 <= (auth.rate_limit_reset_at - datetime.now(UTC)).total_seconds() <= 60
+
+
+@pytest.mark.parametrize(
+    ("remaining", "reset_offset", "elapsed", "sleep_expected"),
+    [
+        pytest.param(5, 60, 0, True, id="pace-low-window"),
+        pytest.param(5, 60, 3, False, id="already-paced"),
+        pytest.param(0, -1, 3, False, id="expired-window"),
+    ],
+)
+async def test_throttle_pacing(
+    auth: AsyncConfigEntryAuth,
+    remaining: int,
+    reset_offset: int,
+    elapsed: int,
+    sleep_expected: bool,
+) -> None:
+    """Pace only requests near the limit and permit expired windows to resume."""
+    auth.rate_limit_remaining = remaining
+    auth.rate_limit_reset_at = datetime.now(UTC) + timedelta(seconds=reset_offset)
+    throttle = Throttle(auth)
+    throttle._last_request_time = datetime.now(UTC) - timedelta(seconds=elapsed)
+    with patch("custom_components.myuplink.api.asyncio.sleep") as sleep:
+        async with throttle:
+            pass
+    assert sleep.called is sleep_expected
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param(None, id="null-body"),
+        pytest.param([], id="array-body"),
+        pytest.param({"payload": None}, id="null-payload"),
+        pytest.param({"payload": {}}, id="missing-confirmation"),
+    ],
+)
+async def test_malformed_mode_confirmation(
+    api: MyUplink, response: MagicMock, data: object
+) -> None:
+    """An unexpected JSON structure is reported as a failed action."""
+    response.json.return_value = data
+    with (
+        patch.object(api.auth, "request", return_value=response),
+        pytest.raises(HomeAssistantError) as error,
+    ):
+        await api.put_smart_home_mode("system-1", "Away")
     assert error.value.translation_key == "write_rejected"

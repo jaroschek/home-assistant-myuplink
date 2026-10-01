@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.climate import HVACMode
+from homeassistant.const import UnitOfTemperature
 
 from custom_components.myuplink.api import Device, Zone
 from custom_components.myuplink.climate import MyUplinkZoneClimateEntity
@@ -108,3 +109,13 @@ async def test_hvac_action(
         await entity.async_set_hvac_mode(HVACMode.COOL)
     write.assert_awaited_once_with(device.id, "1", "mode", "cool")
     assert entity.hvac_mode == HVACMode.COOL
+
+
+def test_fahrenheit_optional_bounds(
+    coordinator: MyUplinkCoordinator, device: Device, zone: Zone
+) -> None:
+    """A zone can omit bounds and use Fahrenheit without losing the temperature."""
+    zone.raw_data.update(isCelsius=False, setpointRangeMin=None, setpointRangeMax=None)
+    entity = MyUplinkZoneClimateEntity(coordinator, device, zone)
+    assert entity.temperature_unit == UnitOfTemperature.FAHRENHEIT
+    assert entity.current_temperature == 20

@@ -7,9 +7,12 @@ import json
 import logging
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
+from functools import lru_cache
 from http import HTTPStatus
 from math import ceil
-from typing import Any
+from time import monotonic
+from types import TracebackType
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from aiohttp import (
     ClientError,
@@ -18,7 +21,6 @@ from aiohttp import (
     ClientSession,
     ClientTimeout,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
     UnitOfElectricCurrent,
@@ -46,12 +48,31 @@ from .const import (
     CONF_PLATFORM_OVERRIDE,
     CONF_WRITABLE_OVERRIDE,
     CONF_WRITABLE_WITHOUT_SUBSCRIPTION,
-    DEFAULT_PLATFORM_OVERRIDE,
-    DEFAULT_WRITABLE_OVERRIDE,
     DOMAIN,
 )
+from .models import (
+    DeviceData,
+    EnumValue,
+    FirmwareData,
+    NotificationData,
+    NotificationsResponse,
+    ParameterData,
+    SmartHomeModeResponse,
+    SubscriptionData,
+    SubscriptionsResponse,
+    SystemData,
+    SystemsResponse,
+    WriteValue,
+    ZoneData,
+)
+from .options import parameter_ids, platform_overrides, writable_overrides
+
+if TYPE_CHECKING:
+    from .coordinator import MyUplinkConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
+SUBSCRIPTION_CACHE_SECONDS = 15 * 60
+FIRMWARE_CACHE_SECONDS = 60 * 60
 
 
 class MyUplinkRateLimitError(Exception):
@@ -83,7 +104,7 @@ class AsyncConfigEntryAuth:
         async with asyncio.timeout(30):
             await self._oauth_session.async_ensure_token_valid()
 
-        return self._oauth_session.token["access_token"]
+        return cast(str, self._oauth_session.token["access_token"])
 
     def _update_rate_limit_headers(self, response: ClientResponse) -> None:
         """Extract and update rate limit headers from response.
@@ -122,7 +143,7 @@ class AsyncConfigEntryAuth:
             _LOGGER.debug("Could not parse %s header value: %r", name, value)
             return None
 
-    async def request(self, method, path, **kwargs) -> ClientResponse:
+    async def request(self, method: str, path: str, **kwargs: Any) -> ClientResponse:
         """Make an authorized request with rate limit window awareness."""
         headers = kwargs.pop("headers", None)
 
@@ -179,7 +200,7 @@ class AsyncConfigEntryAuth:
 class Subscription:
     """Class that represents the subscription in the myUplink API."""
 
-    def __init__(self, raw_data: dict) -> None:
+    def __init__(self, raw_data: SubscriptionData) -> None:
         """Initialize a subscription object."""
         self.raw_data = raw_data
 
@@ -197,7 +218,7 @@ class Subscription:
 class Notification:
     """Class that represents the notificationobject in the myUplink API."""
 
-    def __init__(self, raw_data: dict) -> None:
+    def __init__(self, raw_data: NotificationData) -> None:
         """Initialize a notification object."""
         self.raw_data = raw_data
 
@@ -250,7 +271,7 @@ class Notification:
 class FirmwareInfo:
     """Class that represents the firmware info object in the myUplink API."""
 
-    def __init__(self, raw_data: dict) -> None:
+    def __init__(self, raw_data: FirmwareData) -> None:
         """Initialize a firmware object."""
         self.raw_data = raw_data
 
@@ -267,29 +288,26 @@ class FirmwareInfo:
     @property
     def current_version(self) -> str | None:
         """Return the current firmware version of the device."""
-        if self.raw_data.get("currentFwVersion", "").strip() == "":
-            return None
-        return self.raw_data["currentFwVersion"].strip()
+        version = self.raw_data.get("currentFwVersion")
+        return version.strip() or None if version is not None else None
 
     @property
     def pending_version(self) -> str | None:
         """Return the pending firmware version of the device."""
-        if self.raw_data.get("pendingFwVersion", "").strip() == "":
-            return None
-        return self.raw_data["pendingFwVersion"].strip()
+        version = self.raw_data.get("pendingFwVersion")
+        return version.strip() or None if version is not None else None
 
     @property
     def desired_version(self) -> str | None:
         """Return the desired firmware version of the device."""
-        if self.raw_data.get("desiredFwVersion", "").strip() == "":
-            return None
-        return self.raw_data["desiredFwVersion"].strip()
+        version = self.raw_data.get("desiredFwVersion")
+        return version.strip() or None if version is not None else None
 
 
 class Parameter:
     """Class that represents a parameter object in the myUplink API."""
 
-    def __init__(self, raw_data: dict, device: Device) -> None:
+    def __init__(self, raw_data: ParameterData, device: Device) -> None:
         """Initialize a parameter object."""
         self.raw_data = raw_data
         self.device = device
@@ -353,22 +371,22 @@ class Parameter:
         return self.raw_data["smartHomeCategories"]
 
     @property
-    def min_value(self) -> int:
+    def min_value(self) -> int | None:
         """Return the min value of the parameter."""
         return self.raw_data["minValue"]
 
     @property
-    def max_value(self) -> int:
+    def max_value(self) -> int | None:
         """Return the max value of the parameter."""
         return self.raw_data["maxValue"]
 
     @property
-    def step_value(self) -> int:
+    def step_value(self) -> int | None:
         """Return the step value of the parameter."""
         return self.raw_data.get("stepValue", 1)
 
     @property
-    def enum_values(self) -> list[dict]:
+    def enum_values(self) -> list[EnumValue]:
         """Return the enum values of the parameter."""
         return self.raw_data["enumValues"]
 
@@ -385,7 +403,7 @@ class Parameter:
         """Return the zone id of the parameter."""
         return self.raw_data["zoneId"]
 
-    async def update_parameter(self, value) -> None:
+    async def update_parameter(self, value: WriteValue) -> None:
         """Set parameter value if writable."""
         if not self.is_writable:
             raise ServiceValidationError(
@@ -425,6 +443,7 @@ class Parameter:
         return Platform.SENSOR
 
     @staticmethod
+    @lru_cache(maxsize=128)
     def get_unit(parameter_unit: str) -> str:
         """Try to get the correct home assistant unit."""
         aliases = {
@@ -465,7 +484,7 @@ class Parameter:
 class Zone:
     """Class that represents a zone object in the myUplink API."""
 
-    def __init__(self, raw_data: dict, device: Device) -> None:
+    def __init__(self, raw_data: ZoneData, device: Device) -> None:
         """Initialize a zone object."""
         self.raw_data = raw_data
         self.device = device
@@ -498,56 +517,38 @@ class Zone:
     @property
     def temperature(self) -> float | None:
         """Return the current temperature of the zone."""
-        return (
-            float(self.raw_data.get("temperature"))
-            if self.raw_data.get("temperature") is not None
-            else None
-        )
+        value = self.raw_data.get("temperature")
+        return float(value) if value is not None else None
 
     @property
     def setpoint(self) -> float | None:
         """Return the target temperature of the zone."""
-        return (
-            float(self.raw_data.get("setpoint"))
-            if self.raw_data.get("setpoint") is not None
-            else None
-        )
+        value = self.raw_data.get("setpoint")
+        return float(value) if value is not None else None
 
     @property
     def setpoint_heating(self) -> float | None:
         """Return the heating setpoint value of the zone."""
-        return (
-            float(self.raw_data.get("setpointHeat"))
-            if self.raw_data.get("setpointHeat") is not None
-            else None
-        )
+        value = self.raw_data.get("setpointHeat")
+        return float(value) if value is not None else None
 
     @property
     def setpoint_cooling(self) -> float | None:
         """Return the cooling setpoint value of the zone."""
-        return (
-            float(self.raw_data.get("setpointCool"))
-            if self.raw_data.get("setpointCool") is not None
-            else None
-        )
+        value = self.raw_data.get("setpointCool")
+        return float(value) if value is not None else None
 
     @property
     def setpoint_range_min(self) -> int | None:
         """Return the minimum temperature range of the zone."""
-        return (
-            int(self.raw_data.get("setpointRangeMin"))
-            if self.raw_data.get("setpointRangeMin") is not None
-            else None
-        )
+        value = self.raw_data.get("setpointRangeMin")
+        return int(value) if value is not None else None
 
     @property
     def setpoint_range_max(self) -> int | None:
         """Return the maximum temperature range of the zone."""
-        return (
-            int(self.raw_data.get("setpointRangeMax"))
-            if self.raw_data.get("setpointRangeMax") is not None
-            else None
-        )
+        value = self.raw_data.get("setpointRangeMax")
+        return int(value) if value is not None else None
 
     @property
     def is_celsius(self) -> bool:
@@ -561,22 +562,16 @@ class Zone:
     @property
     def indoor_co2(self) -> int | None:
         """Return the indoor co2 level of the zone."""
-        return (
-            int(self.raw_data.get("indoorCo2"))
-            if self.raw_data.get("indoorCo2") is not None
-            else None
-        )
+        value = self.raw_data.get("indoorCo2")
+        return int(value) if value is not None else None
 
     @property
     def indoor_humidity(self) -> float | None:
         """Return the indoor humidity of the zone."""
-        return (
-            float(self.raw_data.get("indoorHumidity"))
-            if self.raw_data.get("indoorHumidity") is not None
-            else None
-        )
+        value = self.raw_data.get("indoorHumidity")
+        return float(value) if value is not None else None
 
-    async def update_zone_property(self, property_name: str, value) -> None:
+    async def update_zone_property(self, property_name: str, value: WriteValue) -> None:
         """Patch zone if writable."""
         if self.is_command_only:
             raise ServiceValidationError(
@@ -585,28 +580,20 @@ class Zone:
         await self.device.system.api.patch_zone_property(
             self.device.id, str(self.id), property_name, value
         )
-        self.raw_data[property_name] = value
+        cast(dict[str, WriteValue], self.raw_data)[property_name] = value
 
 
 class Device:
     """Class that represents a device object in the myUplink API."""
 
-    # Firmware info
-    firmware_info: FirmwareInfo
-
-    # List of collected notifications
-    notifications: list[Notification] = []
-
-    # List of collected parameters
-    parameters: list[Parameter] = []
-
-    # List of collected zones
-    zones: list[Zone] = []
-
-    def __init__(self, raw_data: dict, system: System) -> None:
+    def __init__(self, raw_data: DeviceData, system: System) -> None:
         """Initialize a device object."""
         self.raw_data = raw_data
         self.system = system
+        self.firmware_info = FirmwareInfo({"deviceId": self.id, "firmwareId": 0})
+        self.notifications: list[Notification] = []
+        self.parameters: list[Parameter] = []
+        self.zones: list[Zone] = []
 
     @property
     def id(self) -> str:
@@ -634,14 +621,14 @@ class Device:
     def current_firmware_version(self) -> str:
         """Return the current firmware version of the device."""
         if "firmware" in self.raw_data:
-            return self.raw_data["firmware"]["currentFwVersion"]
+            return self.raw_data["firmware"].get("currentFwVersion") or "N/A"
         return self.raw_data.get("currentFwVersion", "N/A")
 
     @property
     def desired_firmware_version(self) -> str:
         """Return the desired firmware version of the device."""
         if "firmware" in self.raw_data:
-            return self.raw_data["firmware"]["desiredFwVersion"]
+            return self.raw_data["firmware"].get("desiredFwVersion") or "?"
         return "?"
 
     async def async_fetch_data(self) -> None:
@@ -656,18 +643,13 @@ class Device:
 class System:
     """Class that represents a system object in the myUplink API."""
 
-    # List of collected devices
-    devices: list[Device] = []
-
-    # Smart home mode of the system
-    smart_home_mode: str = "Default"
-
-    premium_manage: bool = True
-
-    def __init__(self, raw_data: dict, api: MyUplink) -> None:
+    def __init__(self, raw_data: SystemData, api: MyUplink) -> None:
         """Initialize a system object."""
         self.raw_data = raw_data
         self.api = api
+        self.devices: list[Device] = []
+        self.smart_home_mode = "Default"
+        self.premium_manage = True
 
     @property
     def id(self) -> str:
@@ -714,7 +696,7 @@ class System:
 
             await device.async_fetch_data()
 
-    async def update_smart_home_mode(self, value) -> None:
+    async def update_smart_home_mode(self, value: str) -> None:
         """Put smart home mode for system."""
         await self.api.put_smart_home_mode(self.id, str(value))
 
@@ -738,7 +720,7 @@ class Throttle:
         self._auth = auth
         self._last_request_time = datetime.now(UTC)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Self:
         """Enter async throttle - apply delay before making request."""
         now = datetime.now(UTC)
 
@@ -769,7 +751,12 @@ class Throttle:
 
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         """Exit async throttle - record request time."""
         self._last_request_time = datetime.now(UTC)
 
@@ -777,11 +764,8 @@ class Throttle:
 class MyUplink:
     """Class to communicate with the myUplink API."""
 
-    # List of collected systems
-    systems: list[System] = []
-
     def __init__(
-        self, auth: AsyncConfigEntryAuth, language_code: str, entry: ConfigEntry
+        self, auth: AsyncConfigEntryAuth, language_code: str, entry: MyUplinkConfigEntry
     ) -> None:
         """Initialize the API and store the auth so we can make requests."""
         self.auth = auth
@@ -790,6 +774,9 @@ class MyUplink:
         self.throttle = Throttle(auth)
         self._subscription_failures: set[str] = set()
         self._premium_manage: dict[str, bool] = {}
+        self._subscription_cache: dict[str, tuple[float, bool]] = {}
+        self._firmware_cache: dict[str, tuple[float, FirmwareInfo]] = {}
+        self.systems: list[System] = []
 
         self.header = {"Accept-Language": language_code}
 
@@ -797,39 +784,18 @@ class MyUplink:
             CONF_WRITABLE_WITHOUT_SUBSCRIPTION, True
         )
 
-        try:
-            self.parameter_whitelist = json.loads(
-                entry.options.get(CONF_PARAMETER_WHITELIST, "[]")
-            )
-        except json.decoder.JSONDecodeError:
-            self.parameter_whitelist = []
-
-        try:
-            self.additional_parameter = json.loads(
-                entry.options.get(CONF_ADDITIONAL_PARAMETER, "[]")
-            )
-        except json.decoder.JSONDecodeError:
-            self.additional_parameter = []
-
-        try:
-            self.platform_override = json.loads(
-                entry.options.get(
-                    CONF_PLATFORM_OVERRIDE, json.dumps(DEFAULT_PLATFORM_OVERRIDE)
-                ),
-                object_hook=self.parse_int_keys,
-            )
-        except json.decoder.JSONDecodeError:
-            self.platform_override = DEFAULT_PLATFORM_OVERRIDE
-
-        try:
-            self.writable_override = json.loads(
-                entry.options.get(
-                    CONF_WRITABLE_OVERRIDE, json.dumps(DEFAULT_WRITABLE_OVERRIDE)
-                ),
-                object_hook=self.parse_int_keys,
-            )
-        except json.decoder.JSONDecodeError:
-            self.writable_override = DEFAULT_WRITABLE_OVERRIDE
+        self.parameter_whitelist = parameter_ids(
+            entry.options.get(CONF_PARAMETER_WHITELIST)
+        )
+        self.additional_parameter = parameter_ids(
+            entry.options.get(CONF_ADDITIONAL_PARAMETER)
+        )
+        self.platform_override = platform_overrides(
+            entry.options.get(CONF_PLATFORM_OVERRIDE)
+        )
+        self.writable_override = writable_overrides(
+            entry.options.get(CONF_WRITABLE_OVERRIDE)
+        )
 
     async def get_systems(self) -> list[System]:
         """Return all systems."""
@@ -837,15 +803,15 @@ class MyUplink:
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", "systems/me?page=1&itemsPerPage=99")
         resp.raise_for_status()
-        data = await resp.json()
-
-        self.systems = [System(system_data, self) for system_data in data["systems"]]
+        data = cast(SystemsResponse, await resp.json())
+        systems = [System(system_data, self) for system_data in data["systems"]]
 
         _LOGGER.debug("Update systems")
-        for system in self.systems:
+        for system in systems:
             await system.async_fetch_data()
 
-        return self.systems
+        self.systems = systems
+        return systems
 
     async def get_notifications(self, system: System) -> list[Notification]:
         """Return all active notifications by system id."""
@@ -857,12 +823,15 @@ class MyUplink:
                 headers=self.header,
             )
         resp.raise_for_status()
-        data = await resp.json()
-
+        data = cast(NotificationsResponse, await resp.json())
         return [Notification(notification) for notification in data["notifications"]]
 
     async def get_premium_manage(self, system: System) -> bool:
         """Check for a premium subscription to allow writing values."""
+        now = monotonic()
+        if cached := self._subscription_cache.get(system.id):
+            if now - cached[0] < SUBSCRIPTION_CACHE_SECONDS:
+                return cached[1]
         _LOGGER.debug("Fetch subscriptions for system %s", system.id)
 
         try:
@@ -874,11 +843,12 @@ class MyUplink:
             resp.raise_for_status()
 
             if resp.status == 200:
-                data = await resp.json()
+                data = cast(SubscriptionsResponse, await resp.json())
                 for subscription in data.get("subscriptions", []):
                     if Subscription(subscription).type == "manage":
                         self._subscription_failures.discard(system.id)
                         self._premium_manage[system.id] = True
+                        self._subscription_cache[system.id] = (now, True)
                         return True
 
         except ClientResponseError as err:
@@ -894,6 +864,7 @@ class MyUplink:
 
         self._subscription_failures.discard(system.id)
         self._premium_manage[system.id] = False
+        self._subscription_cache[system.id] = (now, False)
         return False
 
     async def get_smart_home_mode(self, system: System) -> str:
@@ -904,11 +875,10 @@ class MyUplink:
                 "get", f"systems/{system.id}/smart-home-mode"
             )
         resp.raise_for_status()
-        data = await resp.json()
-
+        data = cast(SmartHomeModeResponse, await resp.json())
         return data["smartHomeMode"]
 
-    async def put_smart_home_mode(self, system_id, value: str) -> None:
+    async def put_smart_home_mode(self, system_id: str, value: str) -> None:
         """Set the smart home mode for a system."""
         _LOGGER.debug(
             "Put smart home mode for system %s with value %s",
@@ -923,38 +893,45 @@ class MyUplink:
         )
         if resp.status == 200:
             try:
-                data = await resp.json()
+                data: object = await resp.json()
             except (ClientError, TimeoutError, ValueError) as err:
                 raise HomeAssistantError(
                     translation_domain=DOMAIN, translation_key="write_rejected"
                 ) from err
-            if data.get("payload", {}).get("state") != "ok":
+            payload = data.get("payload") if isinstance(data, dict) else None
+            if not isinstance(payload, dict) or payload.get("state") != "ok":
                 raise HomeAssistantError(
                     translation_domain=DOMAIN, translation_key="write_rejected"
                 )
 
-    async def get_device(self, device_id: str) -> Device:
+    async def get_device(self, device_id: str, system: System) -> Device:
         """Return a device by id."""
         _LOGGER.debug("Fetch device with id %s", device_id)
         async with self.lock, self.throttle:
             resp = await self.auth.request("get", f"devices/{device_id}")
         resp.raise_for_status()
-        return Device(await resp.json(), self)
+        return Device(cast(DeviceData, await resp.json()), system)
 
     async def get_firmware_info(self, device: Device) -> FirmwareInfo:
         """Return firmware info for a device."""
+        now = monotonic()
+        if cached := self._firmware_cache.get(device.id):
+            if now - cached[0] < FIRMWARE_CACHE_SECONDS:
+                return cached[1]
         _LOGGER.debug("Fetch firmware info for device %s", device.id)
         async with self.lock, self.throttle:
             resp = await self.auth.request(
                 "get", f"devices/{device.id}/firmware-info", headers=self.header
             )
         resp.raise_for_status()
-        return FirmwareInfo(await resp.json())
+        info = FirmwareInfo(cast(FirmwareData, await resp.json()))
+        self._firmware_cache[device.id] = (now, info)
+        return info
 
     async def get_parameters(self, device: Device) -> list[Parameter]:
         """Return parameters info for a device."""
         _LOGGER.debug("Fetch parameters for device %s", device.id)
-        parameter_filters = []
+        parameter_filters: list[list[int]] = []
 
         if len(self.parameter_whitelist) == 0:
             parameter_filters.append([])
@@ -965,7 +942,7 @@ class MyUplink:
                 [*self.parameter_whitelist, *self.additional_parameter]
             )
 
-        unique_parameters = {}
+        unique_parameters: dict[int, Parameter] = {}
 
         for parameter_filter in parameter_filters:
             query_parameters = {}
@@ -982,7 +959,7 @@ class MyUplink:
                     params=query_parameters,
                 )
             resp.raise_for_status()
-            parameters_data = await resp.json()
+            parameters_data = cast(list[ParameterData], await resp.json())
 
             for parameter_data in parameters_data:
                 parameter = Parameter(parameter_data, device)
@@ -998,9 +975,11 @@ class MyUplink:
                 "get", f"devices/{device.id}/smart-home-zones", headers=self.header
             )
         resp.raise_for_status()
-        return [Zone(zone, device) for zone in await resp.json()]
+        return [Zone(zone, device) for zone in cast(list[ZoneData], await resp.json())]
 
-    async def patch_parameter(self, device_id, parameter_id: str, value: Any) -> None:
+    async def patch_parameter(
+        self, device_id: str, parameter_id: str, value: WriteValue
+    ) -> None:
         """Update the value of a parameter for a device."""
         _LOGGER.debug(
             "Patch parameter %s for device %s with value %s",
@@ -1016,7 +995,7 @@ class MyUplink:
         )
 
     async def patch_zone_property(
-        self, device_id, zone_id: str, property_name: str, value: str
+        self, device_id: str, zone_id: str, property_name: str, value: WriteValue
     ) -> None:
         """Update the value of a zone property for a device."""
         _LOGGER.debug(
@@ -1065,17 +1044,3 @@ class MyUplink:
                 translation_domain=DOMAIN, translation_key="write_rejected"
             )
         return response
-
-    def parse_int_keys(self, dct):
-        """Parse object keys into integers."""
-        rval = {}
-        for key, val in dct.items():
-            try:
-                # Convert the key to an integer
-                int_key = int(key)
-                # Assign value to the integer key in the new dict
-                rval[int_key] = val
-            except ValueError:
-                # Couldn't convert key to an integer; Use original key
-                rval[key] = val
-        return rval

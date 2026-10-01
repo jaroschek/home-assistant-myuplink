@@ -20,7 +20,9 @@ _LOGGER = logging.getLogger(__name__)
 class MyUplinkCoordinator(DataUpdateCoordinator[list[System]]):
     """Fetch account data with Home Assistant's retry and reauthentication support."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, api: MyUplink) -> None:
+    def __init__(
+        self, hass: HomeAssistant, entry: MyUplinkConfigEntry, api: MyUplink
+    ) -> None:
         """Bind the client and polling interval to this account."""
         super().__init__(
             hass,
@@ -84,3 +86,6 @@ class MyUplinkCoordinator(DataUpdateCoordinator[list[System]]):
             raise UpdateFailed("Unable to communicate with myUplink") from err
         self._index_data(systems)
         return systems
+
+
+type MyUplinkConfigEntry = ConfigEntry[MyUplinkCoordinator]

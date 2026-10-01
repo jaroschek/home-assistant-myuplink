@@ -8,13 +8,13 @@ from homeassistant.components.water_heater import (
     WaterHeaterEntity,
     WaterHeaterEntityFeature,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter
 from .const import WATER_HEATERS
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkDeviceEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
@@ -22,7 +22,9 @@ REQUIRED_PARAMETERS = {406, 500, 516, 527, 528}
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 
@@ -68,14 +70,11 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
         for parameter in self._device.parameters:
             parameter_map[parameter.id] = parameter
         # API bounds are raw values; readings are already scaled.
-        if parameter_map[527].min_value is not None:
-            self._attr_min_temp = (
-                parameter_map[527].min_value * parameter_map[527].scale_value
-            )
-        if parameter_map[527].max_value is not None:
-            self._attr_max_temp = (
-                parameter_map[527].max_value * parameter_map[527].scale_value
-            )
+        target = parameter_map[527]
+        if (minimum := target.min_value) is not None:
+            self._attr_min_temp = minimum * target.scale_value
+        if (maximum := target.max_value) is not None:
+            self._attr_max_temp = maximum * target.scale_value
         self._attr_current_temperature = parameter_map[528].value
         self._attr_target_temperature = parameter_map[527].value
         self._attr_target_temperature_high = self._attr_target_temperature
