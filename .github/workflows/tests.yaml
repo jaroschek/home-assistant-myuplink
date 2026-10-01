@@ -1,0 +1,22 @@
+name: Tests and code quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.14.5"
+          enable-cache: true
+      - run: script/setup
+      - run: uv run --no-sync prek run --all-files
+      - run: uv run --no-sync pytest tests --cov --cov-report=term-missing --cov-report=xml
+      - run: uv run --no-sync coverage report --include=custom_components/myuplink/config_flow.py --fail-under=100

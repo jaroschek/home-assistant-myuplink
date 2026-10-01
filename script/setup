@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+export UV_PROJECT_ENVIRONMENT="$PWD/.venv"
+uv sync --locked
+uv run --no-sync prek install
