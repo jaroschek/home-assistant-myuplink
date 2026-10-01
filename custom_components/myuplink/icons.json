@@ -1,0 +1,22 @@
+{
+  "entity": {
+    "sensor": {
+      "parameter_degree_minutes": {"default": "mdi:thermometer-lines"},
+      "parameter_percentage": {"default": "mdi:speedometer"},
+      "myuplink_notifications": {"default": "mdi:bell-alert"},
+      "myuplink_zone_mode": {
+        "default": "mdi:thermostat",
+        "state": {"heat": "mdi:fire", "cool": "mdi:snowflake", "off": "mdi:power"}
+      }
+    },
+    "number": {
+      "parameter_degree_minutes": {"default": "mdi:thermometer-lines"}
+    },
+    "select": {
+      "myuplink_smart_home_mode": {
+        "default": "mdi:home-thermometer",
+        "state": {"home": "mdi:home", "away": "mdi:home-export-outline", "vacation": "mdi:airplane"}
+      }
+    }
+  }
+}

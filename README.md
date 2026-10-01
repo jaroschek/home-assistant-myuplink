@@ -1,104 +1,216 @@
-# MyUplink integration for Home Assistant
+# myUplink integration for Home Assistant
 
 [![Version](https://img.shields.io/github/v/release/jaroschek/home-assistant-myuplink?label=version)](https://github.com/jaroschek/home-assistant-myuplink/releases/latest)
-[![Validate for HACS](https://github.com/jaroschek/home-assistant-myuplink/workflows/Validate%20for%20HACS/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml)
-[![Validate with hassfest](https://github.com/jaroschek/home-assistant-myuplink/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml)
+[![Tests](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/tests.yaml/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/tests.yaml)
+[![HACS](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hacs.yaml)
+[![hassfest](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/jaroschek/home-assistant-myuplink/actions/workflows/hassfest.yaml)
 
-Custom Home Assistant integration for devices and sensors in [myUplink](https://myuplink.com/) account.
+This custom integration reads and controls devices exposed by your [myUplink](https://myuplink.com/) account. It uses myUplink's cloud API and OAuth authorization. Available entities depend on the device manufacturer's API data.
 
-This integration should work with most smart devices from brands listed [here](https://myuplink.com/legal/works-with/en).
+![Example device view](example-device-view.png)
 
-![example view](example-device-view.png)
+## Installation and account setup
 
-## Install
-### HACS
-The easiest way to install this component is by clicking the badge below, which adds this repo as a custom repo in your HASS instance.
+Install through HACS using this custom repository:
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&owner=jaroschek&repository=home-assistant-myuplink)
+[![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&owner=jaroschek&repository=home-assistant-myuplink)
 
-You can also add the integration manually by copying `custom_components/myuplink` into `<HASS config directory>/custom_components`
-### Configuration
+Alternatively, copy the **custom_components/myuplink** directory into your Home Assistant configuration's **custom_components** directory. Restart Home Assistant after installation.
 
-To use this integration, you need to make an application at [dev.myuplink.com](https://dev.myuplink.com/). 
+1. Register an application at [dev.myuplink.com](https://dev.myuplink.com/).
+2. Set its callback URL to **https://my.home-assistant.io/redirect/oauth**.
+3. In **Settings → Devices & services**, select **Add integration → myUplink**.
+4. Enter the application's **Client Identifier** and **Client Secret** when prompted. These identify your application; they are separate from your myUplink account login.
+5. Sign in to myUplink and authorize the application's requested access: **READSYSTEM**, **WRITESYSTEM**, and **offline_access**.
+6. Save the integration options.
 
-Remember to set a valid Callback Url. Make sure you use `https://my.home-assistant.io/redirect/oauth`, as HA currently uses that callback URL by default for the Oauth2 config flow.
+An internet connection and an account containing a device exposed by the API are required. Account access and subscriptions determine whether the API accepts writes. The client uses Home Assistant's HTTP session; no separate myUplink client package is installed.
 
-_Note: You cannot edit the Callback Url after the application has been created, even though the GUI makes you think so. Create a new one if you want to change it._
+## Supported devices and functions
 
-Start the myUplink integration setup and copy the Client Identifier and Client Secret from your myUplink-application into the OAuth text fields.
+General support follows the devices reported by your account's API. See the provider's [supported brands](https://myuplink.com/legal/works-with/en); individual model capabilities vary.
 
-Next, approve access via the OAuth pop-up and you should be good to go!
+| Function | Availability |
+| --- | --- |
+| Parameter sensors | Read-only numeric values and enumerated states reported by the device |
+| Binary sensors and switches | Boolean points, with switches created for writable points |
+| Number and select controls | Writable bounded or enumerated points |
+| Connection state | A diagnostic binary sensor that stays usable while the device is disconnected |
+| Notifications | A diagnostic count and notification attributes; disabled by default for newly created entities |
+| Firmware information | An update entity reporting installed and available versions; installation is performed through the provider |
+| Smart home mode | System modes such as Home, Away, and Vacation; enable in options |
+| Smart home zones | Climate controls and optional temperature, humidity, and CO2 sensors; enable in options |
+| Water heater | Products whose API name starts with **18760NE**, with points **406, 500, 516, 527, and 528** present |
+| Raw actions | Administrator actions for a parameter ID or a zone property |
 
-## Troubleshooting
+Smart home mode attaches to the device for a single-device system and to a system registry device for a multi-device system. Zone names come from your account. Parameter names and enum text come from the API's language response; fixed labels are translated in English, German, Danish, and Norwegian Bokmål.
 
-Reading this might help if you run into issues
+## Options
 
-### "Sorry, there was an error : invalid_request"
+Open the integration entry's **Configure** menu to change options. Saving changed options reloads the entry.
 
-This often means that the Callback URL provided is invalid or unreachable.
+| Option | Default | Effect |
+| --- | --- | --- |
+| Enable smart home mode | On | Fetch the system mode and create its select control |
+| Enable smart home zones | On | Fetch zone readings and supported thermostat controls |
+| Fetch firmware information | On | Fetch installed and available firmware versions |
+| Fetch notifications | On | Fetch active notifications; enable the notification entity manually if wanted |
+| Scan interval | 300 seconds | Poll every 5–600 seconds, in 5-second increments |
+| Keep disconnected device readings available | Off | Keep cached device readings available when the device disconnects; cloud update failures still make entities unavailable |
+| Expert mode | Off | Show the advanced fields below |
 
-Double-check that the Callback URL saved in the myUpLink application is correct.
+Expert fields use JSON. An empty field preserves the existing setting; invalid JSON restores the client's default.
 
-### "Sorry, there was an error : unauthorized_client"
+| Expert option | Default | Example and purpose |
+| --- | --- | --- |
+| Platform overrides | Built-in point corrections | **{"12345": "sensor"}** forces a point to a supported parameter platform |
+| Writable without subscription | On | Creates writable controls from API metadata even when a Manage subscription is not reported; the API still decides whether writes are permitted |
+| Writable overrides | Built-in point corrections | **{"12345": false}** treats a point as read-only |
+| Parameter whitelist | Empty | **[12345, 12346]** limits requested point IDs; an empty list requests all points |
+| Additional parameters | Empty | **[12347]** requests known point IDs omitted from the normal response |
 
-This means that the credentials used by the integration is invalid. This often occurs when the myuplink-application is deleted and recreated, without deleting the old credentials from Home Assistant.
+Water-heater controls require all five listed points. A whitelist that omits them prevents this entity from being created. Platform and writable overrides help with incorrect manufacturer metadata and do not grant permissions.
 
-You can delete the old credentials stored in Home Assistant by going to the Devices & Services page, clicking the three dots top right and selecting "Application Credentials". Delete the one originating from myuplink, and you'll be prompted for new credentials next time you set up the integration.
+## Data updates and availability
 
-### Some entities don't look right
+The default cloud polling interval is five minutes. A refresh reads the account's systems, each device's points, and the optional endpoints you enable. Without a whitelist, additional parameter IDs require another point request per device.
 
-This can happen when the device is integrated poorly with the myUpLink-API, or it's implemented in a way this integration cannot handle yet.
+The API's quota headers determine backoff. The client paces requests near the reported limit and defers an exhausted window. HTTP 429 responses use **Retry-After** seconds or an HTTP date, then **RateLimit-Reset**, then a 60-second fallback. Home Assistant schedules a retry after that delay. Token and HTTP requests have 30-second timeouts; intentional pacing is outside those timeouts.
 
-See the debugging section below to find some useful info about the offending data point.
+New devices, points, and zones appear after a successful refresh without reloading the account. Points are combined by parameter ID and retain their initial Home Assistant platform until reload, preventing duplicate entities when writable metadata changes. Existing unique IDs, entity IDs, and names customized in Home Assistant are preserved.
 
-## Debugging misbehaving entities
+Missing systems, devices, points, or zones make their existing entities unavailable until the data returns. Disconnected devices are unavailable unless cached availability is enabled. Repeated polling failures are logged once, followed by recovery. Expired or revoked authorization starts Home Assistant's reauthentication flow.
 
-If the your entities are malformed, it's often caused by the manufacturer's implementation of the myUpLink-API. The easiest way to check this is by getting the raw data points from the Swagger client.
+The optional subscription endpoint's HTTP 500 response retains known permissions and logs one warning per outage. Authentication failures from that endpoint still start reauthentication.
 
-1. Take note of the entity's name, and open [myUpLink's Swagger](https://api.myuplink.com/swagger/index.html).
-2. Click Authorize and paste your application credentials. Make sure to check the READSYSTEM box.
-3. Find your device ID by querying ​`/v2​/systems​/me`, and enter it when querying `/v2/devices/{deviceId}/points`.
-4. Find the relevant data points and post them in an issue.
+## Actions
 
-## Development
+The actions are registered when the integration loads and remain registered when accounts are unloaded. Select a device belonging to a loaded account. Calls from a signed-in user require administrator access; Home Assistant automations can call them.
 
-The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are tracked in `custom_components/myuplink/quality_scale.yaml`. This checklist is a self-assessment; the integration remains a custom integration.
+**myuplink.set_device_parameter_value** requires:
 
-Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer, then run:
+- **device_id**: the Home Assistant device registry ID, selected in the action editor.
+- **parameter_id**: the myUplink API point ID as text.
+- **value**: the API-accepted value as text.
 
-```sh
+~~~yaml
+action: myuplink.set_device_parameter_value
+data:
+  device_id: REPLACE_WITH_HOME_ASSISTANT_DEVICE_ID
+  parameter_id: "12345"
+  value: "20"
+~~~
+
+**myuplink.set_device_zone_property_value** requires:
+
+- **device_id**: the Home Assistant device registry ID.
+- **zone_id**: the myUplink zone ID as text.
+- **property_name**: an API-supported property, such as setpoint.
+- **value**: the API-accepted value as text.
+
+~~~yaml
+action: myuplink.set_device_zone_property_value
+data:
+  device_id: REPLACE_WITH_HOME_ASSISTANT_DEVICE_ID
+  zone_id: "1"
+  property_name: setpoint
+  value: "21"
+~~~
+
+Rejected writes, read-only points, disconnected accounts, rate limits, and network failures produce action errors. Failed writes do not update the displayed target. Prefer the relevant number, select, switch, climate, or water-heater action when the integration exposes a control for the setting.
+
+## Example use cases
+
+Use temperature and energy sensors in dashboards, track device connectivity, or change supported comfort settings through existing entity actions. Replace the example entity IDs with IDs from your own installation.
+
+This automation creates a notification when a heat pump has been disconnected for ten minutes:
+
+~~~yaml
+alias: Heat pump disconnected
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.heat_pump_connection_state
+    to: "off"
+    for: "00:10:00"
+actions:
+  - action: persistent_notification.create
+    data:
+      title: Heat pump disconnected
+      message: Check the heat pump's internet connection and myUplink status.
+~~~
+
+Set an exposed smart home mode through its select entity:
+
+~~~yaml
+action: select.select_option
+target:
+  entity_id: select.heat_pump_smart_home_mode
+data:
+  option: away
+~~~
+
+## Known limitations
+
+- Cloud connectivity, device firmware, account permissions, and manufacturer API support determine which data and controls are available. A device appearing in the provider's app does not guarantee every function is exposed through the API.
+- Manage permissions may depend on the account's subscription. The writable-without-subscription option changes Home Assistant entity creation and does not bypass API permissions.
+- Command-only zones expose a mode sensor; the integration does not provide thermostat controls for them. Climate controls use the API's shared setpoint in heat-cool mode and the heating/cooling setpoint in those respective modes.
+- Firmware entities report version availability and do not install updates.
+- Only the **18760NE** product prefix has the specialized water-heater mapping.
+- Degree-minutes retain their API unit and have no unsupported custom device class. The ambiguous **Ws** unit is retained without a power or energy classification until manufacturer semantics are confirmed. Recognized duration aliases are normalized, for example hours to h and days to d.
+- Notification entities are disabled by default when first created to limit recorded notification attributes. Existing enabled entities retain their setting. Disable notification fetching as well if you want to avoid those API calls.
+- The account list endpoints currently request the first page, up to 99 systems or active notifications. Exceptionally large accounts may need future pagination support.
+- Automated tests use synthetic API responses. Hardware compatibility and model-specific behavior are verified by maintainers and users.
+
+## Removal
+
+To remove an account, open **Settings → Devices & services → myUplink**, open the entry's menu, and choose **Delete**. Remove any automations that refer to its entities.
+
+Devices are not deleted automatically when temporarily absent from the cloud. After a device disappears, remove its registry entry from **Settings → Devices & services → Devices**. Devices still present in the account are protected from manual removal through this integration; unloaded accounts permit manual cleanup.
+
+To uninstall the custom integration, remove it through HACS or delete its **custom_components/myuplink** directory, then restart Home Assistant. Remove application credentials through **Settings → Devices & services → Application credentials** once no account uses them. Revoke the application's authorization in myUplink if you no longer need access.
+
+## Troubleshooting and diagnostics
+
+### OAuth invalid_request
+
+Check that the callback URL saved in the myUplink application exactly matches the callback used for setup.
+
+### OAuth unauthorized_client
+
+Check the application Client Identifier and Client Secret. If the application was replaced, update its credentials through Home Assistant's **Application credentials** menu and reconfigure the account.
+
+### Missing or read-only entities
+
+Check which points your manufacturer exposes, whether the device is connected, account permissions, and any whitelist or overrides. A writable control can still be rejected by the cloud. Firmware and zone entities also depend on their fetch options.
+
+### Unavailable entities or rate-limit errors
+
+Check the device's internet connection and Home Assistant's logs. Complete the reauthentication prompt when requested. For rate limits, increase the scan interval or disable optional endpoints and allow the reported retry window to expire.
+
+### Downloading diagnostics
+
+Open the integration entry's menu in **Settings → Devices & services** and download diagnostics. Diagnostics use cached metadata without API requests. Account credentials, entry identity, cloud system and device IDs, serial numbers, and system/device/zone names are redacted; notification text is omitted.
+
+For malformed points, inspect [myUplink's Swagger API](https://api.myuplink.com/swagger/index.html) with your application credentials and READSYSTEM access. The systems/me endpoint lists your devices; the devices/{deviceId}/points endpoint exposes their metadata. Include the relevant redacted point data and integration version when [reporting an issue](https://github.com/jaroschek/home-assistant-myuplink/issues).
+
+## Development and quality scale
+
+The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are recorded in **custom_components/myuplink/quality_scale.yaml**. This is a self-assessment; the project remains a custom integration.
+
+Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer:
+
+~~~sh
 script/setup
 uv run --no-sync pytest tests --cov --cov-report=term-missing
 uv run --no-sync prek run --all-files
-```
+uv run --no-sync python3 script/sync_translations.py --check
+~~~
 
-Setup creates the project's `.venv` and installs Git hooks. If your IDE sets `UV_PROJECT_ENVIRONMENT` to a shared environment, set it to `.venv` when running these commands so this project uses its own environment.
+Setup creates the project's **.venv** and installs Git hooks. If your IDE sets **UV_PROJECT_ENVIRONMENT** to a shared environment, set it to **.venv** for these commands.
 
-CI checks formatting, lint, and tests, including 100% coverage of the config flow. The Silver target is above 95% coverage of every integration module; the checklist records this rule as pending until measured coverage meets that target.
+CI checks formatting, lint, English translation synchronization, and tests, including 100% config-flow coverage. The Silver target is above 95% coverage of every integration module; the checklist keeps this rule pending until measured coverage meets it.
 
-### Actions and entity names in 1.9
-
-The `myuplink.set_device_parameter_value` and `myuplink.set_device_zone_property_value` actions are registered when the integration loads. They remain available when an account is unloaded, and report an unavailable-device error until the selected account is loaded. Raw parameter and zone writes require an administrator when called by a signed-in user; Home Assistant automations can continue to call them.
-
-Entity names are relative to their device. Existing unique IDs are retained, so existing entity IDs and names customized in Home Assistant remain associated with the same entities. Newly added entities include their device name in Home Assistant's generated name.
-
-### Runtime failures in 1.9
-
-Expired or revoked authorization starts Home Assistant's reauthentication flow. Network failures and API outages make coordinator-backed entities unavailable until polling succeeds again. Repeated polling failures are logged once, followed by recovery when data returns.
-
-HTTP 429 responses use `Retry-After` (seconds or an HTTP date), falling back to `RateLimit-Reset` and then 60 seconds. Home Assistant schedules the next poll after this delay. Each token or HTTP request has a 30-second timeout; intentional request pacing is outside that timeout. Writes report rejected requests and read-only points as action errors. A successful write needs a 2xx response, and smart-home-mode responses must confirm success when they return a command payload.
-
-The optional subscription endpoint's HTTP 500 response retains known manage permissions and logs one warning per outage. Authentication failures from that endpoint still start reauthentication.
-
-### Discovery, removal, and diagnostics in 1.9
-
-New devices, parameters, and smart-home zones are discovered after a successful refresh. A parameter retains its initial Home Assistant platform until account reload, preventing duplicate entities if its writable flag changes. Duplicate point responses are combined by parameter ID. Zero-valued zone measurements are included.
-
-Missing systems, devices, points, and zones make their existing entities unavailable. They become available again when data returns. The disconnected-availability option keeps cached device readings available, while a failed cloud refresh still makes them unavailable. The connection diagnostic remains available to report an offline device.
-
-Devices are not deleted automatically because a temporary absence from the cloud does not confirm permanent removal. After a device disappears, remove its registry entry from **Settings → Devices & services → Devices**. Devices still present in the account are protected from manual removal through this integration. Unloaded accounts allow manual cleanup.
-
-Download diagnostics from the integration's entry in **Settings → Devices & services**. Diagnostics use cached metadata without making API requests. Account credentials, entry identity, cloud system and device IDs, serial numbers, and system/device/zone names are redacted; notification text is omitted.
+After editing strings.json, run **python3 script/sync_translations.py** before tests. The script preserves already-resolved Home Assistant common strings and regenerates integration-owned English values. New common references need their resolved English value in translations/en.json. Keep the other language files updated alongside changed labels.
 
 ### AI assistance
 

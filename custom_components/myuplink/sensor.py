@@ -9,20 +9,30 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
     EntityCategory,
     Platform,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfFrequency,
     UnitOfPower,
+    UnitOfPressure,
     UnitOfTemperature,
     UnitOfTime,
+    UnitOfVolumeFlowRate,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter, Zone
-from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
+from .const import (
+    CONF_FETCH_NOTIFICATIONS,
+    DOMAIN,
+    TRANSLATED_PARAMETER_IDS,
+    CustomUnits,
+)
 from .entity import (
     MyUplinkDeviceEntity,
     MyUplinkParameterEntity,
@@ -73,10 +83,7 @@ async def async_setup_entry(
                             entities.append(
                                 MyUplinkZoneCO2SensorEntity(coordinator, device, zone)
                             )
-                        if (
-                            zone.indoor_humidity is not None
-                            and zone.indoor_humidity != 0
-                        ):
+                        if zone.indoor_humidity is not None:
                             entities.append(
                                 MyUplinkZoneHumiditySensorEntity(
                                     coordinator, device, zone
@@ -97,61 +104,80 @@ class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
     """Representation of a myUplink parameter sensor entity."""
 
     def _update_from_parameter(self, parameter: Parameter) -> None:
-        """Update attrs from parameter."""
+        """Apply normalized units and clear metadata that no longer applies."""
         super()._update_from_parameter(parameter)
+        self._attr_device_class = None
+        self._attr_state_class = None
+        self._attr_native_unit_of_measurement = parameter.unit or None
+        self._attr_options = None
 
-        if not self._parameter.unit and len(parameter.enum_values):
+        if not parameter.unit and parameter.enum_values:
             self._attr_device_class = SensorDeviceClass.ENUM
-            self._attr_translation_key = str(self._parameter.id)
-            self._attr_options = []
-            for option in parameter.enum_values:
-                self._attr_options.append(option["text"])
-            self._attr_native_value = self._parameter.string_value
+            if parameter.id in TRANSLATED_PARAMETER_IDS:
+                self._attr_translation_key = str(parameter.id)
+            self._attr_options = [option["text"] for option in parameter.enum_values]
+            self._attr_native_value = (
+                parameter.string_value if parameter.value is not None else None
+            )
+            return
 
-        else:
-            self._attr_native_unit_of_measurement = self._parameter.unit
-
-            if self._parameter.unit in (
-                UnitOfTemperature.CELSIUS,
-                UnitOfTemperature.FAHRENHEIT,
-            ):
-                self._attr_device_class = SensorDeviceClass.TEMPERATURE
-                self._attr_state_class = SensorStateClass.MEASUREMENT
-            elif self._parameter.unit == UnitOfEnergy.KILO_WATT_HOUR:
-                self._attr_device_class = SensorDeviceClass.ENERGY
-                self._attr_state_class = SensorStateClass.TOTAL
-            elif self._parameter.unit == UnitOfFrequency.HERTZ:
-                self._attr_device_class = SensorDeviceClass.FREQUENCY
-                self._attr_state_class = SensorStateClass.MEASUREMENT
-            elif self._parameter.unit in (UnitOfPower.KILO_WATT, UnitOfPower.WATT):
-                self._attr_device_class = SensorDeviceClass.POWER
-                self._attr_state_class = SensorStateClass.MEASUREMENT
-            elif self._parameter.unit in (
-                UnitOfTime.DAYS,
-                UnitOfTime.HOURS,
-                UnitOfTime.MINUTES,
-                CustomUnits.TIME_DAY,
-                CustomUnits.TIME_DAYS,
-                CustomUnits.TIME_HOUR,
-                CustomUnits.TIME_HOURS,
-            ):
-                self._attr_device_class = SensorDeviceClass.DURATION
-            elif self._parameter.unit == CustomUnits.POWER_WS:
-                self._attr_device_class = SensorDeviceClass.POWER
-                self._attr_state_class = SensorStateClass.MEASUREMENT
-                self._attr_native_unit_of_measurement = UnitOfPower.WATT
-            elif self._parameter.unit == CustomUnits.DEGREE_MINUTES:
-                self._attr_device_class = "degree_minutes"
-            elif self._parameter.unit in (PERCENTAGE, CustomUnits.VOLUME_LM):
-                self._attr_icon = "mdi:speedometer"
-
-            self._attr_native_value = self._parameter.value
+        metadata = (
+            (
+                UnitOfTemperature,
+                SensorDeviceClass.TEMPERATURE,
+                SensorStateClass.MEASUREMENT,
+            ),
+            (UnitOfEnergy, SensorDeviceClass.ENERGY, SensorStateClass.TOTAL),
+            (
+                UnitOfFrequency,
+                SensorDeviceClass.FREQUENCY,
+                SensorStateClass.MEASUREMENT,
+            ),
+            (UnitOfPower, SensorDeviceClass.POWER, SensorStateClass.MEASUREMENT),
+            (
+                UnitOfElectricCurrent,
+                SensorDeviceClass.CURRENT,
+                SensorStateClass.MEASUREMENT,
+            ),
+            (
+                UnitOfElectricPotential,
+                SensorDeviceClass.VOLTAGE,
+                SensorStateClass.MEASUREMENT,
+            ),
+            (UnitOfPressure, SensorDeviceClass.PRESSURE, SensorStateClass.MEASUREMENT),
+            (
+                UnitOfVolumeFlowRate,
+                SensorDeviceClass.VOLUME_FLOW_RATE,
+                SensorStateClass.MEASUREMENT,
+            ),
+        )
+        for units, device_class, state_class in metadata:
+            if parameter.unit in units:
+                self._attr_device_class = device_class
+                self._attr_state_class = state_class
+                break
+        if parameter.unit in (
+            UnitOfTime.SECONDS,
+            UnitOfTime.MINUTES,
+            UnitOfTime.HOURS,
+            UnitOfTime.DAYS,
+        ):
+            self._attr_device_class = SensorDeviceClass.DURATION
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif parameter.unit == CustomUnits.DEGREE_MINUTES:
+            self._attr_translation_key = "parameter_degree_minutes"
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif parameter.unit == PERCENTAGE:
+            self._attr_translation_key = "parameter_percentage"
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_value = parameter.value
 
 
 class MyUplinkNotificationsSensorEntity(MyUplinkDeviceEntity, SensorEntity):
     """Representation of a myUplink alarm sensor entity."""
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_entity_registry_enabled_default = False
     _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:
@@ -186,7 +212,8 @@ class MyUplinkZoneModeSensorEntity(MyUplinkZoneEntity, SensorEntity):
         """Update attrs from zone."""
         super()._update_from_zone(zone)
 
-        self._attr_name = f"{zone.name} Mode"
+        self._attr_translation_key = "myuplink_zone_mode"
+        self._attr_translation_placeholders = {"zone": zone.name}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_mode"
 
         self._attr_native_value = zone.mode
@@ -196,12 +223,15 @@ class MyUplinkZoneCO2SensorEntity(MyUplinkZoneEntity, SensorEntity):
     """Representation of a myUplink zone CO2 sensor entity."""
 
     _attr_device_class = SensorDeviceClass.CO2
+    _attr_native_unit_of_measurement = CONCENTRATION_PARTS_PER_MILLION
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
     def _update_from_zone(self, zone: Zone) -> None:
         """Update attrs from zone."""
         super()._update_from_zone(zone)
 
-        self._attr_name = f"{zone.name} CO2"
+        self._attr_translation_key = "myuplink_zone_co2"
+        self._attr_translation_placeholders = {"zone": zone.name}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_co2"
 
         self._attr_native_value = zone.indoor_co2
@@ -211,12 +241,15 @@ class MyUplinkZoneHumiditySensorEntity(MyUplinkZoneEntity, SensorEntity):
     """Representation of a myUplink zone humidity sensor entity."""
 
     _attr_device_class = SensorDeviceClass.HUMIDITY
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
     def _update_from_zone(self, zone: Zone) -> None:
         """Update attrs from zone."""
         super()._update_from_zone(zone)
 
-        self._attr_name = f"{zone.name} Humidity"
+        self._attr_translation_key = "myuplink_zone_humidity"
+        self._attr_translation_placeholders = {"zone": zone.name}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_humidity"
 
         self._attr_native_value = zone.indoor_humidity
@@ -226,12 +259,14 @@ class MyUplinkZoneTemperatureSensorEntity(MyUplinkZoneEntity, SensorEntity):
     """Representation of a myUplink zone temperature sensor entity."""
 
     _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
     def _update_from_zone(self, zone: Zone) -> None:
         """Update attrs from zone."""
         super()._update_from_zone(zone)
 
-        self._attr_name = f"{zone.name} Temperature"
+        self._attr_translation_key = "myuplink_zone_temperature"
+        self._attr_translation_placeholders = {"zone": zone.name}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_temperature"
 
         self._attr_native_value = zone.temperature
