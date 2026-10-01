@@ -15,7 +15,7 @@ from homeassistant.config_entries import (
     SOURCE_REAUTH,
     SOURCE_RECONFIGURE,
     ConfigEntry,
-    OptionsFlowWithConfigEntry,
+    OptionsFlowWithReload,
 )
 from homeassistant.const import CONF_SCAN_INTERVAL, UnitOfTime
 from homeassistant.core import callback
@@ -250,17 +250,18 @@ class OAuth2FlowHandler(
     def async_get_options_flow(
         config_entry: ConfigEntry,
     ) -> OptionsFlow:
-        """Options callback for Eaton ePDU."""
-        return OptionsFlow(config_entry)
+        """Return the myUplink options flow."""
+        return OptionsFlow()
 
 
-class OptionsFlow(OptionsFlowWithConfigEntry):
+class OptionsFlow(OptionsFlowWithReload):
     """Options flow to handle myUplink options."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Initialize form."""
+        self.options = dict(self.config_entry.options)
         return await self.async_step_options(options_input=user_input)
 
     async def async_step_options(
