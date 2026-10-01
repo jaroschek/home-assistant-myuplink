@@ -11,6 +11,8 @@ This custom integration reads and controls devices exposed by your [myUplink](ht
 
 ## Installation and account setup
 
+The 1.9.x series requires Home Assistant **2026.9.4 or newer**. CI validates Home Assistant 2026.9.4 with Python 3.14.5. Review the [1.9.0 upgrade notes](CHANGELOG.md) before updating.
+
 Install through HACS using this custom repository:
 
 [![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&owner=jaroschek&repository=home-assistant-myuplink)
