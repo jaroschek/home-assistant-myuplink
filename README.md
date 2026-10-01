@@ -59,3 +59,23 @@ If the your entities are malformed, it's often caused by the manufacturer's impl
 2. Click Authorize and paste your application credentials. Make sure to check the READSYSTEM box.
 3. Find your device ID by querying ​`/v2​/systems​/me`, and enter it when querying `/v2/devices/{deviceId}/points`.
 4. Find the relevant data points and post them in an issue.
+
+## Development
+
+The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are tracked in `custom_components/myuplink/quality_scale.yaml`. This checklist is a self-assessment; the integration remains a custom integration.
+
+Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer, then run:
+
+```sh
+script/setup
+uv run --no-sync pytest tests --cov --cov-report=term-missing
+uv run --no-sync prek run --all-files
+```
+
+Setup creates the project's `.venv` and installs Git hooks. If your IDE sets `UV_PROJECT_ENVIRONMENT` to a shared environment, set it to `.venv` when running these commands so this project uses its own environment.
+
+CI checks formatting, lint, and tests, including 100% coverage of the config flow. The Silver target is above 95% coverage of every integration module; the checklist records this rule as pending until measured coverage meets that target.
+
+### AI assistance
+
+AI tools assist with code, tests, and documentation in this project. AI-assisted changes require maintainer review, understanding, and passing automated checks before merging. Pull requests describe the AI assistance and validation performed; the maintainer remains responsible for the changes.
