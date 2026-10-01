@@ -1,9 +1,10 @@
 """Local Home Assistant fixtures for the myUplink regression tests."""
 
+import logging
 from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
 from types import MappingProxyType
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import jwt
 import pytest
@@ -11,9 +12,20 @@ from homeassistant import loader
 from homeassistant.config_entries import ConfigEntries, ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import frame
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from custom_components.myuplink import async_setup_entry
+from custom_components.myuplink.api import (
+    AsyncConfigEntryAuth,
+    Device,
+    FirmwareInfo,
+    MyUplink,
+    Parameter,
+    System,
+)
 from custom_components.myuplink.config_flow import OAuth2FlowHandler
 from custom_components.myuplink.const import (
     CONF_ADDITIONAL_PARAMETER,
@@ -36,6 +48,9 @@ async def hass(tmp_path: Path) -> AsyncGenerator[HomeAssistant]:
     instance.config_entries = ConfigEntries(instance, {})
     frame.async_setup(instance)
     loader.async_setup(instance)
+    dr.async_setup(instance)
+    await dr.async_load(instance)
+    await er.async_load(instance)
     with patch.object(instance.config_entries, "_async_schedule_save"):
         yield instance
         await instance.async_stop()
@@ -115,3 +130,89 @@ async def setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         patch("custom_components.myuplink.async_setup_services"),
     ):
         assert await async_setup_entry(hass, entry)
+
+
+@pytest.fixture
+def api(entry: ConfigEntry) -> MyUplink:
+    """Provide the real client with mocked transport."""
+    return MyUplink(MagicMock(spec=AsyncConfigEntryAuth), "en-GB", entry)
+
+
+@pytest.fixture
+def system(api: MyUplink) -> System:
+    """Provide a synthetic heating system."""
+    return System(
+        {
+            "systemId": "system-1",
+            "name": "Home",
+            "securityLevel": "Admin",
+            "devices": [],
+        },
+        api,
+    )
+
+
+@pytest.fixture
+def device(system: System) -> Device:
+    """Provide a connected device and cached firmware."""
+    result = Device(
+        {
+            "id": "device-1",
+            "connectionState": "Connected",
+            "product": {"name": "NIBE S1255", "serialNumber": "test-serial"},
+            "currentFwVersion": "1.0",
+        },
+        system,
+    )
+    result.firmware_info = FirmwareInfo(
+        {
+            "deviceId": result.id,
+            "firmwareId": 1,
+            "currentFwVersion": "1.0",
+            "desiredFwVersion": "1.1",
+        }
+    )
+    result.parameters = []
+    result.zones = []
+    result.notifications = []
+    system.devices = [result]
+    return result
+
+
+@pytest.fixture
+def parameter(device: Device) -> Parameter:
+    """Provide a readable temperature point."""
+    result = Parameter(
+        {
+            "parameterId": "123",
+            "parameterName": "Supply temperature",
+            "category": "Heating",
+            "parameterUnit": "°C",
+            "writable": False,
+            "value": 20.0,
+            "strVal": "20",
+            "timestamp": "2026-09-01T12:00:00Z",
+            "smartHomeCategories": [],
+            "minValue": 0,
+            "maxValue": 60,
+            "stepValue": 1,
+            "enumValues": [],
+            "scaleValue": 1,
+            "zoneId": "zone-1",
+        },
+        device,
+    )
+    device.parameters = [result]
+    return result
+
+
+@pytest.fixture
+def coordinator(
+    hass: HomeAssistant, system: System
+) -> DataUpdateCoordinator[list[System]]:
+    """Provide cached coordinator data without scheduling cloud updates."""
+    result = DataUpdateCoordinator(
+        hass, logging.getLogger(DOMAIN), name="myUplink", config_entry=system.api.entry
+    )
+    result.async_set_updated_data([system])
+    return result

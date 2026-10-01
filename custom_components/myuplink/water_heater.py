@@ -40,6 +40,8 @@ async def async_setup_entry(
 class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
     """Representation of a myUplink paramater binary sensor."""
 
+    _attr_name = None
+
     def __init__(self, coordinator: DataUpdateCoordinator, device: Device) -> None:
         super().__init__(coordinator, device)
         self._update_from_parameters()

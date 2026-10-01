@@ -16,6 +16,8 @@ from .const import CONF_DISCONNECTED_AVAILABLE, DOMAIN
 class MyUplinkSystemEntity(CoordinatorEntity):
     """Base class for myUplink system entities."""
 
+    _attr_has_entity_name = True
+
     def __init__(self, coordinator: DataUpdateCoordinator, system: System) -> None:
         """Initialize class."""
         super().__init__(coordinator)
@@ -55,6 +57,8 @@ class MyUplinkSystemEntity(CoordinatorEntity):
 
 class MyUplinkDeviceEntity(CoordinatorEntity):
     """Base class for myUplink device entities."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: Device) -> None:
         """Initialize class."""

@@ -273,5 +273,10 @@
         }
       }
     }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "The selected myUplink device is unavailable or belongs to an unloaded account. Load the account before using {service}."
+    }
   }
 }
