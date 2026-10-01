@@ -19,5 +19,6 @@ jobs:
       - run: script/setup
       - run: uv run --no-sync prek run --all-files
       - run: uv run --no-sync python3 script/sync_translations.py --check
-      - run: uv run --no-sync pytest tests --cov --cov-report=term-missing --cov-report=xml
-      - run: uv run --no-sync coverage report --include=custom_components/myuplink/config_flow.py --fail-under=100
+      - run: uv run --no-sync mypy
+      - run: uv run --no-sync pytest tests --cov --cov-report=term-missing --cov-report=xml --cov-report=json
+      - run: uv run --no-sync python3 script/check_coverage.py

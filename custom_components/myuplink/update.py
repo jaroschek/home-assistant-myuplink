@@ -3,20 +3,22 @@
 from __future__ import annotations
 
 from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device
 from .const import CONF_FETCH_FIRMWARE, DOMAIN
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkDeviceEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up update platform entities."""
 
@@ -28,10 +30,10 @@ async def async_setup_entry(
 
         if entry.options.get(CONF_FETCH_FIRMWARE, True):
             for system in coordinator.data:
-                [
-                    entities.append(MyUplinkUpdateEntity(coordinator, device))
+                entities.extend(
+                    MyUplinkUpdateEntity(coordinator, device)
                     for device in system.devices
-                ]
+                )
         return entities
 
     async_setup_entities(entry, async_add_entities, build_entities)

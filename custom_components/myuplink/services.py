@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
@@ -15,7 +16,6 @@ from homeassistant.helpers.service import (
     async_extract_config_entry_ids,
     async_register_admin_service,
 )
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import Device
 from .const import (
@@ -25,6 +25,7 @@ from .const import (
     ATTR_ZONE_ID,
     DOMAIN,
 )
+from .coordinator import MyUplinkConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ SERVICE_SCHEMA_SET_DEVICE_ZONE_PROPERTY_VALUE = vol.Schema(
     }
 )
 
-SERVICE_LIST: list[tuple[str, vol.Schema | None]] = [
+SERVICE_LIST: list[tuple[str, vol.Schema]] = [
     (SERVICE_SET_DEVICE_PARAMETER_VALUE, SERVICE_SCHEMA_SET_DEVICE_PARAMETER_VALUE),
     (
         SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE,
@@ -101,6 +102,9 @@ async def _async_get_selected_myuplink_device(
 
     device_id = service_call.data[ATTR_DEVICE_ID]
     device_registry = dr.async_get(hass)
+    hass_device = device_registry.async_get(device_id)
+    if hass_device is None:
+        return None
 
     for entry_id in await async_extract_config_entry_ids(service_call):
         config_entry = hass.config_entries.async_get_entry(entry_id)
@@ -109,14 +113,14 @@ async def _async_get_selected_myuplink_device(
             and config_entry.domain == DOMAIN
             and config_entry.state == ConfigEntryState.LOADED
         ):
-            coordinator: DataUpdateCoordinator = config_entry.runtime_data
-            for myuplink_system in coordinator.data:
-                for myuplink_device in myuplink_system.devices:
-                    hass_device = device_registry.async_get_device(
-                        identifiers={(DOMAIN, myuplink_device.id)}
-                    )
-                    if hass_device is not None and hass_device.id == device_id:
-                        _LOGGER.debug("Found device %s", myuplink_device.id)
-                        return myuplink_device
+            coordinator = cast(MyUplinkConfigEntry, config_entry).runtime_data
+            for domain, identifier in hass_device.identifiers:
+                if (
+                    domain == DOMAIN
+                    and (device := coordinator.devices_by_id.get(identifier))
+                    is not None
+                ):
+                    _LOGGER.debug("Found device %s", device.id)
+                    return device
 
     return None

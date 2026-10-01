@@ -3,8 +3,9 @@
 from typing import Any
 
 from homeassistant.components.diagnostics import async_redact_data
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+
+from .coordinator import MyUplinkConfigEntry
 
 TO_REDACT = {
     "data",
@@ -20,13 +21,13 @@ TO_REDACT = {
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: MyUplinkConfigEntry
 ) -> dict[str, Any]:
     """Describe only the current cached snapshot, without cloud requests."""
-    result = {"config_entry": async_redact_data(entry.as_dict(), TO_REDACT)}
+    result: dict[str, Any] = {"config_entry": entry.as_dict()}
     coordinator = getattr(entry, "runtime_data", None)
     if coordinator is None:
-        return result
+        return async_redact_data(result, TO_REDACT)
     result["coordinator"] = {
         "last_update_success": coordinator.last_update_success,
         "poll_interval_seconds": coordinator.update_interval.total_seconds()
@@ -35,43 +36,40 @@ async def async_get_config_entry_diagnostics(
         "rate_limit": coordinator.api.auth.rate_limit_limit,
         "rate_limit_remaining": coordinator.api.auth.rate_limit_remaining,
     }
-    result["systems"] = async_redact_data(
-        [
-            {
-                "system_id": system.id,
-                "name": system.name,
-                "premium_manage": system.premium_manage,
-                "devices": [
-                    {
-                        "device_id": device.id,
-                        "name": device.name,
-                        "serial_number": device.serial_number,
-                        "connection_state": device.connection_state,
-                        "firmware": device.current_firmware_version,
-                        "notification_count": len(device.notifications),
-                        "parameters": [
-                            {
-                                "id": parameter.id,
-                                "unit": parameter.unit,
-                                "platform": parameter.get_platform(),
-                                "writable": parameter.is_writable,
-                            }
-                            for parameter in device.parameters
-                        ],
-                        "zones": [
-                            {
-                                "zone_id": zone.id,
-                                "name": zone.name,
-                                "command_only": zone.is_command_only,
-                            }
-                            for zone in device.zones
-                        ],
-                    }
-                    for device in system.devices
-                ],
-            }
-            for system in (coordinator.data or [])
-        ],
-        TO_REDACT,
-    )
-    return result
+    result["systems"] = [
+        {
+            "system_id": system.id,
+            "name": system.name,
+            "premium_manage": system.premium_manage,
+            "devices": [
+                {
+                    "device_id": device.id,
+                    "name": device.name,
+                    "serial_number": device.serial_number,
+                    "connection_state": device.connection_state,
+                    "firmware": device.current_firmware_version,
+                    "notification_count": len(device.notifications),
+                    "parameters": [
+                        {
+                            "id": parameter.id,
+                            "unit": parameter.unit,
+                            "platform": parameter.get_platform(),
+                            "writable": parameter.is_writable,
+                        }
+                        for parameter in device.parameters
+                    ],
+                    "zones": [
+                        {
+                            "zone_id": zone.id,
+                            "name": zone.name,
+                            "command_only": zone.is_command_only,
+                        }
+                        for zone in device.zones
+                    ],
+                }
+                for device in system.devices
+            ],
+        }
+        for system in (coordinator.data or [])
+    ]
+    return async_redact_data(result, TO_REDACT)
