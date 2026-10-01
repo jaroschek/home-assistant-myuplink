@@ -4,13 +4,14 @@ The release files are prepared on a draft PR. Complete the maintainer review and
 
 - [ ] Review and understand each quality-scale PR and its AI assistance disclosure.
 - [ ] Verify all stack layers pass Tests, hassfest, and HACS validation.
+- [ ] Verify the release passes the full test and quality checks on Home Assistant 2026.1.0 and 2026.9.4.
 - [ ] Verify a real account can authorize, configure options, reload, unload, and reauthenticate.
 - [ ] Check existing entity IDs and user-customized names after upgrading from 1.8.4.
 - [ ] Check new-device discovery, disconnected availability, and return of missing device data.
 - [ ] Validate representative number, select, switch, thermostat, and supported water-heater writes with available account permissions.
 - [ ] Verify an invalid or rejected write reports an error without displaying a successful target.
 - [ ] Inspect downloaded diagnostics for identifying information before sharing.
-- [ ] Confirm the declared Home Assistant minimum and upgrade notes are acceptable.
+- [ ] Confirm the Home Assistant 2026.1.0 minimum and documented upgrade behavior.
 - [ ] Merge the reviewed stack from the bottom up.
 - [ ] Update the changelog's unreleased heading with the release date.
 - [ ] Run the complete test, typing, translation, coverage, and lint checks on the merged release commit.

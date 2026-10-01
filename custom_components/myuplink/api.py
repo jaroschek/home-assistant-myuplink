@@ -139,7 +139,7 @@ class AsyncConfigEntryAuth:
             return None
         try:
             return int(value)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             _LOGGER.debug("Could not parse %s header value: %r", name, value)
             return None
 
@@ -188,7 +188,7 @@ class AsyncConfigEntryAuth:
                         parsedate_to_datetime(value).timestamp()
                         - datetime.now(UTC).timestamp(),
                     )
-                except TypeError, ValueError, OverflowError:
+                except (TypeError, ValueError, OverflowError):
                     pass
         if self.rate_limit_reset_at is not None:
             return max(
