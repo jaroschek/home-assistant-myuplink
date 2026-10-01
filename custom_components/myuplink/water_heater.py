@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from homeassistant.components.water_heater import (
     WaterHeaterEntity,
     WaterHeaterEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -76,8 +78,9 @@ class MyUplinkWaterHeaterEntity(MyUplinkDeviceEntity, WaterHeaterEntity):
             | WaterHeaterEntityFeature.OPERATION_MODE
         )
 
-    async def async_set_temperature(self, temperature: float, entity_id: str) -> None:
+    async def async_set_temperature(self, **kwargs: Any) -> None:
         """Update the current value."""
+        temperature = float(kwargs[ATTR_TEMPERATURE])
         for parameter in self._device.parameters:
             if parameter.id == 527:
                 await parameter.update_parameter(temperature)

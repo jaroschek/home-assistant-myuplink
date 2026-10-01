@@ -25,6 +25,7 @@ from custom_components.myuplink.api import (
     MyUplink,
     Parameter,
     System,
+    Zone,
 )
 from custom_components.myuplink.config_flow import OAuth2FlowHandler
 from custom_components.myuplink.const import (
@@ -125,7 +126,7 @@ async def setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         patch("custom_components.myuplink.config_entry_oauth2_flow.OAuth2Session"),
         patch("custom_components.myuplink.aiohttp_client.async_get_clientsession"),
         patch("custom_components.myuplink.AsyncConfigEntryAuth", autospec=True),
-        patch("custom_components.myuplink.DataUpdateCoordinator", autospec=True),
+        patch("custom_components.myuplink.MyUplinkCoordinator", autospec=True),
         patch.object(hass.config_entries, "async_forward_entry_setups"),
         patch("custom_components.myuplink.async_setup_services"),
     ):
@@ -135,7 +136,7 @@ async def setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 @pytest.fixture
 def api(entry: ConfigEntry) -> MyUplink:
     """Provide the real client with mocked transport."""
-    return MyUplink(MagicMock(spec=AsyncConfigEntryAuth), "en-GB", entry)
+    return MyUplink(AsyncConfigEntryAuth(MagicMock(), MagicMock()), "en-GB", entry)
 
 
 @pytest.fixture
@@ -203,6 +204,32 @@ def parameter(device: Device) -> Parameter:
         device,
     )
     device.parameters = [result]
+    return result
+
+
+@pytest.fixture
+def zone(device: Device) -> Zone:
+    """Provide a readable and controllable smart-home zone."""
+    result = Zone(
+        {
+            "zoneId": "1",
+            "name": "Living room",
+            "commandOnly": False,
+            "supportedModes": "off,auto,heat,cool,heatcool",
+            "mode": "heat",
+            "temperature": 20,
+            "setpoint": 21,
+            "setpointHeat": 21,
+            "setpointCool": 24,
+            "setpointRangeMin": 5,
+            "setpointRangeMax": 30,
+            "isCelsius": True,
+            "indoorCo2": 500,
+            "indoorHumidity": 40,
+        },
+        device,
+    )
+    device.zones = [result]
     return result
 
 

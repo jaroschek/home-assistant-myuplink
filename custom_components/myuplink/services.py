@@ -5,11 +5,10 @@ from __future__ import annotations
 import logging
 
 import voluptuous as vol
-from aiohttp import ClientResponseError
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import selector
 from homeassistant.helpers.service import (
@@ -80,32 +79,13 @@ async def async_setup_services(hass: HomeAssistant) -> None:
 
         if service_call.service == SERVICE_SET_DEVICE_PARAMETER_VALUE:
             parameter_id = service_call.data[ATTR_PARAMETER_ID]
-            try:
-                await device.system.api.patch_parameter(
-                    device.id,
-                    parameter_id,
-                    value,
-                )
-            except ClientResponseError as ex:
-                raise HomeAssistantError(
-                    f"The myUplink API returned an error trying to set the parameter {parameter_id} to value {value} for device {device.id}"
-                    f" Code: {ex.status}  Message: {ex.message}"
-                ) from ex
-        elif service_call.service == SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE:
+            await device.system.api.patch_parameter(device.id, parameter_id, value)
+        else:
             zone_id = service_call.data[ATTR_ZONE_ID]
             property_name = service_call.data[ATTR_PROPERTY_NAME]
-            try:
-                await device.system.api.patch_zone_property(
-                    device.id,
-                    zone_id,
-                    property_name,
-                    value,
-                )
-            except ClientResponseError as ex:
-                raise HomeAssistantError(
-                    f"The myUplink API returned an error trying to set the property {property_name} to value {value} for zone {zone_id} of device {device.id}"
-                    f" Code: {ex.status}  Message: {ex.message}"
-                ) from ex
+            await device.system.api.patch_zone_property(
+                device.id, zone_id, property_name, value
+            )
 
     for service, schema in SERVICE_LIST:
         if not hass.services.has_service(DOMAIN, service):

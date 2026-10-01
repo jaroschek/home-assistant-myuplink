@@ -82,6 +82,14 @@ The `myuplink.set_device_parameter_value` and `myuplink.set_device_zone_property
 
 Entity names are relative to their device. Existing unique IDs are retained, so existing entity IDs and names customized in Home Assistant remain associated with the same entities. Newly added entities include their device name in Home Assistant's generated name.
 
+### Runtime failures in 1.9
+
+Expired or revoked authorization starts Home Assistant's reauthentication flow. Network failures and API outages make coordinator-backed entities unavailable until polling succeeds again. Repeated polling failures are logged once, followed by recovery when data returns.
+
+HTTP 429 responses use `Retry-After` (seconds or an HTTP date), falling back to `RateLimit-Reset` and then 60 seconds. Home Assistant schedules the next poll after this delay. Each token or HTTP request has a 30-second timeout; intentional request pacing is outside that timeout. Writes report rejected requests and read-only points as action errors. A successful write needs a 2xx response, and smart-home-mode responses must confirm success when they return a command payload.
+
+The optional subscription endpoint's HTTP 500 response retains known manage permissions and logs one warning per outage. Authentication failures from that endpoint still start reauthentication.
+
 ### AI assistance
 
 AI tools assist with code, tests, and documentation in this project. AI-assisted changes require maintainer review, understanding, and passing automated checks before merging. Pull requests describe the AI assistance and validation performed; the maintainer remains responsible for the changes.
