@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from contextlib import suppress
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
@@ -22,11 +21,15 @@ from aiohttp import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfFrequency,
     UnitOfPower,
+    UnitOfPressure,
     UnitOfTemperature,
     UnitOfTime,
+    UnitOfVolumeFlowRate,
 )
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_entry_oauth2_flow
@@ -421,21 +424,41 @@ class Parameter:
 
         return Platform.SENSOR
 
-    def get_unit(self, parameter_unit) -> str:
+    @staticmethod
+    def get_unit(parameter_unit: str) -> str:
         """Try to get the correct home assistant unit."""
-        if parameter_unit != "":
-            for units in (
+        aliases = {
+            "day": "d",
+            "days": "d",
+            "hour": "h",
+            "hours": "h",
+            "hrs": "h",
+            "sec": "s",
+            "l/m": "L/min",
+            "m3/h": "m³/h",
+        }
+        if parameter_unit.lower() in aliases:
+            return aliases[parameter_unit.lower()]
+        units = [
+            str(unit)
+            for unit_type in (
                 UnitOfEnergy,
                 UnitOfFrequency,
                 UnitOfPower,
                 UnitOfTemperature,
                 UnitOfTime,
-            ):
-                with suppress(ValueError):
-                    for unit in units:
-                        if parameter_unit.lower() == unit.lower():
-                            return str(unit)
-
+                UnitOfElectricCurrent,
+                UnitOfElectricPotential,
+                UnitOfPressure,
+                UnitOfVolumeFlowRate,
+            )
+            for unit in unit_type
+        ]
+        if parameter_unit in units:
+            return parameter_unit
+        matches = [unit for unit in units if parameter_unit.lower() == unit.lower()]
+        if len(matches) == 1:
+            return matches[0]
         return parameter_unit
 
 

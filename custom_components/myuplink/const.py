@@ -80,6 +80,22 @@ DEFAULT_WRITABLE_OVERRIDE = {
 
 WATER_HEATERS = ["18760NE"]
 
+TRANSLATED_PARAMETER_IDS = {
+    406,
+    500,
+    517,
+    544,
+    549,
+    601,
+    1965,
+    14950,
+    55000,
+    55027,
+    62005,
+    62017,
+    62246,
+}
+
 
 class CustomUnits(StrEnum):
     """Custom units."""

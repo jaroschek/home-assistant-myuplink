@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Parameter
+from .const import CustomUnits
 from .entity import MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
@@ -45,6 +46,8 @@ class MyUplinkParameterNumberEntity(MyUplinkParameterEntity, NumberEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
+        if parameter.unit == CustomUnits.DEGREE_MINUTES:
+            self._attr_translation_key = "parameter_degree_minutes"
         unit_conversion = {
             "°C": NumberDeviceClass.TEMPERATURE,
             "°F": NumberDeviceClass.TEMPERATURE,

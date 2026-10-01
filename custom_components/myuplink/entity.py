@@ -146,10 +146,12 @@ class MyUplinkParameterEntity(MyUplinkDeviceEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Apply parameter data and its device-relative name."""
         self._parameter = parameter
+        self._attr_translation_key = "parameter"
         if parameter.category and self._device.name != parameter.category:
-            self._attr_name = f"{parameter.category} {parameter.name} ({parameter.id})"
+            name = f"{parameter.category} {parameter.name}"
         else:
-            self._attr_name = f"{parameter.name} ({parameter.id})"
+            name = parameter.name
+        self._attr_translation_placeholders = {"name": name, "id": str(parameter.id)}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{parameter.id}"
 
     @callback

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -40,6 +41,7 @@ class MyUplinkUpdateEntity(MyUplinkDeviceEntity, UpdateEntity):
     """Representation of a myUplink update entity."""
 
     _attr_device_class = UpdateDeviceClass.FIRMWARE
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_has_entity_name = True
 
     def _update_from_device(self, device: Device) -> None:

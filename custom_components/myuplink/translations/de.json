@@ -24,19 +24,19 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Smart-Home-Modus aktivieren?",
-          "enable_smart_home_zone": "Smart-Home-Zone aktivieren?",
+          "enable_smart_home_zone": "Smart-Home-Zonen aktivieren",
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
-          "disconnected_available": "Getrennte Parameter verfügbar halten?",
+          "disconnected_available": "Messwerte getrennter Geräte verfügbar halten?",
           "expert_mode": "Expertenmodus"
         },
         "data_description": {
           "enable_smart_home_mode": "Der Smart-Home-Modus ist eine systembezogene Entität in der myUplink-API.\n\nWenn ein System nur über ein einziges Gerät verfügt, wird der Smart-Home-Modus diesem Gerät hinzugefügt. Andernfalls wird der Smart-Home-Modus einem zusätzlichen Gerät hinzugfügt, dass auf den verfügbaren Systeminformationen basiert.\n\nDie Unterstützung des Smart-Home-Modus erfordert einen zusätzlichen API-Aufruf pro System.",
-          "enable_smart_home_zone": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
+          "enable_smart_home_zone": "Zonenmesswerte und Thermostatsteuerung abrufen; eine zusätzliche API-Anfrage pro Gerät.",
           "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
           "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf pro System.",
-          "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
+          "disconnected_available": "Zwischengespeicherte Messwerte getrennter Geräte verfügbar halten. Fehlgeschlagene Cloud-Aktualisierungen machen Entitäten weiterhin nicht verfügbar.",
           "expert_mode": "Erweiterte Optionen konfigurieren."
         }
       },
@@ -69,13 +69,9 @@
           "100": "Stoppt",
           "120": "Enteisung wird durchgeführt",
           "140": "Enteisung wird durchgeführt",
-          "160": "Enteisung wird durchgeführt",
-          "Defrosting": "Enteisung wird durchgeführt",
-          "Off": "Aus",
-          "On": "Ein",
-          "Starting": "Startet",
-          "Stopping": "Stoppt"
-        }
+          "160": "Enteisung wird durchgeführt"
+        },
+        "name": "{name} ({id})"
       },
       "14950": {
         "state": {
@@ -85,15 +81,9 @@
           "3": "Brauchwasser",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Vorwärmung",
-          "Cooling": "Kühlung",
-          "Heating": "Heizung",
-          "Hot water": "Brauchwasser",
-          "Off": "Aus",
-          "Pool 2": "Pool 2",
-          "Pool": "Pool",
-          "Preheating": "Vorwärmung"
-        }
+          "6": "Vorwärmung"
+        },
+        "name": "{name} ({id})"
       },
       "55000": {
         "state": {
@@ -103,15 +93,9 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Transfer",
-          "60": "Kühlung",
-          "Cooling": "Kühlung",
-          "Heating": "Heizung",
-          "Hot water": "Brauchwasser",
-          "Off": "Aus",
-          "Pool 2": "Pool 2",
-          "Pool": "Pool",
-          "Transfer": "Transfer"
-        }
+          "60": "Kühlung"
+        },
+        "name": "{name} ({id})"
       },
       "55027": {
         "state": {
@@ -121,25 +105,156 @@
           "3": "Aus",
           "4": "Blockiert",
           "5": "Aus",
-          "6": "Aktiv",
-          "Active": "Aktiv",
-          "Alarm": "Alarm",
-          "Blocked": "Blockiert",
-          "Off": "Aus"
-        }
+          "6": "Aktiv"
+        },
+        "name": "{name} ({id})"
       },
       "myuplink_notifications": {
         "name": "Benachrichtigungen"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      },
+      "parameter_percentage": {
+        "name": "{name} ({id})"
+      },
+      "406": {
+        "state": {
+          "0": "Test",
+          "1": "Off",
+          "2": "Sleep",
+          "3": "Eco",
+          "4": "Normal",
+          "5": "Express",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "9": "Legionella",
+          "10": "Vacation",
+          "11": "Boost"
+        },
+        "name": "{name} ({id})"
+      },
+      "500": {
+        "state": {
+          "3": "Eco",
+          "4": "Normal",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "10": "Vacation",
+          "11": "Boost"
+        },
+        "name": "{name} ({id})"
+      },
+      "517": {
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W"
+        },
+        "name": "{name} ({id})"
+      },
+      "544": {
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5"
+        },
+        "name": "{name} ({id})"
+      },
+      "549": {
+        "state": {
+          "0": "Unknown",
+          "1": "Cheap",
+          "2": "Normal",
+          "3": "Expensive"
+        },
+        "name": "{name} ({id})"
+      },
+      "601": {
+        "state": {
+          "1": "heat",
+          "heat": "heat"
+        },
+        "name": "{name} ({id})"
+      },
+      "62005": {
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        },
+        "name": "{name} ({id})"
+      },
+      "62017": {
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        },
+        "name": "{name} ({id})"
+      },
+      "62246": {
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
+        },
+        "name": "{name} ({id})"
+      },
+      "myuplink_zone_temperature": {
+        "name": "{zone} Temperatur"
+      },
+      "myuplink_zone_humidity": {
+        "name": "{zone} Luftfeuchtigkeit"
+      },
+      "myuplink_zone_mode": {
+        "name": "{zone} Modus"
+      },
+      "myuplink_zone_co2": {
+        "name": "{zone} CO2"
       }
     },
     "binary_sensor": {
       "myuplink_connection_state": {
         "name": "Verbindungsstatus"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
       }
     },
     "climate": {
       "myuplink_thermostat": {
-        "name": "Thermostat"
+        "name": "{zone}"
       }
     },
     "select": {
@@ -152,11 +267,185 @@
           "vacation": "Urlaub",
           "home": "Zuhause"
         }
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "406": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Test",
+          "1": "Off",
+          "2": "Sleep",
+          "3": "Eco",
+          "4": "Normal",
+          "5": "Express",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "9": "Legionella",
+          "10": "Vacation",
+          "11": "Boost"
+        }
+      },
+      "500": {
+        "name": "{name} ({id})",
+        "state": {
+          "3": "Eco",
+          "4": "Normal",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "10": "Vacation",
+          "11": "Boost"
+        }
+      },
+      "517": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W"
+        }
+      },
+      "544": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5"
+        }
+      },
+      "549": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Unknown",
+          "1": "Cheap",
+          "2": "Normal",
+          "3": "Expensive"
+        }
+      },
+      "601": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "heat",
+          "heat": "heat"
+        }
+      },
+      "1965": {
+        "name": "{name} ({id})",
+        "state": {
+          "20": "Aus",
+          "40": "Startet",
+          "60": "Ein",
+          "100": "Stoppt",
+          "120": "Enteisung wird durchgeführt",
+          "140": "Enteisung wird durchgeführt",
+          "160": "Enteisung wird durchgeführt"
+        }
+      },
+      "14950": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Aus",
+          "1": "Heizung",
+          "2": "Kühlung",
+          "3": "Brauchwasser",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Vorwärmung"
+        }
+      },
+      "55000": {
+        "name": "{name} ({id})",
+        "state": {
+          "10": "Aus",
+          "20": "Brauchwasser",
+          "30": "Heizung",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Transfer",
+          "60": "Kühlung"
+        }
+      },
+      "55027": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Aktiv",
+          "3": "Aus",
+          "4": "Blockiert",
+          "5": "Aus",
+          "6": "Aktiv"
+        }
+      },
+      "62005": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        }
+      },
+      "62017": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        }
+      },
+      "62246": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
+        }
       }
     },
     "update": {
       "myuplink_firmware": {
         "name": "Firmware"
+      }
+    },
+    "number": {
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      }
+    },
+    "switch": {
+      "parameter": {
+        "name": "{name} ({id})"
       }
     }
   },
@@ -168,15 +457,17 @@
           "fetch_firmware": "Firmware-Informationen von API abrufen?",
           "fetch_notifications": "Benachrichtigungen von der API abrufen?",
           "scan_interval": "Scanintervall (Sekunden)",
-          "disconnected_available": "Getrennte Parameter verfügbar halten?",
-          "expert_mode": "Expertenmodus"
+          "disconnected_available": "Messwerte getrennter Geräte verfügbar halten?",
+          "expert_mode": "Expertenmodus",
+          "enable_smart_home_zone": "Smart-Home-Zonen aktivieren"
         },
         "data_description": {
           "enable_smart_home_mode": "Der Smart-Home-Modus ist eine systembezogene Entität in der myUplink-API.\n\nWenn ein System nur über ein einziges Gerät verfügt, wird der Smart-Home-Modus diesem Gerät hinzugefügt. Andernfalls wird der Smart-Home-Modus einem zusätzlichen Gerät hinzugfügt, dass auf den verfügbaren Systeminformationen basiert.\n\nDie Unterstützung des Smart-Home-Modus erfordert einen zusätzlichen API-Aufruf pro System.",
           "fetch_firmware": "Erfordert einen zusätzlichen API-Aufruf pro Gerät.",
           "fetch_notifications": "Erfordert einen zusätzlichen API-Aufruf pro System.",
-          "disconnected_available": "Parameterentitäten getrennter Geräte als `verfügbar` anzeigen.",
-          "expert_mode": "Erweiterte Optionen konfigurieren."
+          "disconnected_available": "Zwischengespeicherte Messwerte getrennter Geräte verfügbar halten. Fehlgeschlagene Cloud-Aktualisierungen machen Entitäten weiterhin nicht verfügbar.",
+          "expert_mode": "Erweiterte Optionen konfigurieren.",
+          "enable_smart_home_zone": "Zonenmesswerte und Thermostatsteuerung abrufen; eine zusätzliche API-Anfrage pro Gerät."
         }
       },
       "expert": {
@@ -238,6 +529,29 @@
           "description": "Geben Sie den festzulegenden Wert ein."
         }
       }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "Das ausgewählte myUplink-Gerät ist nicht verfügbar oder das Konto ist nicht geladen. Laden Sie das Konto vor der Verwendung von {service}."
+    },
+    "connection_error": {
+      "message": "myUplink ist nicht erreichbar. Versuchen Sie es später erneut."
+    },
+    "api_error": {
+      "message": "myUplink hat die Aktion mit HTTP {status} abgelehnt. Prüfen Sie Kontoberechtigungen und Abonnements."
+    },
+    "rate_limited": {
+      "message": "myUplink-Anfragelimit erreicht. Versuchen Sie es in {seconds} Sekunden erneut."
+    },
+    "write_rejected": {
+      "message": "myUplink hat die gewünschte Änderung nicht bestätigt."
+    },
+    "parameter_not_writable": {
+      "message": "Dieser myUplink-Parameter ist derzeit schreibgeschützt."
+    },
+    "zone_command_only": {
+      "message": "Diese Zone unterstützt nur Befehle und wird von der Integration nicht unterstützt."
     }
   }
 }

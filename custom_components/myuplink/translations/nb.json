@@ -27,15 +27,17 @@
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
-          "disconnected_available": "Vil du holde frakoblede parametere tilgjengelige?",
-          "expert_mode": "Ekspertmodus"
+          "disconnected_available": "Behold målinger fra frakoblede enheter som tilgjengelige?",
+          "expert_mode": "Ekspertmodus",
+          "enable_smart_home_zone": "Aktiver smart home-soner"
         },
         "data_description": {
           "enable_smart_home_mode": "Smart Home Mode er en systemrelatert enhet i myUplink API.\n\nHvis et system bare har én enkelt enhet, vil Smart Home Mode bli lagt til denne enheten. Ellers vil Smart Home Mode bli lagt til en ekstra enhet, som er basert på tilgjengelig systeminformasjon.\n\nStøtte for Smart Home Mode krever ett ekstra API-kall per system.",
           "fetch_firmware": "Krever et ekstra API-kall per enhet.",
           "fetch_notifications": "Krever et ekstra API-kall per system.",
-          "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
-          "expert_mode": "Konfigurer avanserte alternativer."
+          "disconnected_available": "Behold lagrede målinger når en enhet kobles fra. Mislykkede skyoppdateringer gjør fortsatt entiteter utilgjengelige.",
+          "expert_mode": "Konfigurer avanserte alternativer.",
+          "enable_smart_home_zone": "Hent sonemålinger og termostatstyring; én ekstra API-forespørsel per enhet."
         }
       },
       "expert": {
@@ -72,20 +74,9 @@
           "8": "Ekstern",
           "9": "Legionella",
           "10": "Ferie",
-          "11": "Boost",
-          "Boost": "Boost",
-          "Eco": "Øko",
-          "Express": "Ekspress",
-          "External": "Ekstern",
-          "Legionella": "Legionella",
-          "Normal": "Normal",
-          "Off": "Av",
-          "Price": "Pris",
-          "Schedule": "Timeplan",
-          "Sleep": "Hvilemodus",
-          "Test": "Test",
-          "Vacation": "Ferie"
-        }
+          "11": "Boost"
+        },
+        "name": "{name} ({id})"
       },
       "500": {
         "state": {
@@ -95,15 +86,9 @@
           "7": "Timeplan",
           "8": "Ekstern",
           "10": "Ferie",
-          "11": "Boost",
-          "Boost": "Boost",
-          "Eco": "Øko",
-          "External": "Ekstern",
-          "Normal": "Normal",
-          "Price": "Pris",
-          "Schedule": "Timeplan",
-          "Vacation": "Ferie"
-        }
+          "11": "Boost"
+        },
+        "name": "{name} ({id})"
       },
       "517": {
         "state": {
@@ -111,7 +96,8 @@
           "1": "700W",
           "2": "1300W",
           "3": "2000W"
-        }
+        },
+        "name": "{name} ({id})"
       },
       "544": {
         "state": {
@@ -120,25 +106,24 @@
           "3": "NO3",
           "4": "NO4",
           "5": "NO5"
-        }
+        },
+        "name": "{name} ({id})"
       },
       "549": {
         "state": {
           "0": "Ukjent",
           "1": "Billig",
           "2": "Normal",
-          "3": "Dyr",
-          "Cheap": "Billig",
-          "Expensive": "Dyr",
-          "Normal": "Normal",
-          "Unknown": "Ukjent"
-        }
+          "3": "Dyr"
+        },
+        "name": "{name} ({id})"
       },
       "601": {
         "state": {
           "1": "varme",
           "heat": "varme"
-        }
+        },
+        "name": "{name} ({id})"
       },
       "1965": {
         "state": {
@@ -148,13 +133,9 @@
           "100": "Stopper",
           "120": "Avrimer",
           "140": "Avrimer",
-          "160": "Avrimer",
-          "Defrosting": "Avrimer",
-          "Off": "Av",
-          "On": "På",
-          "Starting": "Starter",
-          "Stopping": "Stopper"
-        }
+          "160": "Avrimer"
+        },
+        "name": "{name} ({id})"
       },
       "14950": {
         "state": {
@@ -164,15 +145,9 @@
           "3": "Varmtvann",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Forvarmer",
-          "Cooling": "Avkjøler",
-          "Heating": "Varmer",
-          "Hot water": "Varmtvann",
-          "Off": "Av",
-          "Pool 2": "Pool 2",
-          "Pool": "Pool",
-          "Preheating": "Forvarmer"
-        }
+          "6": "Forvarmer"
+        },
+        "name": "{name} ({id})"
       },
       "55000": {
         "state": {
@@ -182,15 +157,9 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Overføring",
-          "60": "Avkjøler",
-          "Cooling": "Avkjøling",
-          "Heating": "Varmer",
-          "Hot water": "Varmtvann",
-          "Off": "Av",
-          "Pool 2": "Pool 2",
-          "Pool": "Pool",
-          "Transfer": "Øverføring"
-        }
+          "60": "Avkjøler"
+        },
+        "name": "{name} ({id})"
       },
       "55027": {
         "state": {
@@ -200,42 +169,283 @@
           "3": "Av",
           "4": "Blokkert",
           "5": "Av",
-          "6": "Aktiv",
-          "Active": "Aktiv",
-          "Alarm": "Alarm",
-          "Blocked": "Blokkert",
-          "Off": "Av"
-        }
+          "6": "Aktiv"
+        },
+        "name": "{name} ({id})"
       },
       "myuplink_notifications": {
         "name": "Varsler"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      },
+      "parameter_percentage": {
+        "name": "{name} ({id})"
+      },
+      "62005": {
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        },
+        "name": "{name} ({id})"
+      },
+      "62017": {
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        },
+        "name": "{name} ({id})"
+      },
+      "62246": {
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
+        },
+        "name": "{name} ({id})"
+      },
+      "myuplink_zone_temperature": {
+        "name": "{zone} Temperatur"
+      },
+      "myuplink_zone_humidity": {
+        "name": "{zone} Luftfuktighet"
+      },
+      "myuplink_zone_mode": {
+        "name": "{zone} Modus"
+      },
+      "myuplink_zone_co2": {
+        "name": "{zone} CO2"
       }
     },
     "binary_sensor": {
       "myuplink_connection_state": {
         "name": "Tilkoblingstilstand"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
       }
     },
     "climate": {
       "myuplink_thermostat": {
-        "name": "Termostat"
+        "name": "{zone}"
       }
     },
     "select": {
       "myuplink_smart_home_mode": {
         "name": "Smart Home Mode",
         "state": {
-          "default": "Misligholde",
+          "default": "Standard",
           "normal": "Normal",
           "away": "Borte",
           "vacation": "Ferie",
           "home": "Hjemme"
+        }
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "406": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Test",
+          "1": "Av",
+          "2": "Hvilemodus",
+          "3": "Øko",
+          "4": "Normal",
+          "5": "Ekspress",
+          "6": "Pris",
+          "7": "Timeplan",
+          "8": "Ekstern",
+          "9": "Legionella",
+          "10": "Ferie",
+          "11": "Boost"
+        }
+      },
+      "500": {
+        "name": "{name} ({id})",
+        "state": {
+          "3": "Øko",
+          "4": "Normal",
+          "6": "Pris",
+          "7": "Timeplan",
+          "8": "Ekstern",
+          "10": "Ferie",
+          "11": "Boost"
+        }
+      },
+      "517": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W"
+        }
+      },
+      "544": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5"
+        }
+      },
+      "549": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Ukjent",
+          "1": "Billig",
+          "2": "Normal",
+          "3": "Dyr"
+        }
+      },
+      "601": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "varme",
+          "heat": "varme"
+        }
+      },
+      "1965": {
+        "name": "{name} ({id})",
+        "state": {
+          "20": "Av",
+          "40": "Starter",
+          "60": "På",
+          "100": "Stopper",
+          "120": "Avrimer",
+          "140": "Avrimer",
+          "160": "Avrimer"
+        }
+      },
+      "14950": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Av",
+          "1": "Varmer",
+          "2": "Avkjøler",
+          "3": "Varmtvann",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Forvarmer"
+        }
+      },
+      "55000": {
+        "name": "{name} ({id})",
+        "state": {
+          "10": "Av",
+          "20": "Varmtvann",
+          "30": "Varmer",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Overføring",
+          "60": "Avkjøler"
+        }
+      },
+      "55027": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Aktiv",
+          "3": "Av",
+          "4": "Blokkert",
+          "5": "Av",
+          "6": "Aktiv"
+        }
+      },
+      "62005": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        }
+      },
+      "62017": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        }
+      },
+      "62246": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
         }
       }
     },
     "update": {
       "myuplink_firmware": {
         "name": "Fastvare"
+      }
+    },
+    "number": {
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      }
+    },
+    "switch": {
+      "parameter": {
+        "name": "{name} ({id})"
       }
     }
   },
@@ -244,19 +454,19 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Aktiver Smart Home Mode?",
-          "enable_smart_home_zone": "Aktiver Smart Home Zone?",
+          "enable_smart_home_zone": "Aktiver smart home-soner",
           "fetch_firmware": "Hent fastvareinformasjon fra API?",
           "fetch_notifications": "Hente varsler fra API?",
           "scan_interval": "Skanneintervall (sekunder)",
-          "disconnected_available": "Vil du holde frakoblede parametere tilgjengelige?",
+          "disconnected_available": "Behold målinger fra frakoblede enheter som tilgjengelige?",
           "expert_mode": "Ekspertmodus"
         },
         "data_description": {
           "enable_smart_home_mode": "Smart Home Mode er en systemrelatert enhet i myUplink API.\n\nHvis et system bare har én enkelt enhet, vil Smart Home Mode bli lagt til denne enheten. Ellers vil Smart Home Mode bli lagt til en ekstra enhet, som er basert på tilgjengelig systeminformasjon.\n\nStøtte for Smart Home Mode krever ett ekstra API-kall per system.",
-          "enable_smart_home_zone": "Krever et ekstra API-kall per enhet.",
+          "enable_smart_home_zone": "Hent sonemålinger og termostatstyring; én ekstra API-forespørsel per enhet.",
           "fetch_firmware": "Krever et ekstra API-kall per enhet.",
           "fetch_notifications": "Krever et ekstra API-kall per system.",
-          "disconnected_available": "Vis parameterenheter for frakoblede enheter som `tilgjengelige`.",
+          "disconnected_available": "Behold lagrede målinger når en enhet kobles fra. Mislykkede skyoppdateringer gjør fortsatt entiteter utilgjengelige.",
           "expert_mode": "Konfigurer avanserte alternativer."
         }
       },
@@ -319,6 +529,29 @@
           "description": "Angi verdien som skal angis."
         }
       }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "Den valgte myUplink-enheten er utilgjengelig, eller kontoen er ikke lastet. Last kontoen før du bruker {service}."
+    },
+    "connection_error": {
+      "message": "Kan ikke kommunisere med myUplink. Prøv igjen senere."
+    },
+    "api_error": {
+      "message": "myUplink avviste handlingen med HTTP {status}. Kontroller kontotillatelser og abonnementer."
+    },
+    "rate_limited": {
+      "message": "myUplink-grensen for forespørsler er nådd. Prøv igjen om {seconds} sekunder."
+    },
+    "write_rejected": {
+      "message": "myUplink bekreftet ikke den ønskede endringen."
+    },
+    "parameter_not_writable": {
+      "message": "Denne myUplink-parameteren er skrivebeskyttet."
+    },
+    "zone_command_only": {
+      "message": "Denne sonen støtter bare kommandoer og støttes ikke av integrasjonen."
     }
   }
 }

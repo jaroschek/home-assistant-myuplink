@@ -66,17 +66,24 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
         """Update attrs from zone."""
         super()._update_from_zone(zone)
 
-        self._attr_name = zone.name
+        self._attr_translation_key = "myuplink_thermostat"
+        self._attr_translation_placeholders = {"zone": zone.name}
         self._attr_unique_id = f"{DOMAIN}_{self._device.id}_{zone.id}_thermostat"
 
         self._attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
 
         if zone.supported_modes is not None and zone.supported_modes != "":
             self._attr_hvac_modes = [
-                THERMOSTAT_MODE_MAP[mode] for mode in zone.supported_modes.split(",")
+                THERMOSTAT_MODE_MAP[mode]
+                for mode in zone.supported_modes.split(",")
+                if mode in THERMOSTAT_MODE_MAP
             ]
-        elif zone.mode is not None:
-            self._attr_hvac_modes = [THERMOSTAT_MODE_MAP.get(zone.mode)]
+        else:
+            self._attr_hvac_modes = (
+                [THERMOSTAT_MODE_MAP[zone.mode]]
+                if zone.mode in THERMOSTAT_MODE_MAP
+                else []
+            )
         self._attr_hvac_mode = THERMOSTAT_MODE_MAP.get(zone.mode)
 
         self._attr_current_temperature = zone.temperature
@@ -85,17 +92,15 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
         else:
             self._attr_temperature_unit = UnitOfTemperature.FAHRENHEIT
 
-        if (zone.indoor_humidity is not None) and (zone.indoor_humidity != 0):
-            self._attr_current_humidity = zone.indoor_humidity
+        self._attr_current_humidity = zone.indoor_humidity
         if zone.setpoint_range_max is not None:
             self._attr_max_temp = zone.setpoint_range_max
         if zone.setpoint_range_min is not None:
             self._attr_min_temp = zone.setpoint_range_min
-        if zone.setpoint is not None:
-            self._attr_target_temperature = zone.setpoint
-        if zone.setpoint_heating is not None and zone.mode in ("heat", "heatcool"):
+        self._attr_target_temperature = zone.setpoint
+        if zone.setpoint_heating is not None and zone.mode == "heat":
             self._attr_target_temperature = zone.setpoint_heating
-        if zone.setpoint_cooling is not None and zone.mode in ("cool", "heatcool"):
+        if zone.setpoint_cooling is not None and zone.mode == "cool":
             self._attr_target_temperature = zone.setpoint_cooling
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
@@ -111,7 +116,7 @@ class MyUplinkZoneClimateEntity(MyUplinkZoneEntity, ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
         await self._zone.update_zone_property(
-            "mode", THERMOSTAT_MODE_MAP_INVERTED.get(hvac_mode, "heatcool")
+            "mode", THERMOSTAT_MODE_MAP_INVERTED[hvac_mode]
         )
         self._attr_hvac_mode = hvac_mode
         self.async_write_ha_state()
