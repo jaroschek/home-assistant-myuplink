@@ -76,6 +76,12 @@ Setup creates the project's `.venv` and installs Git hooks. If your IDE sets `UV
 
 CI checks formatting, lint, and tests, including 100% coverage of the config flow. The Silver target is above 95% coverage of every integration module; the checklist records this rule as pending until measured coverage meets that target.
 
+### Actions and entity names in 1.9
+
+The `myuplink.set_device_parameter_value` and `myuplink.set_device_zone_property_value` actions are registered when the integration loads. They remain available when an account is unloaded, and report an unavailable-device error until the selected account is loaded. Raw parameter and zone writes require an administrator when called by a signed-in user; Home Assistant automations can continue to call them.
+
+Entity names are relative to their device. Existing unique IDs are retained, so existing entity IDs and names customized in Home Assistant remain associated with the same entities. Newly added entities include their device name in Home Assistant's generated name.
+
 ### AI assistance
 
 AI tools assist with code, tests, and documentation in this project. AI-assisted changes require maintainer review, understanding, and passing automated checks before merging. Pull requests describe the AI assistance and validation performed; the maintainer remains responsible for the changes.
