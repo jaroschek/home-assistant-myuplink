@@ -1,17 +1,15 @@
-
 """API for myUplink bound to Home Assistant OAuth."""
 
 from __future__ import annotations
 
 import asyncio
-from contextlib import suppress
-from datetime import datetime, timedelta
 import json
 import logging
+from contextlib import suppress
+from datetime import datetime, timedelta
 from typing import Any
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     Platform,
@@ -94,7 +92,7 @@ class AsyncConfigEntryAuth:
             return None
         try:
             return int(value)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             _LOGGER.debug("Could not parse %s header value: %r", name, value)
             return None
 

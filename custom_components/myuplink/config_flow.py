@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 import json
 import logging
+from collections.abc import Mapping
 from typing import Any
 
 import jwt
 import voluptuous as vol
-from voluptuous.schema_builder import Schema
-
 from homeassistant.config_entries import (
     SOURCE_REAUTH,
     SOURCE_RECONFIGURE,
@@ -22,6 +20,7 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_entry_oauth2_flow, selector
 from homeassistant.helpers.typing import ConfigType
+from voluptuous.schema_builder import Schema
 
 from .const import (
     CONF_ADDITIONAL_PARAMETER,

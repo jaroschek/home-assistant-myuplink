@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import timedelta
 from http import HTTPStatus
-import logging
 
 import aiohttp
 import jwt
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
