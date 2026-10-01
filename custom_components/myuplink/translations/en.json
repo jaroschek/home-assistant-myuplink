@@ -1,5 +1,46 @@
 {
   "config": {
+    "step": {
+      "pick_implementation": {
+        "title": "Pick Authentication Method"
+      },
+      "options": {
+        "data": {
+          "enable_smart_home_mode": "Enable Smart Home Mode?",
+          "enable_smart_home_zone": "Enable smart home zones",
+          "fetch_firmware": "Fetch Firmware Info from API?",
+          "fetch_notifications": "Fetch Notifications from API?",
+          "scan_interval": "Scan Interval (seconds)",
+          "disconnected_available": "Keep disconnected device readings available?",
+          "expert_mode": "Expert Mode"
+        },
+        "data_description": {
+          "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
+          "enable_smart_home_zone": "Fetch zone measurements and thermostat controls; adds one API request per device.",
+          "fetch_firmware": "Requires an additional API call per device.",
+          "fetch_notifications": "Requires an additional API call per system.",
+          "disconnected_available": "Keep cached device readings available when the device disconnects. Failed cloud updates still make entities unavailable.",
+          "expert_mode": "Configure advanced options."
+        }
+      },
+      "expert": {
+        "title": "Expert Settings",
+        "data": {
+          "platform_override": "Platform Overrides",
+          "writable_without_subscription": "Writable without subscription",
+          "writable_override": "Writable Overrides",
+          "parameter_whitelist": "Parameter Whitelist",
+          "additional_parameter": "Additional Parameter"
+        },
+        "data_description": {
+          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "writable_without_subscription": "When you do not have a Premium subscription and are not able to write parameter values, create writable entities in Home Assistant anyway\n\nThis is enabled by default to avoid issues with lapsed subscriptions, non-Premium users adding subscriptions, and the possibility of myUplink providing manage permissions unilaterally.",
+          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
+          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
+          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
+        }
+      }
+    },
     "abort": {
       "already_configured": "Account is already configured",
       "already_in_progress": "Configuration flow is already in progress",
@@ -16,45 +57,6 @@
     },
     "create_entry": {
       "default": "Successfully authenticated"
-    },
-    "step": {
-      "pick_implementation": {
-        "title": "Pick Authentication Method"
-      },
-      "options": {
-        "data": {
-          "enable_smart_home_mode": "Enable Smart Home Mode?",
-          "fetch_firmware": "Fetch Firmware Info from API?",
-          "fetch_notifications": "Fetch Notifications from API?",
-          "scan_interval": "Scan Interval (seconds)",
-          "disconnected_available": "Keep disconnected parameters available?",
-          "expert_mode": "Expert Mode"
-        },
-        "data_description": {
-          "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
-          "fetch_firmware": "Requires an additional API call per device.",
-          "fetch_notifications": "Requires an additional API call per system.",
-          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
-          "expert_mode": "Configure advanced options."
-        }
-      },
-      "expert": {
-        "title": "Expert Settings",
-        "data": {
-          "platform_override": "Platform Overrides",
-          "writable_without_subscription": "Writable without Premium",
-          "writable_override": "Writable Overrides",
-          "parameter_whitelist": "Parameter Whitelist",
-          "additional_parameter": "Additional Parameter"
-        },
-        "data_description": {
-          "platform_override": "Force a specific platform for a given parameter ID.\n\nThis is sometimes necessary if the myUplink API provides incorrect parameter data and the integration detects the wrong platform.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
-          "writable_without_subscription": "When you do not have a Premium subscription and are not able to write parameter values, create writable entities in Home Assistant anyway\n\nThis is enabled by default to avoid issues with lapsed subscriptions, non-Premium users adding subscriptions, and the possibility of myUplink providing manage permissions unilaterally.",
-          "writable_override": "Set specific parameter to writeable or not writeable.\n\nThis is sometimes necessary if the myUplink API provides the wrong state for the paramter option `writable`.\n\nMust be valid JSON. To restore the default, invalidate the field and save. An empty field will cause no change.",
-          "parameter_whitelist": "Restriction of the requested parameters to a specific list of parameter IDs.\n\nThis can be useful if the myUplink API provides an extremely large number of parameters, some of which are unimportant, and you want to restrict the available list of parameters.\n\nList of parameter IDs separated by commas. An empty list does not result in any restriction. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any change.",
-          "additional_parameter": "Add additional parameter IDs to the query.\n\nIn extremely rare cases, the myUplink API does not provide all available parameters. With this list, it is possible to add known parameter IDs, which are then queried directly.\n\nComma-separated list of parameter IDs. An empty list does not result in any restrictions. Must be valid JSON. To restore the default, invalidate the field and save. An empty field does not result in any changes."
-        }
-      }
     }
   },
   "entity": {
@@ -72,8 +74,21 @@
           "8": "External",
           "9": "Legionella",
           "10": "Vacation",
-          "11": "Boost"
-        }
+          "11": "Boost",
+          "Test": "Test",
+          "Off": "Off",
+          "Sleep": "Sleep",
+          "Eco": "Eco",
+          "Normal": "Normal",
+          "Express": "Express",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "External": "External",
+          "Legionella": "Legionella",
+          "Vacation": "Vacation",
+          "Boost": "Boost"
+        },
+        "name": "{name} ({id})"
       },
       "500": {
         "state": {
@@ -83,16 +98,28 @@
           "7": "Schedule",
           "8": "External",
           "10": "Vacation",
-          "11": "Boost"
-        }
+          "11": "Boost",
+          "Eco": "Eco",
+          "Normal": "Normal",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "External": "External",
+          "Vacation": "Vacation",
+          "Boost": "Boost"
+        },
+        "name": "{name} ({id})"
       },
       "517": {
         "state": {
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W"
-        }
+          "3": "2000W",
+          "700W": "700W",
+          "1300W": "1300W",
+          "2000W": "2000W"
+        },
+        "name": "{name} ({id})"
       },
       "544": {
         "state": {
@@ -100,21 +127,34 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5"
-        }
+          "5": "NO5",
+          "NO1": "NO1",
+          "NO2": "NO2",
+          "NO3": "NO3",
+          "NO4": "NO4",
+          "NO5": "NO5"
+        },
+        "name": "{name} ({id})"
       },
       "549": {
         "state": {
           "0": "Unknown",
           "1": "Cheap",
           "2": "Normal",
-          "3": "Expensive"
-        }
+          "3": "Expensive",
+          "Unknown": "Unknown",
+          "Cheap": "Cheap",
+          "Normal": "Normal",
+          "Expensive": "Expensive"
+        },
+        "name": "{name} ({id})"
       },
       "601": {
         "state": {
-          "1": "heat"
-        }
+          "1": "heat",
+          "heat": "heat"
+        },
+        "name": "{name} ({id})"
       },
       "1965": {
         "state": {
@@ -124,8 +164,14 @@
           "100": "Stopping",
           "120": "Defrosting",
           "140": "Defrosting",
-          "160": "Defrosting"
-        }
+          "160": "Defrosting",
+          "Off": "Off",
+          "Starting": "Starting",
+          "On": "On",
+          "Stopping": "Stopping",
+          "Defrosting": "Defrosting"
+        },
+        "name": "{name} ({id})"
       },
       "14950": {
         "state": {
@@ -135,8 +181,16 @@
           "3": "Hot water",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Preheating"
-        }
+          "6": "Preheating",
+          "Off": "Off",
+          "Heating": "Heating",
+          "Cooling": "Cooling",
+          "Hot water": "Hot water",
+          "Pool": "Pool",
+          "Pool 2": "Pool 2",
+          "Preheating": "Preheating"
+        },
+        "name": "{name} ({id})"
       },
       "55000": {
         "state": {
@@ -146,8 +200,16 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Transfer",
-          "60": "Cooling"
-        }
+          "60": "Cooling",
+          "Off": "Off",
+          "Hot water": "Hot water",
+          "Heating": "Heating",
+          "Pool": "Pool",
+          "Pool 2": "Pool 2",
+          "Transfer": "Transfer",
+          "Cooling": "Cooling"
+        },
+        "name": "{name} ({id})"
       },
       "55027": {
         "state": {
@@ -157,21 +219,127 @@
           "3": "Off",
           "4": "Blocked",
           "5": "Off",
-          "6": "Active"
-        }
+          "6": "Active",
+          "Alarm": "Alarm",
+          "Active": "Active",
+          "Off": "Off",
+          "Blocked": "Blocked"
+        },
+        "name": "{name} ({id})"
+      },
+      "62005": {
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap",
+          "Heat pump upper": "Heat pump upper",
+          "Heat pump lower": "Heat pump lower",
+          "Additional heat": "Additional heat",
+          "Heat pump + Additional heat": "Heat pump + Additional heat",
+          "Heating": "Heating",
+          "Hot water": "Hot water",
+          "Pool": "Pool",
+          "Off": "Off",
+          "Heating mixing": "Heating mixing",
+          "Wood": "Wood",
+          "Hot water / Heating": "Hot water / Heating",
+          "Cooling": "Cooling",
+          "Swap": "Swap"
+        },
+        "name": "{name} ({id})"
+      },
+      "62017": {
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water",
+          "Off, start delay": "Off, start delay",
+          "Off, ready to start": "Off, ready to start",
+          "Waiting for flow": "Waiting for flow",
+          "On": "On",
+          "Defrosting": "Defrosting",
+          "Cooling": "Cooling",
+          "Blocked": "Blocked",
+          "Off, alarm": "Off, alarm",
+          "Function test": "Function test",
+          "Not defined": "Not defined",
+          "Compressor disabled": "Compressor disabled",
+          "Communication error": "Communication error",
+          "Hot water": "Hot water"
+        },
+        "name": "{name} ({id})"
+      },
+      "62246": {
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling",
+          "Heating off": "Heating off",
+          "Holiday": "Holiday",
+          "Night reduction": "Night reduction",
+          "On": "On",
+          "Cooling": "Cooling"
+        },
+        "name": "{name} ({id})"
       },
       "myuplink_notifications": {
         "name": "Notifications"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      },
+      "parameter_percentage": {
+        "name": "{name} ({id})"
+      },
+      "myuplink_zone_temperature": {
+        "name": "{zone} Temperature"
+      },
+      "myuplink_zone_humidity": {
+        "name": "{zone} Humidity"
+      },
+      "myuplink_zone_mode": {
+        "name": "{zone} Mode"
+      },
+      "myuplink_zone_co2": {
+        "name": "{zone} CO2"
       }
     },
     "binary_sensor": {
       "myuplink_connection_state": {
         "name": "Connection State"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
       }
     },
     "climate": {
       "myuplink_thermostat": {
-        "name": "Thermostat"
+        "name": "{zone}"
       }
     },
     "select": {
@@ -184,11 +352,270 @@
           "vacation": "Vacation",
           "home": "Home"
         }
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "406": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Test",
+          "1": "Off",
+          "2": "Sleep",
+          "3": "Eco",
+          "4": "Normal",
+          "5": "Express",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "9": "Legionella",
+          "10": "Vacation",
+          "11": "Boost",
+          "Test": "Test",
+          "Off": "Off",
+          "Sleep": "Sleep",
+          "Eco": "Eco",
+          "Normal": "Normal",
+          "Express": "Express",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "External": "External",
+          "Legionella": "Legionella",
+          "Vacation": "Vacation",
+          "Boost": "Boost"
+        }
+      },
+      "500": {
+        "name": "{name} ({id})",
+        "state": {
+          "3": "Eco",
+          "4": "Normal",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "10": "Vacation",
+          "11": "Boost",
+          "Eco": "Eco",
+          "Normal": "Normal",
+          "Price": "Price",
+          "Schedule": "Schedule",
+          "External": "External",
+          "Vacation": "Vacation",
+          "Boost": "Boost"
+        }
+      },
+      "517": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W",
+          "700W": "700W",
+          "1300W": "1300W",
+          "2000W": "2000W"
+        }
+      },
+      "544": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5",
+          "NO1": "NO1",
+          "NO2": "NO2",
+          "NO3": "NO3",
+          "NO4": "NO4",
+          "NO5": "NO5"
+        }
+      },
+      "549": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Unknown",
+          "1": "Cheap",
+          "2": "Normal",
+          "3": "Expensive",
+          "Unknown": "Unknown",
+          "Cheap": "Cheap",
+          "Normal": "Normal",
+          "Expensive": "Expensive"
+        }
+      },
+      "601": {
+        "name": "{name} ({id})",
+        "state": {
+          "1": "heat",
+          "heat": "heat"
+        }
+      },
+      "1965": {
+        "name": "{name} ({id})",
+        "state": {
+          "20": "Off",
+          "40": "Starting",
+          "60": "On",
+          "100": "Stopping",
+          "120": "Defrosting",
+          "140": "Defrosting",
+          "160": "Defrosting",
+          "Off": "Off",
+          "Starting": "Starting",
+          "On": "On",
+          "Stopping": "Stopping",
+          "Defrosting": "Defrosting"
+        }
+      },
+      "14950": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Off",
+          "1": "Heating",
+          "2": "Cooling",
+          "3": "Hot water",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Preheating",
+          "Off": "Off",
+          "Heating": "Heating",
+          "Cooling": "Cooling",
+          "Hot water": "Hot water",
+          "Pool": "Pool",
+          "Pool 2": "Pool 2",
+          "Preheating": "Preheating"
+        }
+      },
+      "55000": {
+        "name": "{name} ({id})",
+        "state": {
+          "10": "Off",
+          "20": "Hot water",
+          "30": "Heating",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Transfer",
+          "60": "Cooling",
+          "Off": "Off",
+          "Hot water": "Hot water",
+          "Heating": "Heating",
+          "Pool": "Pool",
+          "Pool 2": "Pool 2",
+          "Transfer": "Transfer",
+          "Cooling": "Cooling"
+        }
+      },
+      "55027": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Active",
+          "3": "Off",
+          "4": "Blocked",
+          "5": "Off",
+          "6": "Active",
+          "Alarm": "Alarm",
+          "Active": "Active",
+          "Off": "Off",
+          "Blocked": "Blocked"
+        }
+      },
+      "62005": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap",
+          "Heat pump upper": "Heat pump upper",
+          "Heat pump lower": "Heat pump lower",
+          "Additional heat": "Additional heat",
+          "Heat pump + Additional heat": "Heat pump + Additional heat",
+          "Heating": "Heating",
+          "Hot water": "Hot water",
+          "Pool": "Pool",
+          "Off": "Off",
+          "Heating mixing": "Heating mixing",
+          "Wood": "Wood",
+          "Hot water / Heating": "Hot water / Heating",
+          "Cooling": "Cooling",
+          "Swap": "Swap"
+        }
+      },
+      "62017": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water",
+          "Off, start delay": "Off, start delay",
+          "Off, ready to start": "Off, ready to start",
+          "Waiting for flow": "Waiting for flow",
+          "On": "On",
+          "Defrosting": "Defrosting",
+          "Cooling": "Cooling",
+          "Blocked": "Blocked",
+          "Off, alarm": "Off, alarm",
+          "Function test": "Function test",
+          "Not defined": "Not defined",
+          "Compressor disabled": "Compressor disabled",
+          "Communication error": "Communication error",
+          "Hot water": "Hot water"
+        }
+      },
+      "62246": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling",
+          "Heating off": "Heating off",
+          "Holiday": "Holiday",
+          "Night reduction": "Night reduction",
+          "On": "On",
+          "Cooling": "Cooling"
+        }
       }
     },
     "update": {
       "myuplink_firmware": {
         "name": "Firmware"
+      }
+    },
+    "number": {
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      }
+    },
+    "switch": {
+      "parameter": {
+        "name": "{name} ({id})"
       }
     }
   },
@@ -197,27 +624,27 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Enable Smart Home Mode?",
-          "enable_smart_home_zone": "Enable Smart Home Zone?",
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
-          "disconnected_available": "Keep disconnected parameters available?",
-          "expert_mode": "Expert Mode"
+          "disconnected_available": "Keep disconnected device readings available?",
+          "expert_mode": "Expert Mode",
+          "enable_smart_home_zone": "Enable smart home zones"
         },
         "data_description": {
           "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
-          "enable_smart_home_zone": "Requires an additional API call per device.",
           "fetch_firmware": "Requires an additional API call per device.",
           "fetch_notifications": "Requires an additional API call per system.",
-          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
-          "expert_mode": "Configure advanced options."
+          "disconnected_available": "Keep cached device readings available when the device disconnects. Failed cloud updates still make entities unavailable.",
+          "expert_mode": "Configure advanced options.",
+          "enable_smart_home_zone": "Fetch zone measurements and thermostat controls; adds one API request per device."
         }
       },
       "expert": {
         "title": "Expert Settings",
         "data": {
           "platform_override": "Platform Overrides",
-          "writable_without_subscription": "Writable without Premium",
+          "writable_without_subscription": "Writable without subscription",
           "writable_override": "Writable Overrides",
           "parameter_whitelist": "Parameter Whitelist",
           "additional_parameter": "Additional Parameter"

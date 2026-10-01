@@ -18,7 +18,11 @@ def test_parameter_identity(
     """Name a point relative to its device while retaining the existing unique ID."""
     entity = MyUplinkParameterEntity(coordinator, device, parameter)
     assert entity.has_entity_name
-    assert entity.name == "Heating Supply temperature (123)"
+    assert entity.translation_key == "parameter"
+    assert entity.translation_placeholders == {
+        "name": "Heating Supply temperature",
+        "id": "123",
+    }
     assert entity.unique_id == "myuplink_device-1_123"
     assert entity.device_info["identifiers"] == {("myuplink", "device-1")}
 
