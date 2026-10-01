@@ -74,19 +74,7 @@
           "8": "External",
           "9": "Legionella",
           "10": "Vacation",
-          "11": "Boost",
-          "Test": "Test",
-          "Off": "Off",
-          "Sleep": "Sleep",
-          "Eco": "Eco",
-          "Normal": "Normal",
-          "Express": "Express",
-          "Price": "Price",
-          "Schedule": "Schedule",
-          "External": "External",
-          "Legionella": "Legionella",
-          "Vacation": "Vacation",
-          "Boost": "Boost"
+          "11": "Boost"
         },
         "name": "{name} ({id})"
       },
@@ -98,14 +86,7 @@
           "7": "Schedule",
           "8": "External",
           "10": "Vacation",
-          "11": "Boost",
-          "Eco": "Eco",
-          "Normal": "Normal",
-          "Price": "Price",
-          "Schedule": "Schedule",
-          "External": "External",
-          "Vacation": "Vacation",
-          "Boost": "Boost"
+          "11": "Boost"
         },
         "name": "{name} ({id})"
       },
@@ -114,10 +95,7 @@
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W",
-          "700W": "700W",
-          "1300W": "1300W",
-          "2000W": "2000W"
+          "3": "2000W"
         },
         "name": "{name} ({id})"
       },
@@ -127,12 +105,7 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5",
-          "NO1": "NO1",
-          "NO2": "NO2",
-          "NO3": "NO3",
-          "NO4": "NO4",
-          "NO5": "NO5"
+          "5": "NO5"
         },
         "name": "{name} ({id})"
       },
@@ -141,11 +114,7 @@
           "0": "Unknown",
           "1": "Cheap",
           "2": "Normal",
-          "3": "Expensive",
-          "Unknown": "Unknown",
-          "Cheap": "Cheap",
-          "Normal": "Normal",
-          "Expensive": "Expensive"
+          "3": "Expensive"
         },
         "name": "{name} ({id})"
       },
@@ -164,12 +133,7 @@
           "100": "Stopping",
           "120": "Defrosting",
           "140": "Defrosting",
-          "160": "Defrosting",
-          "Off": "Off",
-          "Starting": "Starting",
-          "On": "On",
-          "Stopping": "Stopping",
-          "Defrosting": "Defrosting"
+          "160": "Defrosting"
         },
         "name": "{name} ({id})"
       },
@@ -181,14 +145,7 @@
           "3": "Hot water",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Preheating",
-          "Off": "Off",
-          "Heating": "Heating",
-          "Cooling": "Cooling",
-          "Hot water": "Hot water",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Preheating": "Preheating"
+          "6": "Preheating"
         },
         "name": "{name} ({id})"
       },
@@ -200,14 +157,7 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Transfer",
-          "60": "Cooling",
-          "Off": "Off",
-          "Hot water": "Hot water",
-          "Heating": "Heating",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Transfer": "Transfer",
-          "Cooling": "Cooling"
+          "60": "Cooling"
         },
         "name": "{name} ({id})"
       },
@@ -219,11 +169,7 @@
           "3": "Off",
           "4": "Blocked",
           "5": "Off",
-          "6": "Active",
-          "Alarm": "Alarm",
-          "Active": "Active",
-          "Off": "Off",
-          "Blocked": "Blocked"
+          "6": "Active"
         },
         "name": "{name} ({id})"
       },
@@ -241,20 +187,7 @@
           "9": "Wood",
           "10": "Hot water / Heating",
           "11": "Cooling",
-          "12": "Swap",
-          "Heat pump upper": "Heat pump upper",
-          "Heat pump lower": "Heat pump lower",
-          "Additional heat": "Additional heat",
-          "Heat pump + Additional heat": "Heat pump + Additional heat",
-          "Heating": "Heating",
-          "Hot water": "Hot water",
-          "Pool": "Pool",
-          "Off": "Off",
-          "Heating mixing": "Heating mixing",
-          "Wood": "Wood",
-          "Hot water / Heating": "Hot water / Heating",
-          "Cooling": "Cooling",
-          "Swap": "Swap"
+          "12": "Swap"
         },
         "name": "{name} ({id})"
       },
@@ -272,20 +205,7 @@
           "30": "Not defined",
           "31": "Compressor disabled",
           "32": "Communication error",
-          "33": "Hot water",
-          "Off, start delay": "Off, start delay",
-          "Off, ready to start": "Off, ready to start",
-          "Waiting for flow": "Waiting for flow",
-          "On": "On",
-          "Defrosting": "Defrosting",
-          "Cooling": "Cooling",
-          "Blocked": "Blocked",
-          "Off, alarm": "Off, alarm",
-          "Function test": "Function test",
-          "Not defined": "Not defined",
-          "Compressor disabled": "Compressor disabled",
-          "Communication error": "Communication error",
-          "Hot water": "Hot water"
+          "33": "Hot water"
         },
         "name": "{name} ({id})"
       },
@@ -295,12 +215,7 @@
           "1": "Holiday",
           "2": "Night reduction",
           "3": "On",
-          "4": "Cooling",
-          "Heating off": "Heating off",
-          "Holiday": "Holiday",
-          "Night reduction": "Night reduction",
-          "On": "On",
-          "Cooling": "Cooling"
+          "4": "Cooling"
         },
         "name": "{name} ({id})"
       },
@@ -370,19 +285,7 @@
           "8": "External",
           "9": "Legionella",
           "10": "Vacation",
-          "11": "Boost",
-          "Test": "Test",
-          "Off": "Off",
-          "Sleep": "Sleep",
-          "Eco": "Eco",
-          "Normal": "Normal",
-          "Express": "Express",
-          "Price": "Price",
-          "Schedule": "Schedule",
-          "External": "External",
-          "Legionella": "Legionella",
-          "Vacation": "Vacation",
-          "Boost": "Boost"
+          "11": "Boost"
         }
       },
       "500": {
@@ -394,14 +297,7 @@
           "7": "Schedule",
           "8": "External",
           "10": "Vacation",
-          "11": "Boost",
-          "Eco": "Eco",
-          "Normal": "Normal",
-          "Price": "Price",
-          "Schedule": "Schedule",
-          "External": "External",
-          "Vacation": "Vacation",
-          "Boost": "Boost"
+          "11": "Boost"
         }
       },
       "517": {
@@ -410,10 +306,7 @@
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W",
-          "700W": "700W",
-          "1300W": "1300W",
-          "2000W": "2000W"
+          "3": "2000W"
         }
       },
       "544": {
@@ -423,12 +316,7 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5",
-          "NO1": "NO1",
-          "NO2": "NO2",
-          "NO3": "NO3",
-          "NO4": "NO4",
-          "NO5": "NO5"
+          "5": "NO5"
         }
       },
       "549": {
@@ -437,11 +325,7 @@
           "0": "Unknown",
           "1": "Cheap",
           "2": "Normal",
-          "3": "Expensive",
-          "Unknown": "Unknown",
-          "Cheap": "Cheap",
-          "Normal": "Normal",
-          "Expensive": "Expensive"
+          "3": "Expensive"
         }
       },
       "601": {
@@ -460,12 +344,7 @@
           "100": "Stopping",
           "120": "Defrosting",
           "140": "Defrosting",
-          "160": "Defrosting",
-          "Off": "Off",
-          "Starting": "Starting",
-          "On": "On",
-          "Stopping": "Stopping",
-          "Defrosting": "Defrosting"
+          "160": "Defrosting"
         }
       },
       "14950": {
@@ -477,14 +356,7 @@
           "3": "Hot water",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Preheating",
-          "Off": "Off",
-          "Heating": "Heating",
-          "Cooling": "Cooling",
-          "Hot water": "Hot water",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Preheating": "Preheating"
+          "6": "Preheating"
         }
       },
       "55000": {
@@ -496,14 +368,7 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Transfer",
-          "60": "Cooling",
-          "Off": "Off",
-          "Hot water": "Hot water",
-          "Heating": "Heating",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Transfer": "Transfer",
-          "Cooling": "Cooling"
+          "60": "Cooling"
         }
       },
       "55027": {
@@ -515,11 +380,7 @@
           "3": "Off",
           "4": "Blocked",
           "5": "Off",
-          "6": "Active",
-          "Alarm": "Alarm",
-          "Active": "Active",
-          "Off": "Off",
-          "Blocked": "Blocked"
+          "6": "Active"
         }
       },
       "62005": {
@@ -537,20 +398,7 @@
           "9": "Wood",
           "10": "Hot water / Heating",
           "11": "Cooling",
-          "12": "Swap",
-          "Heat pump upper": "Heat pump upper",
-          "Heat pump lower": "Heat pump lower",
-          "Additional heat": "Additional heat",
-          "Heat pump + Additional heat": "Heat pump + Additional heat",
-          "Heating": "Heating",
-          "Hot water": "Hot water",
-          "Pool": "Pool",
-          "Off": "Off",
-          "Heating mixing": "Heating mixing",
-          "Wood": "Wood",
-          "Hot water / Heating": "Hot water / Heating",
-          "Cooling": "Cooling",
-          "Swap": "Swap"
+          "12": "Swap"
         }
       },
       "62017": {
@@ -568,20 +416,7 @@
           "30": "Not defined",
           "31": "Compressor disabled",
           "32": "Communication error",
-          "33": "Hot water",
-          "Off, start delay": "Off, start delay",
-          "Off, ready to start": "Off, ready to start",
-          "Waiting for flow": "Waiting for flow",
-          "On": "On",
-          "Defrosting": "Defrosting",
-          "Cooling": "Cooling",
-          "Blocked": "Blocked",
-          "Off, alarm": "Off, alarm",
-          "Function test": "Function test",
-          "Not defined": "Not defined",
-          "Compressor disabled": "Compressor disabled",
-          "Communication error": "Communication error",
-          "Hot water": "Hot water"
+          "33": "Hot water"
         }
       },
       "62246": {
@@ -591,12 +426,7 @@
           "1": "Holiday",
           "2": "Night reduction",
           "3": "On",
-          "4": "Cooling",
-          "Heating off": "Heating off",
-          "Holiday": "Holiday",
-          "Night reduction": "Night reduction",
-          "On": "On",
-          "Cooling": "Cooling"
+          "4": "Cooling"
         }
       }
     },
