@@ -90,6 +90,16 @@ HTTP 429 responses use `Retry-After` (seconds or an HTTP date), falling back to 
 
 The optional subscription endpoint's HTTP 500 response retains known manage permissions and logs one warning per outage. Authentication failures from that endpoint still start reauthentication.
 
+### Discovery, removal, and diagnostics in 1.9
+
+New devices, parameters, and smart-home zones are discovered after a successful refresh. A parameter retains its initial Home Assistant platform until account reload, preventing duplicate entities if its writable flag changes. Duplicate point responses are combined by parameter ID. Zero-valued zone measurements are included.
+
+Missing systems, devices, points, and zones make their existing entities unavailable. They become available again when data returns. The disconnected-availability option keeps cached device readings available, while a failed cloud refresh still makes them unavailable. The connection diagnostic remains available to report an offline device.
+
+Devices are not deleted automatically because a temporary absence from the cloud does not confirm permanent removal. After a device disappears, remove its registry entry from **Settings → Devices & services → Devices**. Devices still present in the account are protected from manual removal through this integration. Unloaded accounts allow manual cleanup.
+
+Download diagnostics from the integration's entry in **Settings → Devices & services**. Diagnostics use cached metadata without making API requests. Account credentials, entry identity, cloud system and device IDs, serial numbers, and system/device/zone names are redacted; notification text is omitted.
+
 ### AI assistance
 
 AI tools assist with code, tests, and documentation in this project. AI-assisted changes require maintainer review, understanding, and passing automated checks before merging. Pull requests describe the AI assistance and validation performed; the maintainer remains responsible for the changes.

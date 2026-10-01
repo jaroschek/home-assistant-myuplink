@@ -1,6 +1,5 @@
 """Local Home Assistant fixtures for the myUplink regression tests."""
 
-import logging
 from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
 from types import MappingProxyType
@@ -15,7 +14,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import frame
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from custom_components.myuplink import async_setup_entry
 from custom_components.myuplink.api import (
@@ -40,6 +38,7 @@ from custom_components.myuplink.const import (
     DOMAIN,
     SCOPES,
 )
+from custom_components.myuplink.coordinator import MyUplinkCoordinator
 
 
 @pytest.fixture
@@ -235,11 +234,17 @@ def zone(device: Device) -> Zone:
 
 @pytest.fixture
 def coordinator(
-    hass: HomeAssistant, system: System
-) -> DataUpdateCoordinator[list[System]]:
+    hass: HomeAssistant,
+    system: System,
+    device: Device,
+    parameter: Parameter,
+    zone: Zone,
+) -> MyUplinkCoordinator:
     """Provide cached coordinator data without scheduling cloud updates."""
-    result = DataUpdateCoordinator(
-        hass, logging.getLogger(DOMAIN), name="myUplink", config_entry=system.api.entry
-    )
+    result = MyUplinkCoordinator(hass, system.api.entry, system.api)
+    system.devices = [device]
+    device.parameters = [parameter]
+    device.zones = [zone]
     result.async_set_updated_data([system])
+    system.api.entry.runtime_data = result
     return result

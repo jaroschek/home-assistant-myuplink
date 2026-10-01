@@ -15,7 +15,12 @@ from .const import (
     DOMAIN,
     SmartHomeModes,
 )
-from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, MyUplinkSystemEntity
+from .entity import (
+    MyUplinkDeviceEntity,
+    MyUplinkParameterEntity,
+    MyUplinkSystemEntity,
+    async_setup_entities,
+)
 
 PARALLEL_UPDATES = 0
 
@@ -26,35 +31,37 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[SelectEntity] = []
 
-    enable_smart_home_mode = entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True)
+    def build_entities() -> list[SelectEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[SelectEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        if enable_smart_home_mode:
-            if len(system.devices) == 1:
-                entities.append(
-                    MyUplinkSmartHomeModeDeviceSelectEntity(
-                        coordinator, system.devices[0]
+        enable_smart_home_mode = entry.options.get(CONF_ENABLE_SMART_HOME_MODE, True)
+
+        for system in coordinator.data:
+            if enable_smart_home_mode:
+                if len(system.devices) == 1:
+                    entities.append(
+                        MyUplinkSmartHomeModeDeviceSelectEntity(
+                            coordinator, system.devices[0]
+                        )
                     )
-                )
-            else:
-                entities.append(
-                    MyUplinkSmartHomeModeSystemSelectEntity(coordinator, system)
-                )
+                else:
+                    entities.append(
+                        MyUplinkSmartHomeModeSystemSelectEntity(coordinator, system)
+                    )
 
-        for device in system.devices:
-            device: Device
-            [
-                entities.append(
-                    MyUplinkParameterSelectEntity(coordinator, device, parameter)
-                )
-                for parameter in device.parameters
-                if parameter.get_platform() == Platform.SELECT
-            ]
+            for device in system.devices:
+                [
+                    entities.append(
+                        MyUplinkParameterSelectEntity(coordinator, device, parameter)
+                    )
+                    for parameter in device.parameters
+                    if coordinator.parameter_platform(parameter) == Platform.SELECT
+                ]
+        return entities
 
-    async_add_entities(entities)
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkParameterSelectEntity(MyUplinkParameterEntity, SelectEntity):
