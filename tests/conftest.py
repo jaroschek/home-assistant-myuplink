@@ -48,8 +48,9 @@ async def hass(tmp_path: Path) -> AsyncGenerator[HomeAssistant]:
     instance.config_entries = ConfigEntries(instance, {})
     frame.async_setup(instance)
     loader.async_setup(instance)
-    dr.async_setup(instance)
-    await dr.async_load(instance)
+    device_registry = dr.DeviceRegistry(instance)
+    instance.data[dr.DATA_REGISTRY] = device_registry
+    await device_registry.async_load()
     await er.async_load(instance)
     with patch.object(instance.config_entries, "_async_schedule_save"):
         yield instance

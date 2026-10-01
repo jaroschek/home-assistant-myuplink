@@ -6,7 +6,7 @@ This series improves the custom integration against Home Assistant's Integration
 
 ### Compatibility and upgrade notes
 
-- Home Assistant **2026.9.4 or newer** is required and declared in the HACS manifest. Development uses Python 3.14.2 or newer; CI tests Python 3.14.5.
+- Supports Home Assistant **2026.1 and newer**. HACS declares 2026.1.0 as the minimum, and CI checks January and September releases. Home Assistant provides the required Python runtime.
 - Existing entity unique IDs, registry entity IDs, and names customized in Home Assistant are preserved. Default names now follow device-relative naming and translated fixed labels.
 - Notification sensors are diagnostic and disabled by default when newly created. Existing enabled entities retain their setting. Enable a new notification entity manually if wanted.
 - Recognized duration and flow-rate unit aliases are normalized. Ambiguous manufacturer units such as **Ws** remain unclassified.
@@ -33,6 +33,6 @@ This series improves the custom integration against Home Assistant's Integration
 - Document account setup, every option and raw action, supported models and functions, polling, limitations, use cases, removal, and troubleshooting.
 - Disclose AI assistance in the README and PR template while retaining maintainer responsibility and review before merging.
 - Add a locked development environment, strict mypy typing, lint/format checks, translation synchronization, and network-isolated tests.
-- Require above 95% statement and branch coverage in every integration module and 100% config-flow coverage in CI. The release candidate has 234 passing tests and 99.61% overall coverage.
+- Require above 95% statement and branch coverage in every integration module and 100% config-flow coverage in CI. The release candidate has 234 tests, run against both supported test environments.
 
 Automated tests use synthetic API data. Device-specific behavior still requires validation on supported hardware and subscriptions before release.
