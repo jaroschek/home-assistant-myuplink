@@ -74,19 +74,7 @@
           "8": "Ekstern",
           "9": "Legionella",
           "10": "Ferie",
-          "11": "Boost",
-          "Test": "Test",
-          "Off": "Slukket",
-          "Sleep": "Søvn",
-          "Eco": "Øko",
-          "Normal": "Normal",
-          "Express": "Ekspres",
-          "Price": "Pris",
-          "Schedule": "Tidsplan",
-          "External": "Ekstern",
-          "Legionella": "Legionella",
-          "Vacation": "Ferie",
-          "Boost": "Boost"
+          "11": "Boost"
         },
         "name": "{name} ({id})"
       },
@@ -98,14 +86,7 @@
           "7": "Tidsplan",
           "8": "Ekstern",
           "10": "Ferie",
-          "11": "Boost",
-          "Eco": "Øko",
-          "Normal": "Normal",
-          "Price": "Pris",
-          "Schedule": "Tidsplan",
-          "External": "Ekstern",
-          "Vacation": "Ferie",
-          "Boost": "Boost"
+          "11": "Boost"
         },
         "name": "{name} ({id})"
       },
@@ -114,10 +95,7 @@
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W",
-          "700W": "700W",
-          "1300W": "1300W",
-          "2000W": "2000W"
+          "3": "2000W"
         },
         "name": "{name} ({id})"
       },
@@ -127,12 +105,7 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5",
-          "NO1": "NO1",
-          "NO2": "NO2",
-          "NO3": "NO3",
-          "NO4": "NO4",
-          "NO5": "NO5"
+          "5": "NO5"
         },
         "name": "{name} ({id})"
       },
@@ -141,11 +114,7 @@
           "0": "Ukendt",
           "1": "Billig",
           "2": "Normal",
-          "3": "Dyr",
-          "Unknown": "Ukendt",
-          "Cheap": "Billig",
-          "Normal": "Normal",
-          "Expensive": "Dyr"
+          "3": "Dyr"
         },
         "name": "{name} ({id})"
       },
@@ -164,12 +133,7 @@
           "100": "Stopper",
           "120": "Afrimer",
           "140": "Afrimer",
-          "160": "Afrimer",
-          "Off": "Slukket",
-          "Starting": "Starter",
-          "On": "Tændt",
-          "Stopping": "Stopper",
-          "Defrosting": "Afrimer"
+          "160": "Afrimer"
         },
         "name": "{name} ({id})"
       },
@@ -181,14 +145,7 @@
           "3": "Varmt vand",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Forvarmning",
-          "Off": "Slukket",
-          "Heating": "Opvarmning",
-          "Cooling": "Køling",
-          "Hot water": "Varmt vand",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Preheating": "Forvarmning"
+          "6": "Forvarmning"
         },
         "name": "{name} ({id})"
       },
@@ -200,14 +157,7 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Overførsel",
-          "60": "Køling",
-          "Off": "Slukket",
-          "Hot water": "Varmt vand",
-          "Heating": "Opvarmning",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Transfer": "Overførsel",
-          "Cooling": "Køling"
+          "60": "Køling"
         },
         "name": "{name} ({id})"
       },
@@ -219,11 +169,7 @@
           "3": "Slukket",
           "4": "Blokeret",
           "5": "Slukket",
-          "6": "Aktiv",
-          "Alarm": "Alarm",
-          "Active": "Aktiv",
-          "Off": "Slukket",
-          "Blocked": "Blokeret"
+          "6": "Aktiv"
         },
         "name": "{name} ({id})"
       },
@@ -242,77 +188,46 @@
       "62005": {
         "state": {
           "0": "Heat pump upper",
-          "Heat pump upper": "Heat pump upper",
           "1": "Heat pump lower",
-          "Heat pump lower": "Heat pump lower",
           "2": "Additional heat",
-          "Additional heat": "Additional heat",
           "3": "Heat pump + Additional heat",
-          "Heat pump + Additional heat": "Heat pump + Additional heat",
           "4": "Heating",
-          "Heating": "Heating",
           "5": "Hot water",
-          "Hot water": "Hot water",
           "6": "Pool",
-          "Pool": "Pool",
           "7": "Off",
-          "Off": "Off",
           "8": "Heating mixing",
-          "Heating mixing": "Heating mixing",
           "9": "Wood",
-          "Wood": "Wood",
           "10": "Hot water / Heating",
-          "Hot water / Heating": "Hot water / Heating",
           "11": "Cooling",
-          "Cooling": "Cooling",
-          "12": "Swap",
-          "Swap": "Swap"
+          "12": "Swap"
         },
         "name": "{name} ({id})"
       },
       "62017": {
         "state": {
           "0": "Off, start delay",
-          "Off, start delay": "Off, start delay",
           "1": "Off, ready to start",
-          "Off, ready to start": "Off, ready to start",
           "2": "Waiting for flow",
-          "Waiting for flow": "Waiting for flow",
           "3": "On",
-          "On": "On",
           "4": "Defrosting",
-          "Defrosting": "Defrosting",
           "5": "Cooling",
-          "Cooling": "Cooling",
           "6": "Blocked",
-          "Blocked": "Blocked",
           "7": "Off, alarm",
-          "Off, alarm": "Off, alarm",
           "8": "Function test",
-          "Function test": "Function test",
           "30": "Not defined",
-          "Not defined": "Not defined",
           "31": "Compressor disabled",
-          "Compressor disabled": "Compressor disabled",
           "32": "Communication error",
-          "Communication error": "Communication error",
-          "33": "Hot water",
-          "Hot water": "Hot water"
+          "33": "Hot water"
         },
         "name": "{name} ({id})"
       },
       "62246": {
         "state": {
           "0": "Heating off",
-          "Heating off": "Heating off",
           "1": "Holiday",
-          "Holiday": "Holiday",
           "2": "Night reduction",
-          "Night reduction": "Night reduction",
           "3": "On",
-          "On": "On",
-          "4": "Cooling",
-          "Cooling": "Cooling"
+          "4": "Cooling"
         },
         "name": "{name} ({id})"
       },
@@ -370,19 +285,7 @@
           "8": "Ekstern",
           "9": "Legionella",
           "10": "Ferie",
-          "11": "Boost",
-          "Test": "Test",
-          "Off": "Slukket",
-          "Sleep": "Søvn",
-          "Eco": "Øko",
-          "Normal": "Normal",
-          "Express": "Ekspres",
-          "Price": "Pris",
-          "Schedule": "Tidsplan",
-          "External": "Ekstern",
-          "Legionella": "Legionella",
-          "Vacation": "Ferie",
-          "Boost": "Boost"
+          "11": "Boost"
         }
       },
       "500": {
@@ -394,14 +297,7 @@
           "7": "Tidsplan",
           "8": "Ekstern",
           "10": "Ferie",
-          "11": "Boost",
-          "Eco": "Øko",
-          "Normal": "Normal",
-          "Price": "Pris",
-          "Schedule": "Tidsplan",
-          "External": "Ekstern",
-          "Vacation": "Ferie",
-          "Boost": "Boost"
+          "11": "Boost"
         }
       },
       "517": {
@@ -410,10 +306,7 @@
           "0": "0",
           "1": "700W",
           "2": "1300W",
-          "3": "2000W",
-          "700W": "700W",
-          "1300W": "1300W",
-          "2000W": "2000W"
+          "3": "2000W"
         }
       },
       "544": {
@@ -423,12 +316,7 @@
           "2": "NO2",
           "3": "NO3",
           "4": "NO4",
-          "5": "NO5",
-          "NO1": "NO1",
-          "NO2": "NO2",
-          "NO3": "NO3",
-          "NO4": "NO4",
-          "NO5": "NO5"
+          "5": "NO5"
         }
       },
       "549": {
@@ -437,11 +325,7 @@
           "0": "Ukendt",
           "1": "Billig",
           "2": "Normal",
-          "3": "Dyr",
-          "Unknown": "Ukendt",
-          "Cheap": "Billig",
-          "Normal": "Normal",
-          "Expensive": "Dyr"
+          "3": "Dyr"
         }
       },
       "601": {
@@ -460,12 +344,7 @@
           "100": "Stopper",
           "120": "Afrimer",
           "140": "Afrimer",
-          "160": "Afrimer",
-          "Off": "Slukket",
-          "Starting": "Starter",
-          "On": "Tændt",
-          "Stopping": "Stopper",
-          "Defrosting": "Afrimer"
+          "160": "Afrimer"
         }
       },
       "14950": {
@@ -477,14 +356,7 @@
           "3": "Varmt vand",
           "4": "Pool",
           "5": "Pool 2",
-          "6": "Forvarmning",
-          "Off": "Slukket",
-          "Heating": "Opvarmning",
-          "Cooling": "Køling",
-          "Hot water": "Varmt vand",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Preheating": "Forvarmning"
+          "6": "Forvarmning"
         }
       },
       "55000": {
@@ -496,14 +368,7 @@
           "40": "Pool",
           "41": "Pool 2",
           "50": "Overførsel",
-          "60": "Køling",
-          "Off": "Slukket",
-          "Hot water": "Varmt vand",
-          "Heating": "Opvarmning",
-          "Pool": "Pool",
-          "Pool 2": "Pool 2",
-          "Transfer": "Overførsel",
-          "Cooling": "Køling"
+          "60": "Køling"
         }
       },
       "55027": {
@@ -515,88 +380,53 @@
           "3": "Slukket",
           "4": "Blokeret",
           "5": "Slukket",
-          "6": "Aktiv",
-          "Alarm": "Alarm",
-          "Active": "Aktiv",
-          "Off": "Slukket",
-          "Blocked": "Blokeret"
+          "6": "Aktiv"
         }
       },
       "62005": {
         "name": "{name} ({id})",
         "state": {
           "0": "Heat pump upper",
-          "Heat pump upper": "Heat pump upper",
           "1": "Heat pump lower",
-          "Heat pump lower": "Heat pump lower",
           "2": "Additional heat",
-          "Additional heat": "Additional heat",
           "3": "Heat pump + Additional heat",
-          "Heat pump + Additional heat": "Heat pump + Additional heat",
           "4": "Heating",
-          "Heating": "Heating",
           "5": "Hot water",
-          "Hot water": "Hot water",
           "6": "Pool",
-          "Pool": "Pool",
           "7": "Off",
-          "Off": "Off",
           "8": "Heating mixing",
-          "Heating mixing": "Heating mixing",
           "9": "Wood",
-          "Wood": "Wood",
           "10": "Hot water / Heating",
-          "Hot water / Heating": "Hot water / Heating",
           "11": "Cooling",
-          "Cooling": "Cooling",
-          "12": "Swap",
-          "Swap": "Swap"
+          "12": "Swap"
         }
       },
       "62017": {
         "name": "{name} ({id})",
         "state": {
           "0": "Off, start delay",
-          "Off, start delay": "Off, start delay",
           "1": "Off, ready to start",
-          "Off, ready to start": "Off, ready to start",
           "2": "Waiting for flow",
-          "Waiting for flow": "Waiting for flow",
           "3": "On",
-          "On": "On",
           "4": "Defrosting",
-          "Defrosting": "Defrosting",
           "5": "Cooling",
-          "Cooling": "Cooling",
           "6": "Blocked",
-          "Blocked": "Blocked",
           "7": "Off, alarm",
-          "Off, alarm": "Off, alarm",
           "8": "Function test",
-          "Function test": "Function test",
           "30": "Not defined",
-          "Not defined": "Not defined",
           "31": "Compressor disabled",
-          "Compressor disabled": "Compressor disabled",
           "32": "Communication error",
-          "Communication error": "Communication error",
-          "33": "Hot water",
-          "Hot water": "Hot water"
+          "33": "Hot water"
         }
       },
       "62246": {
         "name": "{name} ({id})",
         "state": {
           "0": "Heating off",
-          "Heating off": "Heating off",
           "1": "Holiday",
-          "Holiday": "Holiday",
           "2": "Night reduction",
-          "Night reduction": "Night reduction",
           "3": "On",
-          "On": "On",
-          "4": "Cooling",
-          "Cooling": "Cooling"
+          "4": "Cooling"
         }
       }
     },
