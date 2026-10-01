@@ -8,8 +8,8 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter, System
-from .entity import MyUplinkParameterEntity
+from .api import Parameter
+from .entity import MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
@@ -20,21 +20,25 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[SwitchEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            [
-                entities.append(
-                    MyUplinkParameterSwitchEntityEntity(coordinator, device, parameter)
-                )
-                for parameter in device.parameters
-                if parameter.get_platform() == Platform.SWITCH
-            ]
+    def build_entities() -> list[SwitchEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[SwitchEntity] = []
 
-    async_add_entities(entities)
+        for system in coordinator.data:
+            for device in system.devices:
+                [
+                    entities.append(
+                        MyUplinkParameterSwitchEntityEntity(
+                            coordinator, device, parameter
+                        )
+                    )
+                    for parameter in device.parameters
+                    if coordinator.parameter_platform(parameter) == Platform.SWITCH
+                ]
+        return entities
+
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkParameterSwitchEntityEntity(MyUplinkParameterEntity, SwitchEntity):
@@ -43,7 +47,8 @@ class MyUplinkParameterSwitchEntityEntity(MyUplinkParameterEntity, SwitchEntity)
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        self._attr_is_on = bool(int(self._parameter.value))
+        value = self._parameter.value
+        self._attr_is_on = bool(int(value)) if value is not None else None
 
     async def async_turn_on(self, **kwargs):
         """Turn the entity on."""

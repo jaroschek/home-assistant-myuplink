@@ -21,9 +21,14 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter, System, Zone
+from .api import Device, Parameter, Zone
 from .const import CONF_FETCH_NOTIFICATIONS, DOMAIN, CustomUnits
-from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, MyUplinkZoneEntity
+from .entity import (
+    MyUplinkDeviceEntity,
+    MyUplinkParameterEntity,
+    MyUplinkZoneEntity,
+    async_setup_entities,
+)
 
 PARALLEL_UPDATES = 0
 
@@ -34,49 +39,58 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[SensorEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            if entry.options.get(CONF_FETCH_NOTIFICATIONS, True):
-                entities.append(MyUplinkNotificationsSensorEntity(coordinator, device))
-            for parameter in device.parameters:
-                parameter: Parameter
-                if parameter.get_platform() == Platform.SENSOR:
-                    if (
-                        not parameter.unit
-                        and len(parameter.enum_values) == 0
-                        and not isinstance(parameter.value, (int, float))
-                    ):
-                        continue
+    def build_entities() -> list[SensorEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[SensorEntity] = []
+
+        for system in coordinator.data:
+            for device in system.devices:
+                if entry.options.get(CONF_FETCH_NOTIFICATIONS, True):
                     entities.append(
-                        MyUplinkParameterSensorEntity(coordinator, device, parameter)
+                        MyUplinkNotificationsSensorEntity(coordinator, device)
                     )
-            for zone in device.zones:
-                zone: Zone
-                if zone.is_command_only:
-                    entities.append(
-                        MyUplinkZoneModeSensorEntity(coordinator, device, zone)
-                    )
-                else:
-                    if zone.indoor_co2 is not None and zone.indoor_co2 != 0:
+                for parameter in device.parameters:
+                    if coordinator.parameter_platform(parameter) == Platform.SENSOR:
+                        if (
+                            not parameter.unit
+                            and len(parameter.enum_values) == 0
+                            and not isinstance(parameter.value, (int, float))
+                        ):
+                            continue
                         entities.append(
-                            MyUplinkZoneCO2SensorEntity(coordinator, device, zone)
-                        )
-                    if zone.indoor_humidity is not None and zone.indoor_humidity != 0:
-                        entities.append(
-                            MyUplinkZoneHumiditySensorEntity(coordinator, device, zone)
-                        )
-                    if zone.temperature is not None and zone.temperature != 0:
-                        entities.append(
-                            MyUplinkZoneTemperatureSensorEntity(
-                                coordinator, device, zone
+                            MyUplinkParameterSensorEntity(
+                                coordinator, device, parameter
                             )
                         )
+                for zone in device.zones:
+                    if zone.is_command_only:
+                        entities.append(
+                            MyUplinkZoneModeSensorEntity(coordinator, device, zone)
+                        )
+                    else:
+                        if zone.indoor_co2 is not None:
+                            entities.append(
+                                MyUplinkZoneCO2SensorEntity(coordinator, device, zone)
+                            )
+                        if (
+                            zone.indoor_humidity is not None
+                            and zone.indoor_humidity != 0
+                        ):
+                            entities.append(
+                                MyUplinkZoneHumiditySensorEntity(
+                                    coordinator, device, zone
+                                )
+                            )
+                        if zone.temperature is not None:
+                            entities.append(
+                                MyUplinkZoneTemperatureSensorEntity(
+                                    coordinator, device, zone
+                                )
+                            )
+        return entities
 
-    async_add_entities(entities)
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkParameterSensorEntity(MyUplinkParameterEntity, SensorEntity):
