@@ -201,6 +201,21 @@ async def test_existing_registry_customizations(
     assert entity.entity_id == registered.entity_id
     assert registry.async_get(entity.entity_id).name == "My heating sensor"
     assert hass.states.get(entity.entity_id).state == "20.0"
+    friendly_name = hass.states.get(entity.entity_id).attributes["friendly_name"]
+    device.parameters = [
+        Parameter(
+            {**parameter.raw_data, "parameterName": "New API label", "value": 21.5},
+            device,
+        )
+    ]
+    coordinator.async_set_updated_data([device.system])
+    assert entity.entity_id == registered.entity_id
+    assert len(registry.entities) == 1
+    assert registry.async_get(entity.entity_id).name == "My heating sensor"
+    assert hass.states.get(entity.entity_id).state == "21.5"
+    assert (
+        hass.states.get(entity.entity_id).attributes["friendly_name"] == friendly_name
+    )
     coordinator.async_set_updated_data([])
     assert hass.states.get(entity.entity_id).state == "unavailable"
     await platform.async_reset()

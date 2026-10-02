@@ -203,12 +203,26 @@ async def test_read_only_parameter(parameter: Parameter) -> None:
     assert error.value.translation_key == "parameter_not_writable"
 
 
+@pytest.mark.parametrize(
+    "error",
+    [
+        pytest.param(ClientResponseError(MagicMock(), (), status=500), id="http-500"),
+        pytest.param(ClientResponseError(MagicMock(), (), status=502), id="http-502"),
+        pytest.param(ClientResponseError(MagicMock(), (), status=503), id="http-503"),
+        pytest.param(ClientResponseError(MagicMock(), (), status=504), id="http-504"),
+        pytest.param(ClientConnectionError(), id="connection"),
+        pytest.param(TimeoutError(), id="timeout"),
+    ],
+)
 async def test_subscription_outage_logged_once(
-    api: MyUplink, system: System, response: MagicMock, caplog: pytest.LogCaptureFixture
+    api: MyUplink,
+    system: System,
+    response: MagicMock,
+    caplog: pytest.LogCaptureFixture,
+    error: Exception,
 ) -> None:
     """Keep known permissions during repeated failures of the optional endpoint."""
     response.json.return_value = {"subscriptions": [{"type": "manage"}]}
-    error = ClientResponseError(MagicMock(), (), status=500)
     with (
         patch("custom_components.myuplink.api.monotonic", side_effect=[0, 901, 902]),
         patch.object(
@@ -226,13 +240,13 @@ async def test_subscription_outage_logged_once(
     [
         pytest.param(401, id="unauthorized"),
         pytest.param(403, id="forbidden"),
-        pytest.param(503, id="unavailable"),
+        pytest.param(429, id="rate-limited"),
     ],
 )
 async def test_subscription_errors_propagate(
     api: MyUplink, system: System, status: int
 ) -> None:
-    """Subscription lookup must not hide expired authentication or server outages."""
+    """Subscription lookup must not hide expired authentication or rate limits."""
     with (
         patch.object(
             api.auth,
