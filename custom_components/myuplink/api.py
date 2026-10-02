@@ -20,6 +20,7 @@ from aiohttp import (
     ClientResponseError,
     ClientSession,
     ClientTimeout,
+    ContentTypeError,
 )
 from homeassistant.const import (
     Platform,
@@ -139,7 +140,7 @@ class AsyncConfigEntryAuth:
             return None
         try:
             return int(value)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             _LOGGER.debug("Could not parse %s header value: %r", name, value)
             return None
 
@@ -188,7 +189,7 @@ class AsyncConfigEntryAuth:
                         parsedate_to_datetime(value).timestamp()
                         - datetime.now(UTC).timestamp(),
                     )
-                except TypeError, ValueError, OverflowError:
+                except (TypeError, ValueError, OverflowError):
                     pass
         if self.rate_limit_reset_at is not None:
             return max(
@@ -842,30 +843,35 @@ class MyUplink:
 
             resp.raise_for_status()
 
-            if resp.status == 200:
-                data = cast(SubscriptionsResponse, await resp.json())
-                for subscription in data.get("subscriptions", []):
-                    if Subscription(subscription).type == "manage":
-                        self._subscription_failures.discard(system.id)
-                        self._premium_manage[system.id] = True
-                        self._subscription_cache[system.id] = (now, True)
-                        return True
-
+            data = (
+                cast(SubscriptionsResponse, await resp.json())
+                if resp.status == 200
+                else SubscriptionsResponse(subscriptions=[])
+            )
+        except ContentTypeError:
+            pass
         except ClientResponseError as err:
-            if err.status != HTTPStatus.INTERNAL_SERVER_ERROR:
+            if not 500 <= err.status < 600:
                 raise
-            # This optional endpoint sometimes fails while point reads still work.
-            if system.id not in self._subscription_failures:
-                _LOGGER.warning(
-                    "myUplink subscription lookup failed; retaining known permissions"
-                )
-                self._subscription_failures.add(system.id)
-            return self._premium_manage.get(system.id, False)
+        except (ClientError, TimeoutError, ValueError):
+            pass
+        else:
+            premium_manage = any(
+                Subscription(subscription).type == "manage"
+                for subscription in data.get("subscriptions", [])
+            )
+            self._subscription_failures.discard(system.id)
+            self._premium_manage[system.id] = premium_manage
+            self._subscription_cache[system.id] = (now, premium_manage)
+            return premium_manage
 
-        self._subscription_failures.discard(system.id)
-        self._premium_manage[system.id] = False
-        self._subscription_cache[system.id] = (now, False)
-        return False
+        # This optional endpoint can fail while point reads still work.
+        if system.id not in self._subscription_failures:
+            _LOGGER.warning(
+                "myUplink subscription lookup failed; retaining known permissions"
+            )
+            self._subscription_failures.add(system.id)
+        return self._premium_manage.get(system.id, False)
 
     async def get_smart_home_mode(self, system: System) -> str:
         """Return smart home mode by system id."""

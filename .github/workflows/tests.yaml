@@ -9,14 +9,31 @@ permissions:
 
 jobs:
   test:
+    name: Home Assistant ${{ matrix.homeassistant }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - homeassistant: "2026.1.0"
+            python: "3.13.2"
+          - homeassistant: "2026.9.4"
+            python: "3.14.5"
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: "3.14.5"
+          python-version: ${{ matrix.python }}
           enable-cache: true
       - run: script/setup
+      - name: Verify Home Assistant test version
+        env:
+          EXPECTED_HOMEASSISTANT: ${{ matrix.homeassistant }}
+        run: >-
+          uv run --no-sync python3 -c
+          'import os; from importlib.metadata import version;
+          actual = version("homeassistant"); print(f"Home Assistant {actual}");
+          assert actual == os.environ["EXPECTED_HOMEASSISTANT"]'
       - run: uv run --no-sync prek run --all-files
       - run: uv run --no-sync python3 script/sync_translations.py --check
       - run: uv run --no-sync mypy

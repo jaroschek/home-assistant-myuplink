@@ -103,8 +103,9 @@ async def test_runtime_reauth(
             "get_systems",
             side_effect=ClientResponseError(MagicMock(), (), status=status),
         ),
-        patch.object(ConfigEntry, "async_start_reauth") as reauth,
+        patch.object(ConfigEntry, "async_start_reauth", autospec=True) as reauth,
     ):
         await coordinator.async_refresh()
     assert not coordinator.last_update_success
-    reauth.assert_called_once_with(hass, None, None)
+    reauth.assert_called_once()
+    assert reauth.call_args.args[:2] == (entry, hass)

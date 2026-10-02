@@ -11,6 +11,8 @@ This custom integration reads and controls devices exposed by your [myUplink](ht
 
 ## Installation and account setup
 
+The 1.9.x series supports Home Assistant **2026.1 and newer**. Home Assistant provides the required Python runtime. See the [1.9.0 upgrade notes](CHANGELOG.md) for changes when updating from 1.8.x.
+
 Install through HACS using this custom repository:
 
 [![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&owner=jaroschek&repository=home-assistant-myuplink)
@@ -197,7 +199,7 @@ For malformed points, inspect [myUplink's Swagger API](https://api.myuplink.com/
 
 The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are recorded in **custom_components/myuplink/quality_scale.yaml**. This is a self-assessment; the project remains a custom integration.
 
-Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer:
+Install [uv](https://docs.astral.sh/uv/) and use Python 3.13.2 or newer:
 
 ~~~sh
 script/setup
@@ -209,6 +211,10 @@ uv run --no-sync python3 script/sync_translations.py --check
 ~~~
 
 Setup creates the project's **.venv** and installs Git hooks. If your IDE sets **UV_PROJECT_ENVIRONMENT** to a shared environment, set it to **.venv** for these commands.
+
+The development lockfile selects Home Assistant 2026.1.0 on Python below 3.14.2 and Home Assistant 2026.9.4 on newer Python. These exact version pins make development and CI reproducible. The integration's supported minimum is Home Assistant 2026.1.0, as declared in **hacs.json**.
+
+CI runs the full checks on Home Assistant 2026.1.0 with Python 3.13.2 and Home Assistant 2026.9.4 with Python 3.14.5. Keep both environments passing when changing Home Assistant APIs.
 
 CI checks formatting, lint, English translation synchronization, strict mypy typing, and tests. Every integration module must exceed 95% statement and branch coverage, and config flows require 100%. Network sockets are blocked during tests; local Unix sockets remain enabled for asyncio.
 
