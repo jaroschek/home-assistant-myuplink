@@ -67,7 +67,10 @@ class MyUplinkParameterSelectEntity(MyUplinkParameterEntity, SelectEntity):
         self._attr_options = []
         for enum in parameter.enum_values:
             self._attr_options.append(enum["text"])
-        self._attr_current_option = parameter.string_value
+        # Prefer mapping the raw value onto its enum text; the API's strVal
+        # does not always match one of the option texts (e.g. it may include a
+        # unit), which would leave the select showing "unknown".
+        self._attr_current_option = parameter.enum_text or parameter.string_value
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected parameter option."""
