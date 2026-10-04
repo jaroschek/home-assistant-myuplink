@@ -334,6 +334,24 @@ class Parameter:
         return self.raw_data["enumValues"]
 
     @property
+    def enum_text(self) -> str | None:
+        """Return the enum text matching the current value.
+
+        The ``strVal`` returned by the API does not always match one of the
+        enum option texts (e.g. it may carry a unit or a different format), so
+        map the raw value onto its ``enumValues`` entry to obtain the matching
+        option text. Returns ``None`` when the value has no matching entry.
+        """
+        raw_value = self.raw_data["value"]
+        value_strings = {str(raw_value)}
+        if isinstance(raw_value, float) and raw_value.is_integer():
+            value_strings.add(str(int(raw_value)))
+        for enum_value in self.enum_values:
+            if enum_value.get("value") in value_strings:
+                return enum_value["text"]
+        return None
+
+    @property
     def scale_value(self) -> float:
         """Return the scale value of the parameter."""
         if self.raw_data["scaleValue"]:
