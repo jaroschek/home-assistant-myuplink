@@ -320,6 +320,24 @@
   "exceptions": {
     "device_not_found": {
       "message": "The selected myUplink device is unavailable or belongs to an unloaded account. Load the account before using {service}."
+    },
+    "connection_error": {
+      "message": "Unable to communicate with myUplink. Try again later."
+    },
+    "api_error": {
+      "message": "myUplink rejected the action with HTTP {status}. Check account permissions and subscriptions."
+    },
+    "rate_limited": {
+      "message": "myUplink request limit reached. Try again in {seconds} seconds."
+    },
+    "write_rejected": {
+      "message": "myUplink did not confirm the requested change."
+    },
+    "parameter_not_writable": {
+      "message": "This myUplink parameter is currently read-only."
+    },
+    "zone_command_only": {
+      "message": "This command-only zone is not supported by the integration."
     }
   }
 }
