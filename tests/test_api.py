@@ -320,8 +320,8 @@ async def test_get_device_association(
         pytest.param({"writable": True}, Platform.NUMBER, id="bounded-number"),
         pytest.param(
             {"writable": True, "minValue": None, "maxValue": None},
-            Platform.SENSOR,
-            id="unbounded-point",
+            Platform.NUMBER,
+            id="unbounded-temperature",
         ),
         pytest.param({"writable": False}, Platform.SENSOR, id="read-only-point"),
     ],

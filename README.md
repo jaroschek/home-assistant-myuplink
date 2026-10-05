@@ -11,6 +11,8 @@ This custom integration reads and controls devices exposed by your [myUplink](ht
 
 ## Installation and account setup
 
+The 1.9.x series supports Home Assistant **2026.1 and newer**. Home Assistant provides the required Python runtime. See the [1.9.0 upgrade notes](CHANGELOG.md) for changes when updating from 1.8.x.
+
 Install through HACS using this custom repository:
 
 [![Add this repository to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&owner=jaroschek&repository=home-assistant-myuplink)
@@ -34,7 +36,7 @@ General support follows the devices reported by your account's API. See the prov
 | --- | --- |
 | Parameter sensors | Read-only numeric values and enumerated states reported by the device |
 | Binary sensors and switches | Boolean points, with switches created for writable points |
-| Number and select controls | Writable bounded or enumerated points |
+| Number and select controls | Writable bounded or enumerated points, plus numeric temperature points without bounds |
 | Connection state | A diagnostic binary sensor that stays usable while the device is disconnected |
 | Notifications | A diagnostic count and notification attributes; disabled by default for newly created entities |
 | Firmware information | An update entity reporting installed and available versions; installation is performed through the provider |
@@ -44,6 +46,10 @@ General support follows the devices reported by your account's API. See the prov
 | Raw actions | Administrator actions for a parameter ID or a zone property |
 
 Smart home mode attaches to the device for a single-device system and to a system registry device for a multi-device system. Zone names come from your account. Parameter names and enum text come from the API's language response; fixed labels are translated in English, German, Danish, and Norwegian Bokmål.
+
+Writable, finite numeric temperature points in °C or °F are exposed as number controls when both API bounds are absent, including the iGate 2.0 heat/cool setpoints. These controls use Home Assistant's default range of **0–100 in the native temperature unit**, not manufacturer-specified limits. The API's step and scale metadata are still used, and requested temperatures are sent without applying the scale twice.
+
+Reload after upgrading to discover these number controls. An existing sensor for the same point may remain unavailable; update any automations that reference it to use the new number entity. Points keep their initial platform until reload, including points first discovered with an unavailable reading.
 
 ## Options
 
@@ -197,7 +203,11 @@ For malformed points, inspect [myUplink's Swagger API](https://api.myuplink.com/
 
 The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are recorded in **custom_components/myuplink/quality_scale.yaml**. This is a self-assessment; the project remains a custom integration.
 
-Install [uv](https://docs.astral.sh/uv/) and use Python 3.14.2 or newer:
+Development for this series lands on **release/1.9.x**. The quality-scale PR stack targets that floating branch, retaining each layer's comparison with the preceding branch. The **release/1.9.0** branch is the final preparation PR's source; merged changes accumulate on **release/1.9.x**.
+
+Create prerelease tags such as **1.9.0-rc1** from validated commits on **release/1.9.x**, and mark their GitHub releases as prereleases. When the series is ready, promote it to **main** through a reviewed release PR. See [the release checklist](RELEASE_CHECKLIST.md) for version metadata, checks and publishing steps.
+
+Install [uv](https://docs.astral.sh/uv/) and use Python 3.13.2 or newer:
 
 ~~~sh
 script/setup
@@ -209,6 +219,10 @@ uv run --no-sync python3 script/sync_translations.py --check
 ~~~
 
 Setup creates the project's **.venv** and installs Git hooks. If your IDE sets **UV_PROJECT_ENVIRONMENT** to a shared environment, set it to **.venv** for these commands.
+
+The development lockfile selects Home Assistant 2026.1.0 on Python below 3.14.2 and Home Assistant 2026.9.4 on newer Python. These exact version pins make development and CI reproducible. The integration's supported minimum is Home Assistant 2026.1.0, as declared in **hacs.json**.
+
+CI runs the full checks on Home Assistant 2026.1.0 with Python 3.13.2 and Home Assistant 2026.9.4 with Python 3.14.5. Keep both environments passing when changing Home Assistant APIs.
 
 CI checks formatting, lint, English translation synchronization, strict mypy typing, and tests. Every integration module must exceed 95% statement and branch coverage, and config flows require 100%. Network sockets are blocked during tests; local Unix sockets remain enabled for asyncio.
 

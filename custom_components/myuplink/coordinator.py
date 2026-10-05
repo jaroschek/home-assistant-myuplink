@@ -1,5 +1,7 @@
 """Coordinate myUplink polling and classify runtime failures."""
 
+from __future__ import annotations
+
 import logging
 from datetime import timedelta
 from http import HTTPStatus
