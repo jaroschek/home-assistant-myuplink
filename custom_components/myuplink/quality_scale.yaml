@@ -1,5 +1,5 @@
 rules:
-  action-setup: todo
+  action-setup: done
   appropriate-polling: todo
   brands: done
   common-modules: todo
@@ -20,7 +20,7 @@ rules:
     comment: The integration does not define custom triggers.
   entity-event-setup: done
   entity-unique-id: done
-  has-entity-name: todo
+  has-entity-name: done
   runtime-data: done
   test-before-configure: done
   test-before-setup: done

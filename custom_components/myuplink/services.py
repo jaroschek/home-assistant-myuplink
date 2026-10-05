@@ -9,10 +9,13 @@ from aiohttp import ClientResponseError
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import ATTR_DEVICE_ID
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import selector
-from homeassistant.helpers.service import async_extract_config_entry_ids
+from homeassistant.helpers.service import (
+    async_extract_config_entry_ids,
+    async_register_admin_service,
+)
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import Device
@@ -25,8 +28,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-MYUPLINK_SERVICES = "myuplink_services"
 
 SERVICE_SET_DEVICE_PARAMETER_VALUE = "set_device_parameter_value"
 
@@ -61,28 +62,24 @@ SERVICE_LIST: list[tuple[str, vol.Schema | None]] = [
 async def async_setup_services(hass: HomeAssistant) -> None:
     """Set up services for myUplink integration."""
 
-    for service, _ in SERVICE_LIST:
-        if hass.services.has_service(DOMAIN, service):
-            return
-
     async def async_call_myuplink_service(service_call: ServiceCall) -> None:
         """Call myUpLink service."""
 
         if not (
             device := await _async_get_selected_myuplink_device(hass, service_call)
         ):
-            raise HomeAssistantError(
+            raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="device_not_found",
                 translation_placeholders={"service": service_call.service},
             )
 
-        value = service_call.data.get(ATTR_VALUE)
+        value = service_call.data[ATTR_VALUE]
 
         _LOGGER.debug("Executing service %s", service_call.service)
 
         if service_call.service == SERVICE_SET_DEVICE_PARAMETER_VALUE:
-            parameter_id = service_call.data.get(ATTR_PARAMETER_ID)
+            parameter_id = service_call.data[ATTR_PARAMETER_ID]
             try:
                 await device.system.api.patch_parameter(
                     device.id,
@@ -95,8 +92,8 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                     f" Code: {ex.status}  Message: {ex.message}"
                 ) from ex
         elif service_call.service == SERVICE_SET_DEVICE_ZONE_PROPERTY_VALUE:
-            zone_id = service_call.data.get(ATTR_ZONE_ID)
-            property_name = service_call.data.get(ATTR_PROPERTY_NAME)
+            zone_id = service_call.data[ATTR_ZONE_ID]
+            property_name = service_call.data[ATTR_PROPERTY_NAME]
             try:
                 await device.system.api.patch_zone_property(
                     device.id,
@@ -111,9 +108,10 @@ async def async_setup_services(hass: HomeAssistant) -> None:
                 ) from ex
 
     for service, schema in SERVICE_LIST:
-        hass.services.async_register(
-            DOMAIN, service, async_call_myuplink_service, schema
-        )
+        if not hass.services.has_service(DOMAIN, service):
+            async_register_admin_service(
+                hass, DOMAIN, service, async_call_myuplink_service, schema
+            )
 
 
 async def _async_get_selected_myuplink_device(
@@ -121,7 +119,7 @@ async def _async_get_selected_myuplink_device(
 ) -> Device | None:
     """Get myUplink device for service call."""
 
-    device_id = service_call.data.get(ATTR_DEVICE_ID)
+    device_id = service_call.data[ATTR_DEVICE_ID]
     device_registry = dr.async_get(hass)
 
     for entry_id in await async_extract_config_entry_ids(service_call):
@@ -142,15 +140,3 @@ async def _async_get_selected_myuplink_device(
                         return myuplink_device
 
     return None
-
-
-async def async_unload_services(hass: HomeAssistant) -> None:
-    """Unload services for myUplink integration."""
-
-    if not hass.data.get(MYUPLINK_SERVICES):
-        return
-
-    hass.data[MYUPLINK_SERVICES] = False
-
-    for service, _ in SERVICE_LIST:
-        hass.services.async_remove(DOMAIN, service)
