@@ -203,6 +203,10 @@ For malformed points, inspect [myUplink's Swagger API](https://api.myuplink.com/
 
 The 1.9.x series is improving this custom integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). Progress and exemptions are recorded in **custom_components/myuplink/quality_scale.yaml**. This is a self-assessment; the project remains a custom integration.
 
+Development for this series lands on **release/1.9.x**. The quality-scale PR stack targets that floating branch, retaining each layer's comparison with the preceding branch. The **release/1.9.0** branch is the final preparation PR's source; merged changes accumulate on **release/1.9.x**.
+
+Create prerelease tags such as **1.9.0-rc1** from validated commits on **release/1.9.x**, and mark their GitHub releases as prereleases. When the series is ready, promote it to **main** through a reviewed release PR. See [the release checklist](RELEASE_CHECKLIST.md) for version metadata, checks and publishing steps.
+
 Install [uv](https://docs.astral.sh/uv/) and use Python 3.13.2 or newer:
 
 ~~~sh

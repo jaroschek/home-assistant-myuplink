@@ -1,6 +1,10 @@
-# 1.9.0 release preparation
+# 1.9.x release preparation
 
-The release files are prepared on a draft PR. Complete the maintainer review and hardware validation before merging and publishing.
+The series develops on **release/1.9.x**, initially created from the **1.8.5** baseline (`490085d`). Native stack **#271** replaces the former grouping #262 and contains the same PRs in order: **#259 → #260 → #261 → #263 → #264 → #265 → #266**. Its destination is **release/1.9.x**; upper PRs retain their preceding branches as comparison bases. The existing **release/1.9.0** branch remains the source of preparation PR #266.
+
+Merge reviewed work into **release/1.9.x** and publish prereleases from validated commits there. Promote the completed series to **main** through a separate reviewed release PR. Maintainer review and hardware validation remain part of release preparation.
+
+## Development and prereleases
 
 - [x] Review and understand the original quality-scale PRs and their AI assistance disclosures (maintainer confirmed on 2026-10-05).
 - [ ] Review and understand the follow-up PR #270 port and the PR #268 regression tests.
@@ -14,10 +18,20 @@ The release files are prepared on a draft PR. Complete the maintainer review and
 - [ ] Verify an invalid or rejected write reports an error without displaying a successful target.
 - [ ] Inspect downloaded diagnostics for identifying information before sharing.
 - [ ] Confirm the Home Assistant 2026.1.0 minimum and documented upgrade behavior.
-- [ ] Merge the reviewed stack from the bottom up.
+- [ ] Merge the reviewed stack into **release/1.9.x** using GitHub's native stack merge and the merge-commit method to retain commit history.
+- [ ] Set the next prerelease version, such as **1.9.0-rc1**, in **custom_components/myuplink/manifest.json** and **pyproject.toml**, regenerate **uv.lock** with `uv lock`, and record the prerelease notes in **CHANGELOG.md**.
+- [ ] Run the complete checks below on the versioned prerelease commit in both supported environments.
+- [ ] Create the prerelease tag from that validated **release/1.9.x** commit, using the project's existing tag style, for example **1.9.0-rc1**.
+- [ ] Publish the GitHub release with **Set as a pre-release** enabled and leave the current stable latest release selected; verify HACS users can opt into the prerelease.
+
+## Stable release
+
+- [ ] Set the final **1.9.0** version in the manifest and project metadata on **release/1.9.x**, and regenerate **uv.lock**.
 - [ ] Update the changelog's unreleased heading with the release date.
+- [ ] Validate **release/1.9.x** and review the complete promotion diff against **main**.
+- [ ] Merge a reviewed release PR from **release/1.9.x** into **main** with a merge commit.
 - [ ] Run the complete test, typing, translation, coverage, and lint checks on the merged release commit.
-- [ ] Create tag **1.9.0** from that validated commit, following the existing tag naming convention.
+- [ ] Create tag **1.9.0** from that validated **main** commit, following the existing tag naming convention.
 - [ ] Publish the GitHub release with the changelog notes and confirm HACS offers the new version.
 
 Local automated checks:
