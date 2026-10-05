@@ -8,8 +8,8 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter, System
-from .entity import MyUplinkParameterEntity
+from .api import Parameter
+from .entity import MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
@@ -20,21 +20,23 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[NumberEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            [
-                entities.append(
-                    MyUplinkParameterNumberEntity(coordinator, device, parameter)
-                )
-                for parameter in device.parameters
-                if parameter.get_platform() == Platform.NUMBER
-            ]
+    def build_entities() -> list[NumberEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[NumberEntity] = []
 
-    async_add_entities(entities)
+        for system in coordinator.data:
+            for device in system.devices:
+                [
+                    entities.append(
+                        MyUplinkParameterNumberEntity(coordinator, device, parameter)
+                    )
+                    for parameter in device.parameters
+                    if coordinator.parameter_platform(parameter) == Platform.NUMBER
+                ]
+        return entities
+
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkParameterNumberEntity(MyUplinkParameterEntity, NumberEntity):

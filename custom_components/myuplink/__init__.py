@@ -15,7 +15,7 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.typing import ConfigType
 
 from .api import AsyncConfigEntryAuth, MyUplink
-from .const import PLATFORMS, SCOPES
+from .const import DOMAIN, PLATFORMS, SCOPES
 from .coordinator import MyUplinkCoordinator
 from .services import async_setup_services
 
@@ -91,5 +91,12 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_remove_config_entry_device(
     hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
 ) -> bool:
-    """Remove a config entry from a device."""
-    return True
+    """Allow manual removal after a device disappears from the account."""
+    coordinator = getattr(config_entry, "runtime_data", None)
+    if coordinator is None:
+        return True
+    current_ids = coordinator.devices_by_id.keys() | coordinator.systems_by_id.keys()
+    return not any(
+        domain == DOMAIN and identifier in current_ids
+        for domain, identifier in device_entry.identifiers
+    )

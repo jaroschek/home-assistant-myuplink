@@ -11,9 +11,9 @@ from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import Device, Parameter, System
+from .api import Device, Parameter
 from .const import DOMAIN
-from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity
+from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
@@ -24,22 +24,27 @@ async def async_setup_entry(
     """Set up the platform entities."""
 
     coordinator = entry.runtime_data
-    entities: list[BinarySensorEntity] = []
 
-    for system in coordinator.data:
-        system: System
-        for device in system.devices:
-            device: Device
-            entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
-            [
-                entities.append(
-                    MyUplinkParameterBinarySensorEntity(coordinator, device, parameter)
-                )
-                for parameter in device.parameters
-                if parameter.get_platform() == Platform.BINARY_SENSOR
-            ]
+    def build_entities() -> list[BinarySensorEntity]:
+        """Build entities from the current snapshot."""
+        entities: list[BinarySensorEntity] = []
 
-    async_add_entities(entities)
+        for system in coordinator.data:
+            for device in system.devices:
+                entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
+                [
+                    entities.append(
+                        MyUplinkParameterBinarySensorEntity(
+                            coordinator, device, parameter
+                        )
+                    )
+                    for parameter in device.parameters
+                    if coordinator.parameter_platform(parameter)
+                    == Platform.BINARY_SENSOR
+                ]
+        return entities
+
+    async_setup_entities(entry, async_add_entities, build_entities)
 
 
 class MyUplinkParameterBinarySensorEntity(MyUplinkParameterEntity, BinarySensorEntity):
@@ -48,10 +53,11 @@ class MyUplinkParameterBinarySensorEntity(MyUplinkParameterEntity, BinarySensorE
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        self._attr_is_on = bool(int(self._parameter.value))
+        value = self._parameter.value
+        self._attr_is_on = bool(int(value)) if value is not None else None
 
         if self._parameter.id == 10733:
-            self._attr_is_on = not bool(int(self._parameter.value))
+            self._attr_is_on = not bool(int(value)) if value is not None else None
             self._attr_device_class = BinarySensorDeviceClass.LOCK
         elif self._parameter.id in (10905, 10906):
             self._attr_device_class = BinarySensorDeviceClass.RUNNING
@@ -63,6 +69,7 @@ class MyUplinkConnectedBinarySensor(MyUplinkDeviceEntity, BinarySensorEntity):
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_has_entity_name = True
+    _requires_connection = False
 
     def _update_from_device(self, device: Device) -> None:
         """Update attrs from device."""

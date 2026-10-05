@@ -961,7 +961,6 @@ class MyUplink:
             )
 
         unique_parameters = {}
-        seen = set()
 
         for parameter_filter in parameter_filters:
             query_parameters = {}
@@ -981,14 +980,8 @@ class MyUplink:
             parameters_data = await resp.json()
 
             for parameter_data in parameters_data:
-                unique_key = (
-                    parameter_data["parameterId"],
-                    parameter_data["parameterName"],
-                )
-
-                if unique_key not in seen:
-                    seen.add(unique_key)
-                    unique_parameters[unique_key] = Parameter(parameter_data, device)
+                parameter = Parameter(parameter_data, device)
+                unique_parameters[parameter.id] = parameter
 
         return list(unique_parameters.values())
 
