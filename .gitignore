@@ -1,1 +1,10 @@
-__pycache__
+__pycache__/
+.venv
+.venv.incomplete/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.json
+coverage.xml
+htmlcov/

@@ -1,0 +1,34 @@
+[project]
+name = "myuplink-development"
+version = "1.8.4"
+requires-python = ">=3.14.2"
+
+[dependency-groups]
+dev = [
+    "homeassistant==2026.9.4",
+    "mypy==2.3.1",
+    "prek==0.2.28",
+    "pytest==9.0.3",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==7.1.0",
+    "pytest-socket==0.8.0",
+    "ruff==0.16.3",
+    "syrupy==6.0.0",
+    "voluptuous==0.16.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.coverage.run]
+branch = true
+source = ["custom_components.myuplink"]
+
+[tool.coverage.report]
+show_missing = true
