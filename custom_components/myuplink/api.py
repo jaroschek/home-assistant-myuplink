@@ -9,7 +9,7 @@ from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from functools import lru_cache
 from http import HTTPStatus
-from math import ceil
+from math import ceil, isfinite
 from time import monotonic
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Self, cast
@@ -457,6 +457,18 @@ class Parameter:
         if (
             self.max_value is not None or self.min_value is not None
         ) and self.is_writable:
+            return Platform.NUMBER
+
+        # Some thermostats omit bounds for writable temperature setpoints.
+        value = self.value
+        if (
+            self.is_writable
+            and not self.enum_values
+            and self.unit in (UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT)
+            and isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and isfinite(value)
+        ):
             return Platform.NUMBER
 
         return Platform.SENSOR

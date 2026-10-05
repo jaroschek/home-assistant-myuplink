@@ -158,25 +158,38 @@ async def test_switch_failure(
 
 
 @pytest.mark.parametrize(
-    "point_id",
-    [pytest.param(123, id="generic-point"), pytest.param(500, id="known-point")],
+    ("point_id", "value", "string_value", "expected_option"),
+    [
+        pytest.param(123, 20, "Normal", "Normal", id="generic-strval-fallback"),
+        pytest.param(500, 20, "Normal", "Normal", id="known-strval-fallback"),
+        pytest.param(123, 4, "4 units", "Normal", id="strval-with-unit"),
+        pytest.param(123, 4.0, "4.0", "Normal", id="integer-valued-float"),
+        pytest.param(123, "4", "4 units", "Normal", id="text-enum-code"),
+        pytest.param(123, 3, "3 units", "Eco", id="first-enum-option"),
+        pytest.param(123, None, "Normal", "Normal", id="missing-value-fallback"),
+        pytest.param(123, 4.5, "Normal", "Normal", id="unmatched-float-fallback"),
+    ],
 )
 async def test_parameter_select(
     coordinator: MyUplinkCoordinator,
     device: Device,
     parameter: Parameter,
     point_id: int,
+    value: float | str | None,
+    string_value: str,
+    expected_option: str,
 ) -> None:
-    """Map the API's displayed enum text back to its write value."""
+    """PR #268: match numeric enum codes when the API's display text differs."""
     parameter.raw_data.update(
         parameterId=point_id,
         writable=True,
         enumValues=[{"value": "3", "text": "Eco"}, {"value": "4", "text": "Normal"}],
-        strVal="Normal",
+        value=value,
+        strVal=string_value,
     )
     entity = MyUplinkParameterSelectEntity(coordinator, device, parameter)
     assert entity.options == ["Eco", "Normal"]
-    assert entity.current_option == "Normal"
+    assert entity.current_option == expected_option
     with (
         patch.object(device.system.api, "patch_parameter") as write,
         patch.object(entity, "async_update") as refresh,

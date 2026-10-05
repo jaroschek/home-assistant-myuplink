@@ -2,12 +2,13 @@
 
 The release files are prepared on a draft PR. Complete the maintainer review and hardware validation before merging and publishing.
 
-- [ ] Review and understand each quality-scale PR and its AI assistance disclosure.
+- [x] Review and understand the original quality-scale PRs and their AI assistance disclosures (maintainer confirmed on 2026-10-05).
+- [ ] Review and understand the follow-up PR #270 port and the PR #268 regression tests.
 - [ ] Verify all stack layers pass Tests, hassfest, and HACS validation.
 - [ ] Verify the release passes the full test and quality checks on Home Assistant 2026.1.0 and 2026.9.4.
 - [ ] Review the historical regression audit below and validate the remaining cloud and hardware cases.
 - [ ] Verify a real account can authorize, configure options, reload, unload, and reauthenticate.
-- [ ] Check existing entity IDs and user-customized names after upgrading from 1.8.4.
+- [ ] Check existing entity IDs and user-customized names after upgrading from 1.8.x, including the sensor-to-number change for unbounded writable temperatures.
 - [ ] Check new-device discovery, disconnected availability, and return of missing device data.
 - [ ] Validate representative number, select, switch, thermostat, and supported water-heater writes with available account permissions.
 - [ ] Verify an invalid or rejected write reports an error without displaying a successful target.
@@ -29,6 +30,39 @@ uv run --no-sync python3 script/sync_translations.py --check
 uv run --no-sync pytest tests --cov --cov-report=term-missing --cov-report=xml --cov-report=json
 uv run --no-sync python3 script/check_coverage.py
 ~~~
+
+## Recent issues and contributor pull requests
+
+Review date: **2026-10-05**. The rebased stack is based on **1.8.5** (`490085d`), which includes contributor [PR #268](https://github.com/jaroschek/home-assistant-myuplink/pull/268). All seven existing stack PRs passed Tests, hassfest, and HACS validation at their current published tips.
+
+### PR #270 and the 1.8.6 candidate
+
+[PR #270](https://github.com/jaroschek/home-assistant-myuplink/pull/270) is a narrow correction suitable for a **1.8.6** release: writable, finite numeric °C/°F points without bounds become number controls. Existing overrides, permissions, switch/select rules, native write values, and scaled steps retain priority. It directly addresses the reported iGate 2.0 heat/cool payloads in [#234](https://github.com/jaroschek/home-assistant-myuplink/issues/234). The original 28 tests pass on both Home Assistant 2026.1.0/Python 3.13.2 and 2026.9.4/Python 3.14.5 with network sockets blocked. Pending fork hassfest/HACS runs were approved during this review and passed.
+
+The PR remains draft, awaiting real-device feedback. Its branch, contents, and draft state were left unchanged. Before releasing 1.8.6, review the documented **0–100 native-unit default range**, reload/discovery behavior, and the change from sensor to number entity. The old sensor can remain unavailable and its automation references need updating. API acceptance of physical iGate writes remains a device-validation item.
+
+The fix is ported independently into the final **1.9 release layer (#266)**. Its tests use the 1.9 fixtures and coordinator, have annotated parameters, and cover invalid readings, permissions, overrides, platform priority, scaled steps, discovery without duplicates, and native writes. Five tests failed against the existing 1.9 classifier before the port. The contributor's original commit is not merged into the stack, keeping #270 independent for its later 1.8.x merge. Follow-up commits preserve all published stack history.
+
+PR #268 already reaches every stack layer through the 1.8.5 baseline. Additional select regressions check mismatched display text, integer-valued floats, string enum codes, the first enum option, and fallback values. No 1.8.6 merge, version bump, tag, release, or public issue/PR comment was made during this review.
+
+The updated 1.9 candidate passes **345 tests in each supported environment**. Combined statement/branch coverage is **99.68%** on 2026.1.0 and **99.67%** on 2026.9.4; every integration module exceeds 95%, and API/config-flow coverage is 100%. Strict mypy passes in both environments. Repository-wide lint/format hooks and translation synchronization also pass.
+
+### Current issue coverage
+
+| Issue | 1.9 assessment | Evidence and remaining work |
+| --- | --- | --- |
+| [#234](https://github.com/jaroschek/home-assistant-myuplink/issues/234) — iGate setpoints without bounds | Addressed by this port in #266 | The supplied heat/cool metadata now discovers number controls; [temperature regressions](tests/test_unbounded_temperature.py) verify classification, permissions, values, steps and writes. Validate accepted temperatures on the reporter's hardware before calling the physical controls confirmed. |
+| [#267](https://github.com/jaroschek/home-assistant-myuplink/issues/267) — five-minute unavailability after a write | Partly addressed; faster retry remains open | #261 removes the whole-account 30-second timeout and retains per-request timeouts; #265 reduces requests through metadata caches. Entity writes already request a coordinator refresh. A genuine timeout/network/5xx failure still raises UpdateFailed without retry_after and waits for the configured scan interval, normally 300 seconds. No delayed retry or stale-success fallback is implemented; authoritative refreshes can still make entities unavailable after a write. |
+| [#254](https://github.com/jaroschek/home-assistant-myuplink/issues/254), [#241](https://github.com/jaroschek/home-assistant-myuplink/issues/241) — polling dropouts | Mitigated; cloud recovery unconfirmed | #261 provides per-request timeouts, quota backoff and reauthentication; #265 caches metadata; #266 isolates optional subscription outages. The disconnected-device option only changes availability after a successful cloud refresh. It does not mask failed account polls or prove the reported outages resolved. |
+| [#255](https://github.com/jaroschek/home-assistant-myuplink/issues/255) — polling, reconfigure callback 500, reload hang | Partly addressed | Polling benefits from #261/#265/#266. Normal OAuth reconfigure and cancellation/unload paths are tested, but the UnknownFlow exception in Home Assistant's callback handler and the reported reload during setup_retry are not reproduced or specifically corrected. Capture the original callback/reload sequence before claiming either solved. |
+| [#253](https://github.com/jaroschek/home-assistant-myuplink/issues/253) — simultaneous timeout outage | External or unconfirmed | Several reporters recovered on the same day without an integration change. The 1.9 reliability changes mitigate request failures; the discussion does not establish a code defect or verified permanent fix. |
+| [#256](https://github.com/jaroschek/home-assistant-myuplink/issues/256) — missing schedule-blocking settings | Not specifically solved | No schedule editor or model-specific schedule mapping is added. Generic discovery, additional point IDs, overrides and raw actions remain available when the public API exposes the settings. A redacted point payload and expected IDs are needed to identify a concrete integration fix. |
+| [#220](https://github.com/jaroschek/home-assistant-myuplink/issues/220) — pool reading/control; latest comment 2026-09-29 | Not specifically solved | The recent SMO40/AMS10 report confirms readable state but rejected writes. #261 reports failures explicitly; it does not add a pool-specific endpoint or overcome cloud permissions. Obtain the point ID, metadata and write response. The provider's web portal may use a different API contract. |
+| [#245](https://github.com/jaroschek/home-assistant-myuplink/issues/245) — deprecated update listener | Already addressed in 1.8.4 and retained | Maintainer PR #257 migrated option reloads to OptionsFlowWithReload. [Options and OAuth update tests](tests/test_config_flow.py) retain reload-on-change and token-refresh-without-reload behavior throughout the rebased stack. |
+| [#242](https://github.com/jaroschek/home-assistant-myuplink/issues/242) — device-relative names after migration | Naming addressed by #260/#263/#264; migration caveat | Device-relative names and registry customizations are covered by [discovery tests](tests/test_discovery.py). The built-in integration uses device-point unique IDs while this custom integration retains myuplink_device_point IDs; there is no migration that reconnects old built-in registry entries automatically. |
+| [#222](https://github.com/jaroschek/home-assistant-myuplink/issues/222) — zone setpoints sent to the points endpoint | Zone controls already supported; retained and improved | Zone climate entities and the raw zone action use devices/{deviceId}/zones/{zoneId}, introduced in 1.8. #264 selects the correct heating/cooling/shared field and [climate tests](tests/test_climate.py) protect writes and failed-state preservation. Generic parameter actions still use the points endpoint; there is no automatic rerouting of arbitrary point writes. |
+
+Do not close the partially addressed or unconfirmed reports solely because the 1.9 tests pass. The next reliability change for #267 should use a bounded early retry that respects API backoff; it is separate from the temperature-discovery port.
 
 ## Historical regression audit
 
@@ -150,7 +184,7 @@ Two regressions introduced during the 1.9 changes were corrected:
 
 ### Remaining release validation
 
-The audited candidate passes **310 tests in each environment**: Home Assistant 2026.1.0/Python 3.13.2 and Home Assistant 2026.9.4/Python 3.14.5. Combined statement/branch coverage is **99.68%** and **99.67%**, respectively; every integration module exceeds 95%, and API and config-flow coverage are 100%. Strict mypy, translation synchronization, lint/format hooks and local hassfest also pass. GitHub repeats the release checks on PR #266.
+On 2026-10-02, the audited candidate passed **310 tests in each environment**: Home Assistant 2026.1.0/Python 3.13.2 and Home Assistant 2026.9.4/Python 3.14.5. Combined statement/branch coverage was **99.68%** and **99.67%**, respectively; every integration module exceeded 95%, and API and config-flow coverage were 100%. Strict mypy, translation synchronization, lint/format hooks and local hassfest also passed. GitHub repeats the release checks on PR #266; the current candidate's validation is recorded in the recent-review section above.
 
 The confirmed manufacturer/cloud limitations in #111, #98, #37, #147 and #18 cannot be established as currently solved without their real accounts, API access or hardware. Likewise, closed reports #218, #185, #183, #139, #106, #97 and #51 lack a confirmed historical fix. Their automated substitute scenarios are identified above; these reports should not be advertised as verified hardware fixes.
 

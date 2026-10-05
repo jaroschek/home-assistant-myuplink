@@ -36,7 +36,7 @@ General support follows the devices reported by your account's API. See the prov
 | --- | --- |
 | Parameter sensors | Read-only numeric values and enumerated states reported by the device |
 | Binary sensors and switches | Boolean points, with switches created for writable points |
-| Number and select controls | Writable bounded or enumerated points |
+| Number and select controls | Writable bounded or enumerated points, plus numeric temperature points without bounds |
 | Connection state | A diagnostic binary sensor that stays usable while the device is disconnected |
 | Notifications | A diagnostic count and notification attributes; disabled by default for newly created entities |
 | Firmware information | An update entity reporting installed and available versions; installation is performed through the provider |
@@ -46,6 +46,10 @@ General support follows the devices reported by your account's API. See the prov
 | Raw actions | Administrator actions for a parameter ID or a zone property |
 
 Smart home mode attaches to the device for a single-device system and to a system registry device for a multi-device system. Zone names come from your account. Parameter names and enum text come from the API's language response; fixed labels are translated in English, German, Danish, and Norwegian Bokmål.
+
+Writable, finite numeric temperature points in °C or °F are exposed as number controls when both API bounds are absent, including the iGate 2.0 heat/cool setpoints. These controls use Home Assistant's default range of **0–100 in the native temperature unit**, not manufacturer-specified limits. The API's step and scale metadata are still used, and requested temperatures are sent without applying the scale twice.
+
+Reload after upgrading to discover these number controls. An existing sensor for the same point may remain unavailable; update any automations that reference it to use the new number entity. Points keep their initial platform until reload, including points first discovered with an unavailable reading.
 
 ## Options
 
