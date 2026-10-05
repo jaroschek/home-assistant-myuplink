@@ -112,3 +112,31 @@ async def test_migrate(
     assert entry.minor_version == 2
     assert entry.data == original_data
     assert entry.options == original_options
+
+
+@pytest.mark.parametrize(
+    ("country", "expected"),
+    [
+        pytest.param(None, "en", id="language-only"),
+        pytest.param("GB", "en-GB", id="language-and-country"),
+    ],
+)
+async def test_api_language(
+    hass: HomeAssistant, entry: ConfigEntry, country: str | None, expected: str
+) -> None:
+    """An unset country must not put the string None into Accept-Language."""
+    hass.config.language = "en"
+    hass.config.country = country
+    with (
+        patch(
+            "custom_components.myuplink.config_entry_oauth2_flow.async_get_config_entry_implementation"
+        ),
+        patch("custom_components.myuplink.config_entry_oauth2_flow.OAuth2Session"),
+        patch("custom_components.myuplink.aiohttp_client.async_get_clientsession"),
+        patch("custom_components.myuplink.AsyncConfigEntryAuth", autospec=True),
+        patch("custom_components.myuplink.MyUplink") as api,
+        patch("custom_components.myuplink.MyUplinkCoordinator", autospec=True),
+        patch.object(hass.config_entries, "async_forward_entry_setups"),
+    ):
+        assert await async_setup_entry(hass, entry)
+    assert api.call_args.args[1] == expected

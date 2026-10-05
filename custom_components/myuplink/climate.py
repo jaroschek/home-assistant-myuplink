@@ -4,18 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.climate import (
-    ClimateEntity,
-    ClimateEntityFeature,
-    HVACMode,
-)
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.components.climate import ClimateEntity
+from homeassistant.components.climate.const import ClimateEntityFeature, HVACMode
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Zone
 from .const import DOMAIN
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkZoneEntity, async_setup_entities
 
 THERMOSTAT_MODE_MAP: dict[str, HVACMode] = {
@@ -37,7 +34,9 @@ PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the climate platform entities."""
 

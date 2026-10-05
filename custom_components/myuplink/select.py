@@ -3,19 +3,18 @@
 from __future__ import annotations
 
 from homeassistant.components.select import SelectEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter, System
 from .const import (
-    CONF_DISCONNECTED_AVAILABLE,
     CONF_ENABLE_SMART_HOME_MODE,
     DOMAIN,
     TRANSLATED_PARAMETER_IDS,
     SmartHomeModes,
 )
+from .coordinator import MyUplinkConfigEntry
 from .entity import (
     MyUplinkDeviceEntity,
     MyUplinkParameterEntity,
@@ -27,7 +26,9 @@ PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 
@@ -53,13 +54,11 @@ async def async_setup_entry(
                     )
 
             for device in system.devices:
-                [
-                    entities.append(
-                        MyUplinkParameterSelectEntity(coordinator, device, parameter)
-                    )
+                entities.extend(
+                    MyUplinkParameterSelectEntity(coordinator, device, parameter)
                     for parameter in device.parameters
                     if coordinator.parameter_platform(parameter) == Platform.SELECT
-                ]
+                )
         return entities
 
     async_setup_entities(entry, async_add_entities, build_entities)
@@ -109,16 +108,6 @@ class MyUplinkSmartHomeModeDeviceSelectEntity(MyUplinkDeviceEntity, SelectEntity
         """Change the selected smart home mode option."""
         await self._device.system.update_smart_home_mode(option.title())
         await self.async_update()
-
-    @property
-    def available(self):
-        """Return if the device is online."""
-        return super().available and (
-            self._device.connection_state == "Connected"
-            or self._device.system.api.entry.options.get(
-                CONF_DISCONNECTED_AVAILABLE, False
-            )
-        )
 
 
 class MyUplinkSmartHomeModeSystemSelectEntity(MyUplinkSystemEntity, SelectEntity):

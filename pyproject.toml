@@ -32,3 +32,10 @@ source = ["custom_components.myuplink"]
 
 [tool.coverage.report]
 show_missing = true
+precision = 2
+
+[tool.mypy]
+files = ["custom_components/myuplink"]
+python_version = "3.14"
+strict = true
+follow_imports = "silent"

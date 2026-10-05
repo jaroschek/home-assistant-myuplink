@@ -34,7 +34,9 @@ rules:
   log-when-unavailable: done
   parallel-updates: done
   reauthentication-flow: done
-  test-coverage: todo
+  test-coverage:
+    status: done
+    comment: CI requires above 95% statement and branch coverage in every integration module and 100% config-flow coverage.
   devices: done
   diagnostics: done
   discovery:
@@ -68,4 +70,6 @@ rules:
     status: exempt
     comment: There is no separate API dependency; the included client uses asynchronous aiohttp requests.
   inject-websession: done
-  strict-typing: todo
+  strict-typing:
+    status: done
+    comment: Strict mypy covers the included API client, typed response models, coordinator runtime_data, and every platform.

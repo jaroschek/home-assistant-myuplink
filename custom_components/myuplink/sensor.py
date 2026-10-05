@@ -7,7 +7,6 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
@@ -33,6 +32,7 @@ from .const import (
     TRANSLATED_PARAMETER_IDS,
     CustomUnits,
 )
+from .coordinator import MyUplinkConfigEntry
 from .entity import (
     MyUplinkDeviceEntity,
     MyUplinkParameterEntity,
@@ -44,7 +44,9 @@ PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 

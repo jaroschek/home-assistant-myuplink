@@ -3,20 +3,22 @@
 from __future__ import annotations
 
 from homeassistant.components.number import NumberDeviceClass, NumberEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Parameter
 from .const import CustomUnits
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 
@@ -28,13 +30,11 @@ async def async_setup_entry(
 
         for system in coordinator.data:
             for device in system.devices:
-                [
-                    entities.append(
-                        MyUplinkParameterNumberEntity(coordinator, device, parameter)
-                    )
+                entities.extend(
+                    MyUplinkParameterNumberEntity(coordinator, device, parameter)
                     for parameter in device.parameters
                     if coordinator.parameter_platform(parameter) == Platform.NUMBER
-                ]
+                )
         return entities
 
     async_setup_entities(entry, async_add_entities, build_entities)

@@ -6,20 +6,22 @@ from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import Device, Parameter
 from .const import DOMAIN
+from .coordinator import MyUplinkConfigEntry
 from .entity import MyUplinkDeviceEntity, MyUplinkParameterEntity, async_setup_entities
 
 PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: MyUplinkConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the platform entities."""
 
@@ -32,16 +34,12 @@ async def async_setup_entry(
         for system in coordinator.data:
             for device in system.devices:
                 entities.append(MyUplinkConnectedBinarySensor(coordinator, device))
-                [
-                    entities.append(
-                        MyUplinkParameterBinarySensorEntity(
-                            coordinator, device, parameter
-                        )
-                    )
+                entities.extend(
+                    MyUplinkParameterBinarySensorEntity(coordinator, device, parameter)
                     for parameter in device.parameters
                     if coordinator.parameter_platform(parameter)
                     == Platform.BINARY_SENSOR
-                ]
+                )
         return entities
 
     async_setup_entities(entry, async_add_entities, build_entities)
