@@ -8,6 +8,7 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 import json
 import logging
+from math import isfinite
 from typing import Any
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
@@ -397,6 +398,18 @@ class Parameter:
         if (
             self.max_value is not None or self.min_value is not None
         ) and self.is_writable:
+            return Platform.NUMBER
+
+        # Some thermostats omit bounds for writable temperature setpoints.
+        # Restrict this fallback to numeric temperatures, leaving text and
+        # other unbounded parameters on their existing platforms.
+        if (
+            self.is_writable
+            and not self.enum_values
+            and self.unit in (UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT)
+            and type(self.value) in (int, float)
+            and isfinite(self.value)
+        ):
             return Platform.NUMBER
 
         return Platform.SENSOR
