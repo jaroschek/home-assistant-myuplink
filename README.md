@@ -51,6 +51,16 @@ This can happen when the device is integrated poorly with the myUpLink-API, or i
 
 See the debugging section below to find some useful info about the offending data point.
 
+Writable numeric temperature points are exposed as number controls even when
+the API omits both minimum and maximum values (for example, iGate 2.0 heat/cool
+setpoints). In that case, the existing number implementation uses Home
+Assistant's default range of 0–100 in the point's native temperature unit;
+these are UI defaults, not manufacturer-specified limits. The API's step and
+scale metadata are still used. Reload the integration after upgrading to
+discover these controls. An existing sensor may remain as an unavailable
+entity, and automations using that sensor must be updated to use the new number
+entity.
+
 ## Debugging misbehaving entities
 
 If the your entities are malformed, it's often caused by the manufacturer's implementation of the myUpLink-API. The easiest way to check this is by getting the raw data points from the Swagger client.
