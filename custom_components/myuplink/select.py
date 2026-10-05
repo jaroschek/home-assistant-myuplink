@@ -13,6 +13,7 @@ from .const import (
     CONF_DISCONNECTED_AVAILABLE,
     CONF_ENABLE_SMART_HOME_MODE,
     DOMAIN,
+    TRANSLATED_PARAMETER_IDS,
     SmartHomeModes,
 )
 from .entity import (
@@ -70,7 +71,8 @@ class MyUplinkParameterSelectEntity(MyUplinkParameterEntity, SelectEntity):
     def _update_from_parameter(self, parameter: Parameter) -> None:
         """Update attrs from parameter."""
         super()._update_from_parameter(parameter)
-        self._attr_translation_key = str(self._parameter.id)
+        if parameter.id in TRANSLATED_PARAMETER_IDS:
+            self._attr_translation_key = str(parameter.id)
         self._attr_options = []
         for enum in parameter.enum_values:
             self._attr_options.append(enum["text"])

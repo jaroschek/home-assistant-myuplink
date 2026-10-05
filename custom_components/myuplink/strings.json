@@ -7,19 +7,19 @@
       "options": {
         "data": {
           "enable_smart_home_mode": "Enable Smart Home Mode?",
-          "enable_smart_home_zone": "Enable Smart Home Zone?",
+          "enable_smart_home_zone": "Enable smart home zones",
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
-          "disconnected_available": "Keep disconnected parameters available?",
+          "disconnected_available": "Keep disconnected device readings available?",
           "expert_mode": "Expert Mode"
         },
         "data_description": {
           "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
-          "enable_smart_home_zone": "Requires an additional API call per device.",
+          "enable_smart_home_zone": "Fetch zone measurements and thermostat controls; adds one API request per device.",
           "fetch_firmware": "Requires an additional API call per device.",
           "fetch_notifications": "Requires an additional API call per system.",
-          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
+          "disconnected_available": "Keep cached device readings available when the device disconnects. Failed cloud updates still make entities unavailable.",
           "expert_mode": "Configure advanced options."
         }
       },
@@ -75,9 +75,221 @@
           "9": "Legionella",
           "10": "Vacation",
           "11": "Boost"
+        },
+        "name": "{name} ({id})"
+      },
+      "500": {
+        "state": {
+          "3": "Eco",
+          "4": "Normal",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "10": "Vacation",
+          "11": "Boost"
+        },
+        "name": "{name} ({id})"
+      },
+      "517": {
+        "state": {
+          "0": "0",
+          "1": "700W",
+          "2": "1300W",
+          "3": "2000W"
+        },
+        "name": "{name} ({id})"
+      },
+      "544": {
+        "state": {
+          "1": "NO1",
+          "2": "NO2",
+          "3": "NO3",
+          "4": "NO4",
+          "5": "NO5"
+        },
+        "name": "{name} ({id})"
+      },
+      "549": {
+        "state": {
+          "0": "Unknown",
+          "1": "Cheap",
+          "2": "Normal",
+          "3": "Expensive"
+        },
+        "name": "{name} ({id})"
+      },
+      "601": {
+        "state": {
+          "1": "heat",
+          "heat": "heat"
+        },
+        "name": "{name} ({id})"
+      },
+      "1965": {
+        "state": {
+          "20": "Off",
+          "40": "Starting",
+          "60": "On",
+          "100": "Stopping",
+          "120": "Defrosting",
+          "140": "Defrosting",
+          "160": "Defrosting"
+        },
+        "name": "{name} ({id})"
+      },
+      "14950": {
+        "state": {
+          "0": "Off",
+          "1": "Heating",
+          "2": "Cooling",
+          "3": "Hot water",
+          "4": "Pool",
+          "5": "Pool 2",
+          "6": "Preheating"
+        },
+        "name": "{name} ({id})"
+      },
+      "55000": {
+        "state": {
+          "10": "Off",
+          "20": "Hot water",
+          "30": "Heating",
+          "40": "Pool",
+          "41": "Pool 2",
+          "50": "Transfer",
+          "60": "Cooling"
+        },
+        "name": "{name} ({id})"
+      },
+      "55027": {
+        "state": {
+          "0": "Alarm",
+          "1": "Alarm",
+          "2": "Active",
+          "3": "Off",
+          "4": "Blocked",
+          "5": "Off",
+          "6": "Active"
+        },
+        "name": "{name} ({id})"
+      },
+      "62005": {
+        "state": {
+          "0": "Heat pump upper",
+          "1": "Heat pump lower",
+          "2": "Additional heat",
+          "3": "Heat pump + Additional heat",
+          "4": "Heating",
+          "5": "Hot water",
+          "6": "Pool",
+          "7": "Off",
+          "8": "Heating mixing",
+          "9": "Wood",
+          "10": "Hot water / Heating",
+          "11": "Cooling",
+          "12": "Swap"
+        },
+        "name": "{name} ({id})"
+      },
+      "62017": {
+        "state": {
+          "0": "Off, start delay",
+          "1": "Off, ready to start",
+          "2": "Waiting for flow",
+          "3": "On",
+          "4": "Defrosting",
+          "5": "Cooling",
+          "6": "Blocked",
+          "7": "Off, alarm",
+          "8": "Function test",
+          "30": "Not defined",
+          "31": "Compressor disabled",
+          "32": "Communication error",
+          "33": "Hot water"
+        },
+        "name": "{name} ({id})"
+      },
+      "62246": {
+        "state": {
+          "0": "Heating off",
+          "1": "Holiday",
+          "2": "Night reduction",
+          "3": "On",
+          "4": "Cooling"
+        },
+        "name": "{name} ({id})"
+      },
+      "myuplink_notifications": {
+        "name": "Notifications"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      },
+      "parameter_percentage": {
+        "name": "{name} ({id})"
+      },
+      "myuplink_zone_temperature": {
+        "name": "{zone} Temperature"
+      },
+      "myuplink_zone_humidity": {
+        "name": "{zone} Humidity"
+      },
+      "myuplink_zone_mode": {
+        "name": "{zone} Mode"
+      },
+      "myuplink_zone_co2": {
+        "name": "{zone} CO2"
+      }
+    },
+    "binary_sensor": {
+      "myuplink_connection_state": {
+        "name": "Connection State"
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      }
+    },
+    "climate": {
+      "myuplink_thermostat": {
+        "name": "{zone}"
+      }
+    },
+    "select": {
+      "myuplink_smart_home_mode": {
+        "name": "Smart Home Mode",
+        "state": {
+          "default": "Default",
+          "normal": "Normal",
+          "away": "Away",
+          "vacation": "Vacation",
+          "home": "Home"
+        }
+      },
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "406": {
+        "name": "{name} ({id})",
+        "state": {
+          "0": "Test",
+          "1": "Off",
+          "2": "Sleep",
+          "3": "Eco",
+          "4": "Normal",
+          "5": "Express",
+          "6": "Price",
+          "7": "Schedule",
+          "8": "External",
+          "9": "Legionella",
+          "10": "Vacation",
+          "11": "Boost"
         }
       },
       "500": {
+        "name": "{name} ({id})",
         "state": {
           "3": "Eco",
           "4": "Normal",
@@ -89,6 +301,7 @@
         }
       },
       "517": {
+        "name": "{name} ({id})",
         "state": {
           "0": "0",
           "1": "700W",
@@ -97,6 +310,7 @@
         }
       },
       "544": {
+        "name": "{name} ({id})",
         "state": {
           "1": "NO1",
           "2": "NO2",
@@ -106,6 +320,7 @@
         }
       },
       "549": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Unknown",
           "1": "Cheap",
@@ -114,11 +329,14 @@
         }
       },
       "601": {
+        "name": "{name} ({id})",
         "state": {
-          "1": "heat"
+          "1": "heat",
+          "heat": "heat"
         }
       },
       "1965": {
+        "name": "{name} ({id})",
         "state": {
           "20": "Off",
           "40": "Starting",
@@ -130,6 +348,7 @@
         }
       },
       "14950": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Off",
           "1": "Heating",
@@ -141,6 +360,7 @@
         }
       },
       "55000": {
+        "name": "{name} ({id})",
         "state": {
           "10": "Off",
           "20": "Hot water",
@@ -152,6 +372,7 @@
         }
       },
       "55027": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Alarm",
           "1": "Alarm",
@@ -163,6 +384,7 @@
         }
       },
       "62005": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Heat pump upper",
           "1": "Heat pump lower",
@@ -180,6 +402,7 @@
         }
       },
       "62017": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Off, start delay",
           "1": "Off, ready to start",
@@ -197,6 +420,7 @@
         }
       },
       "62246": {
+        "name": "{name} ({id})",
         "state": {
           "0": "Heating off",
           "1": "Holiday",
@@ -204,36 +428,24 @@
           "3": "On",
           "4": "Cooling"
         }
-      },
-      "myuplink_notifications": {
-        "name": "Notifications"
-      }
-    },
-    "binary_sensor": {
-      "myuplink_connection_state": {
-        "name": "Connection State"
-      }
-    },
-    "climate": {
-      "myuplink_thermostat": {
-        "name": "Thermostat"
-      }
-    },
-    "select": {
-      "myuplink_smart_home_mode": {
-        "name": "Smart Home Mode",
-        "state": {
-          "default": "Default",
-          "normal": "Normal",
-          "away": "Away",
-          "vacation": "Vacation",
-          "home": "Home"
-        }
       }
     },
     "update": {
       "myuplink_firmware": {
         "name": "Firmware"
+      }
+    },
+    "number": {
+      "parameter": {
+        "name": "{name} ({id})"
+      },
+      "parameter_degree_minutes": {
+        "name": "{name} ({id})"
+      }
+    },
+    "switch": {
+      "parameter": {
+        "name": "{name} ({id})"
       }
     }
   },
@@ -245,15 +457,17 @@
           "fetch_firmware": "Fetch Firmware Info from API?",
           "fetch_notifications": "Fetch Notifications from API?",
           "scan_interval": "Scan Interval (seconds)",
-          "disconnected_available": "Keep disconnected parameters available?",
-          "expert_mode": "Expert Mode"
+          "disconnected_available": "Keep disconnected device readings available?",
+          "expert_mode": "Expert Mode",
+          "enable_smart_home_zone": "Enable smart home zones"
         },
         "data_description": {
           "enable_smart_home_mode": "The Smart Home Mode is a system related entity in the myUplink API.\n\nIf a system has only one single device, the Smart Home Mode will be added to this device. Otherwise the Smart Home Mode will be added to an additional device, that is based on the available system information.\n\nThe support of the Smart Home Mode requires one additional API call per system.",
           "fetch_firmware": "Requires an additional API call per device.",
           "fetch_notifications": "Requires an additional API call per system.",
-          "disconnected_available": "Show parameter entities of disconnected devices as `available`.",
-          "expert_mode": "Configure advanced options."
+          "disconnected_available": "Keep cached device readings available when the device disconnects. Failed cloud updates still make entities unavailable.",
+          "expert_mode": "Configure advanced options.",
+          "enable_smart_home_zone": "Fetch zone measurements and thermostat controls; adds one API request per device."
         }
       },
       "expert": {
